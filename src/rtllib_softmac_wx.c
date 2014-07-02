@@ -88,34 +88,16 @@ out:
 }
 
 
-#ifdef _RTL8192_EXT_PATCH_
-int rtllib_wx_get_freq(struct rtllib_device *ieee,
-			     struct iw_request_info *a,
-			     union iwreq_data *wrqu, char *b, u8 is_mesh)
-#else
 int rtllib_wx_get_freq(struct rtllib_device *ieee,
 			     struct iw_request_info *a,
 			     union iwreq_data *wrqu, char *b)
-#endif
 {
 	struct iw_freq *fwrq = & wrqu->freq;
 
-#ifdef _RTL8192_EXT_PATCH_
-	if(is_mesh)
-	{
-		if (ieee->current_mesh_network.channel == 0)
-			return -1;
-		fwrq->m = rtllib_wlan_frequencies[ieee->current_mesh_network.channel-1] * 100000;
-		fwrq->e = 1;
-	}
-	else
-#endif
-	{
 	if (ieee->current_network.channel == 0)
 		return -1;
 	fwrq->m = rtllib_wlan_frequencies[ieee->current_network.channel-1] * 100000;
 	fwrq->e = 1;
-	}
 	return 0;
 }
 
@@ -305,9 +287,6 @@ int rtllib_wx_set_mode(struct rtllib_device *ieee, struct iw_request_info *a,
 	case IW_MODE_MONITOR:
 	case IW_MODE_ADHOC:
 	case IW_MODE_INFRA:
-#ifdef _RTL8192_EXT_PATCH_
-	case IW_MODE_MESH:
-#endif
 		break;
 	case IW_MODE_AUTO:
 		wrqu->mode = IW_MODE_INFRA;
@@ -393,11 +372,7 @@ void rtllib_wx_sync_scan_wq(void *data)
 		printk("Scan in 40M, force to 20M first:%d, %d\n", chan_offset, bandwidth);
 		ieee->SetBWModeHandler(ieee->dev, HT_CHANNEL_WIDTH_20, HT_EXTCHNL_OFFSET_NO_EXT);
 		}
-#ifdef _RTL8192_EXT_PATCH_
-	rtllib_start_scan_syncro(ieee, 0);
-#else
 	rtllib_start_scan_syncro(ieee);
-#endif
 	if (b40M) {
 		printk("Scan in 20M, back to 40M\n");
 		if (chan_offset == HT_EXTCHNL_OFFSET_UPPER)
@@ -540,19 +515,7 @@ out:
  int rtllib_wx_get_mode(struct rtllib_device *ieee, struct iw_request_info *a,
 			     union iwreq_data *wrqu, char *b)
 {
-#ifdef _RTL8192_EXT_PATCH_
-	if(ieee->iw_mode == IW_MODE_MESH) {
-		/* WEXT could not show mesh mode properly,
-		 * just disable it */
-		if(ieee->only_mesh) {
-			return -1;
-		} else {
-			wrqu->mode = IW_MODE_INFRA;
-		}
-	}
-	else
-#endif
-		wrqu->mode = ieee->iw_mode;
+	wrqu->mode = ieee->iw_mode;
 	return 0;
 }
 

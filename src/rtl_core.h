@@ -230,16 +230,9 @@ typedef enum tag_DBGP_Flag_Type_Definition
 #define RT_DEBUG_DATA(level, data, datalen) do {} while(0)
 #endif // RTL8169_DEBUG */
 
-#ifdef _RTL8192_EXT_PATCH_
-#define IS_UNDER_11N_AES_MODE(_rtllib)  ((_rtllib->pHTInfo->bCurrentHTSupport == true) &&\
-					((_rtllib->pairwise_key_type == KEY_TYPE_CCMP) || \
-					 (_rtllib->mesh_pairwise_key_type == KEY_TYPE_CCMP)))
-#else
 #define IS_UNDER_11N_AES_MODE(_rtllib)  ((_rtllib->pHTInfo->bCurrentHTSupport == true) &&\
 					(_rtllib->pairwise_key_type == KEY_TYPE_CCMP))
-#endif
 
-//#ifdef RTL8192CE
 #define HAL_MEMORY_MAPPED_IO_RANGE_8190PCI	0x1000     //8190 support 16 pages of IO registers
 #define HAL_HW_PCI_REVISION_ID_8190PCI			0x00
 #define HAL_MEMORY_MAPPED_IO_RANGE_8192PCIE	0x4000	//8192 support 16 pages of IO registers
@@ -518,14 +511,6 @@ typedef	struct _RT_SMOOTH_DATA_4RF {
 	u32	TotalVal[4];		//sum of valid elements
 }RT_SMOOTH_DATA_4RF, *PRT_SMOOTH_DATA_4RF;
 
-#ifdef _RTL8192_EXT_PATCH_
-typedef	struct _RT_SMOOTH_DATA {
-	u32	elements[100];	//array to store values
-	u32	index;			//index to current array to store
-	u32	TotalNum;		//num of valid elements
-	u32	TotalVal;		//sum of valid elements
-}RT_SMOOTH_DATA, *PRT_SMOOTH_DATA;
-#endif
 typedef struct Stats
 {
 	unsigned long txrdu;
@@ -628,12 +613,6 @@ typedef struct Stats
 	u32 Slide_Beacon_Total;		//cosa add for beacon rssi
 	RT_SMOOTH_DATA_4RF		cck_adc_pwdb;
 	u32	CurrentShowTxate;
-#ifdef _RTL8192_EXT_PATCH_
-	//added by amy 090709
-	u32 RssiCalculateCnt;
-	RT_SMOOTH_DATA	ui_rssi;
-	RT_SMOOTH_DATA ui_link_quality;
-#endif
 } Stats;
 
 typedef struct	ChnlAccessSetting {
@@ -712,9 +691,6 @@ typedef struct r8192_priv
 	struct pci_dev *pdev;
 #ifdef RTL8192SE
 	struct pci_dev *bridge_pdev;
-#endif
-#ifdef _RTL8192_EXT_PATCH_
-	u8      rssi_level;
 #endif
 	//add for handles different nics' operations. WB
 	struct rtl819x_ops* ops;
@@ -836,9 +812,6 @@ typedef struct r8192_priv
 	dma_addr_t txcmdringdma;
 	short up;
 	short up_first_time;
-#ifdef _RTL8192_EXT_PATCH_
-	short mesh_up;
-#endif
 	short crcmon; //if 1 allow bad crc frame reception in monitor mode
 	struct semaphore wx_sem;
 	struct semaphore rf_sem;
@@ -872,10 +845,6 @@ typedef struct r8192_priv
 	u16	LongRetryLimit;
 	u32	TransmitConfig;
 	u8	RegCWinMin;		// For turbo mode CW adaptive. Added by Annie, 2005-10-27.
-#ifdef _RTL8192_EXT_PATCH_
-	u32     NumTxUnicast; //YJ,add,090518,for keep alive
-	u8      keepAliveLevel; //YJ,add,090518,for KeepAlive
-#endif
 
 	u32     LastRxDescTSFHigh;
 	u32     LastRxDescTSFLow;
@@ -1229,9 +1198,6 @@ typedef struct r8192_priv
 	u8     polling_timer_on;
 	//#endif
 	bool bDriverIsGoingToUnload;
-#ifdef _RTL8192_EXT_PATCH_
-	struct mshclass			*mshobj;
-#endif
 
 	//These are for MP
 	bool	chan_forced;
@@ -1280,30 +1246,7 @@ typedef struct r8192_priv
 }r8192_priv;
 
 
-#ifdef _RTL8192_EXT_PATCH_
-struct meshdev_priv {
-	struct net_device_stats stats;
-	struct rtllib_device *rtllib;
-	struct r8192_priv * priv;
-	//short up;
-};
-#endif
-
 extern const struct ethtool_ops rtl819x_ethtool_ops;
-
-#ifdef RTL8192SE
-//static void rtl8192se_init_priv_variable(struct net_device* dev);
-void rtl8192se_get_eeprom_size(struct net_device* dev);
-bool rtl8192se_adapter_start(struct net_device* dev);
-void rtl8192se_link_change(struct net_device *dev);
-void  rtl8192se_tx_fill_cmd_desc(struct net_device* dev, tx_desc_cmd * entry, cb_desc * cb_desc, struct sk_buff* skb);
-void  rtl8192se_tx_fill_desc(struct net_device* dev, tx_desc * pDesc, cb_desc * cb_desc, struct sk_buff* skb);
-bool rtl8192se_rx_query_status_desc(struct net_device* dev, struct rtllib_rx_stats*  stats, rx_desc *pdesc, struct sk_buff* skb);
-void rtl8192se_halt_adapter(struct net_device *dev, bool bReset);
-void rtl8192se_update_ratr_table(struct net_device* dev,u8* pMcsRate,struct sta_info* pEntry);
-bool rtl8192se_check_ht_cap(struct net_device* dev, struct sta_info *sta, struct rtllib_network* net);//added by amy for adhoc 090403
-#else
-#endif
 
 bool init_firmware(struct net_device *dev);
 void rtl819xE_tx_cmd(struct net_device *dev, struct sk_buff *skb);
@@ -1365,38 +1308,13 @@ short rtl8192_pci_initdescring(struct net_device *dev);
 
 void rtl8192_cancel_deferred_work(struct r8192_priv* priv);
 
-#ifdef _RTL8192_EXT_PATCH_
-int _rtl8192_up(struct net_device *dev,bool is_silent_reset);
-#else
 int _rtl8192_up(struct net_device *dev);
-#endif
 
 short rtl8192_is_tx_queue_empty(struct net_device *dev);
-#ifdef RTL8192SE
-void rtl8192_irq_disable(struct net_device *dev);
-void GetHwReg8192SE(struct net_device *dev,u8 variable,u8* val);
-void SetHwReg8192SE(struct net_device *dev,u8 variable,u8* val);//added by amy 090330
-void SwLedOn(struct net_device *dev , PLED_8190 pLed);//added by amy 090408
-void SwLedOff(struct net_device *dev, PLED_8190 pLed);
-void Adhoc_InitRateAdaptive(struct net_device *dev,struct sta_info  *pEntry);
-void SetBeaconRelatedRegisters8192SE(struct net_device *dev);
-
-#if LINUX_VERSION_CODE >=KERNEL_VERSION(2,6,20)
-void rtl8192se_check_tsf_wq(struct work_struct * work);
-void rtl8192se_update_peer_ratr_table_wq(struct work_struct * work);
-#else
-void rtl8192se_check_tsf_wq(struct net_device *dev);
-void rtl8192se_update_peer_ratr_table_wq(struct net_device *dev);
-#endif
-#endif
 
 void check_rfctrl_gpio_timer(unsigned long data);
 u8 HalSetSysClk8192SE(struct net_device *dev, u8 Data);
 void gen_RefreshLedState(struct net_device *dev);
-#ifdef _RTL8192_EXT_PATCH_
-extern int r8192_mesh_set_enc_ext(struct net_device *dev, struct iw_point *encoding, struct iw_encode_ext *ext, u8 *addr);
-#endif
-//#define IS_HARDWARE_TYPE_8192SE(dev) (((struct r8192_priv*)rtllib_priv(dev))->card_8192 == NIC_8192SE)
 #define IS_HARDWARE_TYPE_819xP(_priv) ((((struct r8192_priv*)rtllib_priv(dev))->card_8192==NIC_8190P)||\
 					(((struct r8192_priv*)rtllib_priv(dev))->card_8192==NIC_8192E))
 #define IS_HARDWARE_TYPE_8192SE(_priv)	(((struct r8192_priv*)rtllib_priv(dev))->card_8192==NIC_8192SE)
@@ -1418,17 +1336,6 @@ void UpdateReceivedRateHistogramStatistics8190(struct net_device *dev, struct rt
 void UpdateRxPktTimeStamp8190 (struct net_device *dev, struct rtllib_rx_stats *stats);
 void TranslateRxSignalStuff819xpci(struct net_device *dev, struct sk_buff *skb,
 		struct rtllib_rx_stats * pstats, prx_desc pdesc, prx_fwinfo pdrvinfo);
-#ifdef _RTL8192_EXT_PATCH_
-void rtl8192_query_rxphystatus(
-	struct r8192_priv * priv,
-	struct rtllib_rx_stats * pstats,
-	prx_desc  pdesc,
-	prx_fwinfo   pDrvInfo,
-	bool bpacket_match_bssid,
-	bool bpacket_toself,
-	bool bPacketBeacon
-	);
-#else
 void rtl8192_query_rxphystatus(
 	struct r8192_priv * priv,
 	struct rtllib_rx_stats * pstats,
@@ -1440,12 +1347,7 @@ void rtl8192_query_rxphystatus(
 	bool bPacketBeacon,
 	bool bToSelfBA
 	);
-#endif
-#ifdef _RTL8192_EXT_PATCH_
-void rtl8192_process_phyinfo(struct r8192_priv * priv, u8* buffer,struct rtllib_rx_stats * pcurrent_stats,struct rtllib_network * pnet);
-#else
 void rtl8192_process_phyinfo(struct r8192_priv * priv, u8* buffer,struct rtllib_rx_stats * pprevious_stats, struct rtllib_rx_stats * pcurrent_stats);
-#endif
 void rtl8192_irq_disable(struct net_device *dev);
 
 
