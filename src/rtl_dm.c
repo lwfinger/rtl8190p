@@ -29,9 +29,6 @@
 #include "r819xE_phyreg.h"
 #include "r8190_rtl8256.h"
 #endif
-#ifdef _RTL8192_EXT_PATCH_
-#include "../../mshclass/msh_class.h"
-#endif
 
 /*---------------------------Define Local Constant---------------------------*/
 //
@@ -108,19 +105,11 @@ static u32 edca_setting_UL[HT_IOT_PEER_MAX] =
 #elif defined(RTL8192SE)
 static u32 edca_setting_DL[HT_IOT_PEER_MAX] =
 { 0xa44f,		// UNKNOWN
-#ifdef _RTL8192_EXT_PATCH_
-   0xa44f,		//REALTEK_90
-#else
    0x5ea44f,	//REALTEK_90
-#endif
    0x5ea44f,	//REALTEK_92SE
    0xa630,		//BROADCOM
    0xa44f,//0x5e4322,	//RALINK
-#ifdef _RTL8192_EXT_PATCH_
-   0x4322,//0xa42b,//		//ATHEROS
-#else
    0xa630,		//0x4322,		//0xa42b,//		//ATHEROS
-#endif
    0xa630,		//CISCO
    0xa42b,//0xa44f,		//MARVELL
    0x5e4322,	//92U_AP
@@ -131,11 +120,7 @@ static u32 edca_setting_DL_GMode[HT_IOT_PEER_MAX] =
 
 { 0x4322,		// UNKNOWN
    0xa44f,		//REALTEK_90
-#ifdef _RTL8192_EXT_PATCH_
-   0x4322,		//REALTEK_92SE TMP
-#else
    0x5ea44f,	//REALTEK_92SE TMP
-#endif
    0xa42b,		//BROADCOM
    0x5e4322,	//RALINK
    0x4322,		//ATHEROS
@@ -147,11 +132,7 @@ static u32 edca_setting_DL_GMode[HT_IOT_PEER_MAX] =
 
 static u32 edca_setting_UL[HT_IOT_PEER_MAX] =
 { 0x5e4322,	// UNKNOWN
-#ifdef _RTL8192_EXT_PATCH_
-   0x5ea44f,	//REALTEK_90
-#else
    0xa44f,		//REALTEK_90
-#endif
    0x5ea44f,	//REALTEK_92SE
    0x5ea322,	//BROADCOM
    0x5ea422,//0x5e4322,		//RALINK
@@ -323,9 +304,6 @@ static	void	dm_dynamic_txpower(struct net_device *dev);
 // DM --> For rate adaptive and DIG, we must send RSSI to firmware
 static	void dm_send_rssi_tofw(struct net_device *dev);
 static	void	dm_ctstoself(struct net_device *dev);
-#ifdef _RTL8192_EXT_PATCH_
-static	void dm_refresh_rate_adaptive_mask(struct net_device *dev);
-#endif
 /*---------------------------Define function prototype------------------------*/
 //================================================================================
 //	HW Dynamic mechanism interface.
@@ -343,9 +321,6 @@ extern	void
 init_hal_dm(struct net_device *dev)
 {
 	struct r8192_priv *priv = rtllib_priv(dev);
-#ifdef _RTL8192_EXT_PATCH_
-	priv->DM_Type = DM_Type_ByDriver;
-#endif
 
 	// Undecorated Smoothed Signal Strength, it can utilized to dynamic mechanism.
 	priv->undecorated_smoothed_pwdb = -1;
@@ -429,11 +404,6 @@ void dm_CheckRxAggregation(struct net_device *dev) {
 
 extern  void    hal_dm_watchdog(struct net_device *dev)
 {
-#ifdef _RTL8192_EXT_PATCH_
-	struct r8192_priv *priv = rtllib_priv(dev);
-	if(priv->being_init_adapter)
-		return;
-#endif
 	// call script file to enable/disable legacy power save */
 	dm_check_ac_dc_power(dev);
 
@@ -441,9 +411,6 @@ extern  void    hal_dm_watchdog(struct net_device *dev)
 	dm_check_pbc_gpio(dev);
 	dm_check_txrateandretrycount(dev);
 	dm_check_edca_turbo(dev);
-#ifdef _RTL8192_EXT_PATCH_
-	dm_refresh_rate_adaptive_mask(dev);
-#endif
         if (IS_HARDWARE_TYPE_8192SE(dev)){
 #ifdef RTL8192SE
 	    dm_WA_Broadcom_IOT(dev);
@@ -589,12 +556,7 @@ static void dm_check_rate_adaptive(struct net_device * dev)
 	static u8					ping_rssi_state=0;
 
 
-#ifdef _RTL8192_EXT_PATCH_
-	if((!priv->up)&& (!priv->mesh_up))
-#else
-	if(!priv->up)
-#endif
-	{
+	if(!priv->up) {
 		RT_TRACE(COMP_RATE, "<---- dm_check_rate_adaptive(): driver is going to unload\n");
 		return;
 	}
@@ -2365,12 +2327,7 @@ extern void dm_restore_dynamic_mechanism_state(struct net_device *dev)
 	struct r8192_priv *priv = rtllib_priv(dev);
 	u32	reg_ratr = priv->rate_adaptive.last_ratr;
 
-#ifdef _RTL8192_EXT_PATCH_
-	if((!priv->up)&& (!priv->mesh_up))
-#else
-	if(!priv->up)
-#endif
-	{
+	if(!priv->up) {
 		RT_TRACE(COMP_RATE, "<---- dm_restore_dynamic_mechanism_state(): driver is going to unload\n");
 		return;
 	}
@@ -3901,28 +3858,10 @@ dm_WA_Broadcom_IOT(struct net_device * dev)
 		}
 	}
 
-	if(update)
-	{
-#ifdef _RTL8192_EXT_PATCH_
-		if(priv->rtllib->bUseRAMask){
-			printk("=============>%s():bUseRAMask is true\n",__FUNCTION__);
-			priv->rtllib->UpdateHalRAMaskHandler(
-										dev,
-										false,
-										0,
-										NULL,
-										priv->rtllib->mode,
-										0);
-		}
-		else{
-			printk("=============>%s():bUseRAMask is false\n",__FUNCTION__);
-			priv->ops->update_ratr_table(dev, priv->rtllib->dot11HTOperationalRateSet, NULL);
-		}
-#else
+	if(update) {
 		if(!priv->rtllib->bUseRAMask){
 			priv->ops->update_ratr_table(dev, priv->rtllib->dot11HTOperationalRateSet, NULL);
 		}
-#endif
 		priv->rtllib->SetHwRegHandler( dev, HW_VAR_BASIC_RATE, (u8*)(&priv->basic_rate));//(pu1Byte)(&pMgntInfo->mBrates) );
 	}
 }
@@ -4303,11 +4242,7 @@ extern void Power_DomainInit92SE(struct net_device *dev)
 
 	// 2008/09/25 MH From SD1 Jong, For warm reboot NIC disappera bug.
 	tmpU2b = read_nic_word(dev, SYS_FUNC_EN);
-#ifdef _RTL8192_EXT_PATCH_
-	write_nic_word(dev, SYS_FUNC_EN, tmpU2b |= BIT13);
-#else
 	write_nic_word(dev, SYS_FUNC_EN, (tmpU2b |BIT13));
-#endif
 
 	write_nic_byte(dev, SYS_ISO_CTRL+1, 0x68);
 
@@ -5853,15 +5788,6 @@ static void dm_RefreshRateAdaptiveMask(struct net_device *dev)
 			RT_TRACE(COMP_RATE, "RSSI = %ld\n", priv->undecorated_smoothed_pwdb);
 			RT_TRACE(COMP_RATE, "RSSI_LEVEL = %d\n", rssi_level);
 			RT_TRACE(COMP_RATE, "PreState = %d, CurState = %d\n", pRA->PreRATRState, pRA->ratr_state);
-#ifdef _RTL8192_EXT_PATCH_
-			priv->rtllib->UpdateHalRAMaskHandler(
-									dev,
-									false,
-									0,
-									NULL,
-									priv->rtllib->mode,
-									rssi_level);
-#else
 			priv->rtllib->UpdateHalRAMaskHandler(
 									dev,
 									false,
@@ -5869,123 +5795,10 @@ static void dm_RefreshRateAdaptiveMask(struct net_device *dev)
 									NULL,
 									NULL,
 									rssi_level);
-#endif
 			pRA->PreRATRState = pRA->ratr_state;
 		}
 	}
 }
-#ifdef _RTL8192_EXT_PATCH_
-static	void	dm_refresh_rate_adaptive_mask(struct net_device *dev)
-{
-
-	struct r8192_priv *priv = rtllib_priv(dev);
-	prate_adaptive	pRA = (prate_adaptive)&priv->rate_adaptive;
-	u32	LowRSSIThreshForRA = 0, HighRSSIThreshForRA = 0;
-	u8	rssi_level;
-#ifdef _RTL8192_EXT_PATCH_
-	if((!priv->up) && (!priv->mesh_up))
-#else
-	if(!priv->up)
-#endif
-	{
-		RT_TRACE(COMP_RATE,"<---- dm_refresh_rate_adaptive_mask(): driver is going to unload\n");
-		return;
-	}
-
-	if(!priv->rtllib->bUseRAMask)
-	{
-		RT_TRACE(COMP_RATE, "<---- dm_refresh_rate_adaptive_mask(): driver does not control rate adaptive mask\n");
-		return;
-	}
-
-	// Inform fw driver control dm
-	if(priv->pFirmware->FirmwareVersion >= 61 && !priv->bInformFWDriverControlDM)
-	{
-		RT_TRACE(COMP_RATE, "<---- dm_refresh_rate_adaptive_mask(): inform fw driver control dm\n");
-		priv->rtllib->SetFwCmdHandler(dev, FW_CMD_CTRL_DM_BY_DRIVER);
-		priv->bInformFWDriverControlDM = true;
-	}
-
-	// if default port is connected, update RA table for default port (infrastructure mode only)
-	if((priv->rtllib->state == RTLLIB_LINKED &&
-			(priv->rtllib->iw_mode != IW_MODE_MESH)) || ((priv->rtllib->state == RTLLIB_LINKED) && (priv->rtllib->iw_mode == IW_MODE_MESH) && (priv->rtllib->only_mesh == 0)))
-	{
-
-		// decide rastate according to rssi
-		switch (pRA->PreRATRState)
-		{
-			case DM_RATR_STA_HIGH:
-			{
-				HighRSSIThreshForRA = 50;
-				LowRSSIThreshForRA = 20;
-			}
-			break;
-
-			case DM_RATR_STA_MIDDLE:
-			{
-				HighRSSIThreshForRA = 55;
-				LowRSSIThreshForRA = 20;
-			}
-			break;
-
-			case DM_RATR_STA_LOW:
-			{
-				HighRSSIThreshForRA = 50;
-				LowRSSIThreshForRA = 25;
-			}
-			break;
-
-			default:
-			{
-				HighRSSIThreshForRA = 50;
-				LowRSSIThreshForRA = 20;
-			}
-		}
-
-		if(priv->undecorated_smoothed_pwdb > (long)HighRSSIThreshForRA)
-		{
-			pRA->ratr_state = DM_RATR_STA_HIGH;
-			rssi_level = 1;
-		}
-		else if(priv->undecorated_smoothed_pwdb > (long)LowRSSIThreshForRA)
-		{
-			pRA->ratr_state = DM_RATR_STA_MIDDLE;
-			rssi_level = 2;
-		}
-		else
-		{
-			pRA->ratr_state = DM_RATR_STA_LOW;
-			rssi_level = 3;
-		}
-		//printk("===============>rssi_level is %d,priv->rssi_level is %d\n",rssi_level,priv->rssi_level);
-		if((pRA->PreRATRState != pRA->ratr_state) || ((pRA->PreRATRState == pRA->ratr_state) && (rssi_level != priv->rssi_level)))
-		{
-			RT_TRACE(COMP_RATE, "Target AP addr : "MAC_FMT"\n", MAC_ARG(priv->rtllib->current_network.bssid));
-			RT_TRACE(COMP_RATE, "RSSI = %ld\n", priv->undecorated_smoothed_pwdb);
-			RT_TRACE(COMP_RATE, "RSSI_LEVEL = %d\n", rssi_level);
-			RT_TRACE(COMP_RATE, "PreState = %d, CurState = %d\n", pRA->PreRATRState, pRA->ratr_state);
-			priv->rtllib->UpdateHalRAMaskHandler(
-									dev,
-									false,
-									0,
-									NULL,
-									priv->rtllib->mode,
-									rssi_level);
-			priv->rssi_level = rssi_level;
-		//	printk("priv->rssi_level is %d\n",priv->rssi_level);
-			pRA->PreRATRState = pRA->ratr_state;
-		}
-	}
-
-	// if extension port (softap) is started, updaet RA table for more than one clients associate
-	if(priv->rtllib->iw_mode == IW_MODE_MESH)
-	{
-		if(priv->mshobj->ext_refresh_rate_adaptive_mask)
-			priv->mshobj->ext_refresh_rate_adaptive_mask(priv);
-	}
-
-}
-#endif
 
 void Adhoc_InitRateAdaptive(struct net_device *dev,struct sta_info  *pEntry)
 {

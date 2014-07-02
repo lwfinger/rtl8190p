@@ -76,37 +76,6 @@ void _setup_timer( struct timer_list* ptimer, void* fun, unsigned long data )
    init_timer( ptimer );
 }
 
-#ifdef _RTL8192_EXT_PATCH_
-static inline int rtllib_mesh_networks_allocate(struct rtllib_device *ieee)
-{
-	if (ieee->mesh_networks)
-		return 0;
-
-	ieee->mesh_networks = kmalloc(
-		MAX_NETWORK_COUNT * sizeof(struct rtllib_network),
-		GFP_KERNEL);
-
-	if (!ieee->mesh_networks) {
-		printk(KERN_WARNING "%s: Out of memory allocating beacons\n",
-		       ieee->dev->name);
-		return -ENOMEM;
-	}
-
-	memset(ieee->mesh_networks, 0,
-	       MAX_NETWORK_COUNT * sizeof(struct rtllib_network));
-
-	return 0;
-}
-
-static inline void rtllib_mesh_networks_free(struct rtllib_device *ieee)
-{
-	if (!ieee->mesh_networks)
-		return;
-	kfree(ieee->mesh_networks);
-	ieee->mesh_networks = NULL;
-}
-#endif
-
 static inline int rtllib_networks_allocate(struct rtllib_device *ieee)
 {
 	if (ieee->networks)
@@ -151,12 +120,6 @@ static inline void rtllib_networks_initialize(struct rtllib_device *ieee)
 	INIT_LIST_HEAD(&ieee->network_list);
 	for (i = 0; i < MAX_NETWORK_COUNT; i++)
 		list_add_tail(&ieee->networks[i].list, &ieee->network_free_list);
-#ifdef _RTL8192_EXT_PATCH_
-	INIT_LIST_HEAD(&ieee->mesh_network_free_list);
-	INIT_LIST_HEAD(&ieee->mesh_network_list);
-	for (i = 0; i < MAX_NETWORK_COUNT; i++)
-		list_add_tail(&ieee->mesh_networks[i].list, &ieee->mesh_network_free_list);
-#endif
 }
 
 #ifdef CONFIG_CRDA
@@ -269,14 +232,6 @@ struct net_device *alloc_rtllib(int sizeof_priv)
 				err);
 		goto failed;
 	}
-#ifdef _RTL8192_EXT_PATCH_
-	err = rtllib_mesh_networks_allocate(ieee);
-	if (err) {
-		RTLLIB_ERROR("Unable to allocate mesh_beacon storage: %d\n",
-				err);
-		goto failed;
-	}
-#endif
 	rtllib_networks_initialize(ieee);
 
 
@@ -312,19 +267,6 @@ struct net_device *alloc_rtllib(int sizeof_priv)
 	ieee->raw_tx = 0;
 	ieee->hwsec_active = 0;
 
-#ifdef _RTL8192_EXT_PATCH_
-	for (i=0; i<MAX_MP; i++)
-	{
-		ieee->cryptlist[i] = (struct rtllib_crypt_data_list*) kmalloc(sizeof(struct rtllib_crypt_data_list), GFP_KERNEL);
-		if (NULL == ieee->cryptlist[i])
-                {
-			printk("error kmalloc cryptlist\n");
-			goto failed;
-		}
-		memset(ieee->cryptlist[i], 0, sizeof(struct rtllib_crypt_data_list));
-	}
-	memset(ieee->swmeshcamtable,0,sizeof(SW_CAM_TABLE)*32);
-#endif
 	memset(ieee->swcamtable,0,sizeof(SW_CAM_TABLE)*32);
 	rtllib_softmac_init(ieee);
 
@@ -348,11 +290,6 @@ struct net_device *alloc_rtllib(int sizeof_priv)
 	for (i = 0; i < IEEE_IBSS_MAC_HASH_SIZE; i++)
 		INIT_LIST_HEAD(&ieee->ibss_mac_hash[i]);
 
-#ifdef _RTL8192_EXT_PATCH_
-	for (i = 0; i < IEEE_MESH_MAC_HASH_SIZE; i++)
-		INIT_LIST_HEAD(&ieee->mesh_mac_hash[i]);
-#endif
-
 	for (i = 0; i < 17; i++) {
 	  ieee->last_rxseq_num[i] = -1;
 	  ieee->last_rxfrag_num[i] = -1;
@@ -366,18 +303,6 @@ struct net_device *alloc_rtllib(int sizeof_priv)
 	return dev;
 
  failed:
-#ifdef _RTL8192_EXT_PATCH_
-	for (i=0; i<MAX_MP; i++)
-	{
-		if (ieee->cryptlist[i]==NULL){
-			continue;
-		}
-		kfree(ieee->cryptlist[i]);
-		ieee->cryptlist[i] = NULL;
-
-	}
-#endif
-
 	if (dev)
 #if (LINUX_VERSION_CODE >= KERNEL_VERSION(2,5,0))
 		free_netdev(dev);
@@ -392,68 +317,15 @@ void free_rtllib(struct net_device *dev)
 {
 	struct rtllib_device *ieee = (struct rtllib_device *)netdev_priv_rsl(dev);
 	int i;
-#ifdef _RTL8192_EXT_PATCH_
-	int j;
-	struct list_head *p, *q;
-	struct rtllib_crypt_data *crypt = NULL;
-#endif
-#if 1
-	if (ieee->pHTInfo != NULL)
-	{
+
+	if (ieee->pHTInfo != NULL) {
 		kfree(ieee->pHTInfo);
 		ieee->pHTInfo = NULL;
 	}
-#endif
 	rtllib_softmac_free(ieee);
 	del_timer_sync(&ieee->crypt_deinit_timer);
 	rtllib_crypt_deinit_entries(ieee, 1);
 
-#ifdef _RTL8192_EXT_PATCH_
-	for (j=0;j<MAX_MP; j++)
-	{
-		if (ieee->cryptlist[j] == NULL)
-			continue;
-		for (i = 0; i < WEP_KEYS; i++) {
-			crypt = ieee->cryptlist[j]->crypt[i];
-
-			if (crypt)
-			{
-				if (crypt->ops) {
-					crypt->ops->deinit(crypt->priv);
-					printk("===>%s():j is %d,i is %d\n",__FUNCTION__,j,i);
-#ifndef BUILT_IN_RTLLIB
-#if LINUX_VERSION_CODE >= KERNEL_VERSION(2,5,0)
-					module_put(crypt->ops->owner);
-#else
-					__MOD_DEC_USE_COUNT(crypt->ops->owner);
-#endif
-#endif
-				}
-				kfree(crypt);
-				ieee->cryptlist[j]->crypt[i] = NULL;
-			}
-		}
-		kfree(ieee->cryptlist[j]);
-	}
-	for (i = 0; i < WEP_KEYS; i++) {
-		crypt = ieee->sta_crypt[i];
-		if (crypt)
-		{
-			if (crypt->ops) {
-				crypt->ops->deinit(crypt->priv);
-#ifndef BUILT_IN_RTLLIB
-#if LINUX_VERSION_CODE >= KERNEL_VERSION(2,5,0)
-				module_put(crypt->ops->owner);
-#else
-				__MOD_DEC_USE_COUNT(crypt->ops->owner);
-#endif
-#endif
-			}
-			kfree(crypt);
-		}
-		ieee->sta_crypt[i] = NULL;
-	}
-#else
 	for (i = 0; i < WEP_KEYS; i++) {
 		struct rtllib_crypt_data *crypt = ieee->crypt[i];
 		if (crypt) {
@@ -471,30 +343,8 @@ void free_rtllib(struct net_device *dev)
 			ieee->crypt[i] = NULL;
 		}
 	}
-#endif
 
 	rtllib_networks_free(ieee);
-#ifdef _RTL8192_EXT_PATCH_
-	rtllib_mesh_networks_free(ieee);
-#endif
-#if 0
-	for (i = 0; i < IEEE_IBSS_MAC_HASH_SIZE; i++) {
-		list_for_each_safe(p, q, &ieee->ibss_mac_hash[i]) {
-			kfree(list_entry(p, struct ieee_ibss_seq, list));
-			list_del(p);
-		}
-	}
-
-#endif
-#ifdef _RTL8192_EXT_PATCH_
-	for (i = 0; i < IEEE_MESH_MAC_HASH_SIZE; i++) {
-		list_for_each_safe(p, q, &ieee->mesh_mac_hash[i]) {
-			kfree(list_entry(p, struct ieee_mesh_seq, list));
-			list_del(p);
-		}
-	}
-#endif
-
 #if (LINUX_VERSION_CODE >= KERNEL_VERSION(2,5,0))
 #ifdef CONFIG_CRDA
 	wiphy_unregister(ieee->wdev.wiphy);
