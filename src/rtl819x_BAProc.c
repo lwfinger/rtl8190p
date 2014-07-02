@@ -298,12 +298,7 @@ int rtllib_rx_ADDBAReq( struct rtllib_device* ieee, struct sk_buff *skb)
 	pBaStartSeqCtrl = (PSEQUENCE_CONTROL)(req + 7);
 
 	printk("====================>rx ADDBAREQ from :"MAC_FMT"\n", MAC_ARG(dst));
-	if(
-#ifdef _RTL8192_EXT_PATCH_
-		(ieee->current_network.qos_data.active == 0 && ieee->current_mesh_network.qos_data.active==0) ||
-#else
-		ieee->current_network.qos_data.active == 0  ||
-#endif
+	if (ieee->current_network.qos_data.active == 0  ||
 		(ieee->pHTInfo->bCurrentHTSupport == false) ||
 		(ieee->pHTInfo->IOTAction & HT_IOT_ACT_REJECT_ADDBA_REQ))
 	{
@@ -384,11 +379,7 @@ int rtllib_rx_ADDBARsp( struct rtllib_device* ieee, struct sk_buff *skb)
 
 	printk("====================>rx ADDBARSP from :"MAC_FMT"\n", MAC_ARG(dst));
 	if(
-#ifdef _RTL8192_EXT_PATCH_
-		(ieee->current_network.qos_data.active == 0 && ieee->current_mesh_network.qos_data.active==0) ||
-#else
 		ieee->current_network.qos_data.active == 0  ||
-#endif
 		ieee->pHTInfo->bCurrentHTSupport == false ||
 		ieee->pHTInfo->bCurrentAMPDUEnable == false )
 	{
@@ -484,11 +475,7 @@ int rtllib_rx_DELBA(struct rtllib_device* ieee,struct sk_buff *skb)
 	}
 
 	if(
-#ifdef _RTL8192_EXT_PATCH_
-		(ieee->current_network.qos_data.active == 0 && ieee->current_mesh_network.qos_data.active==0) ||
-#else
 		ieee->current_network.qos_data.active == 0  ||
-#endif
 		ieee->pHTInfo->bCurrentHTSupport == false )
 	{
 		RTLLIB_DEBUG(RTLLIB_DL_ERR, "received DELBA while QOS or HT is not supported(%d, %d)\n",ieee->current_network.qos_data.active, ieee->pHTInfo->bCurrentHTSupport);

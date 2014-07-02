@@ -21,9 +21,6 @@
 #include <asm/string.h>
 #include <linux/wireless.h>
 #include <linux/interrupt.h>
-#ifdef _RTL8192_EXT_PATCH_
-#include <linux/etherdevice.h>
-#endif
 #include "rtllib.h"
 
 #if defined(BUILT_IN_CRYPTO) || (LINUX_VERSION_CODE < KERNEL_VERSION(2,5,0))
@@ -249,10 +246,6 @@ static int rtllib_ccmp_encrypt(struct sk_buff *skb, int hdr_len, void *priv)
 	u8 *pos;
 	struct rtllib_hdr_4addr *hdr;
 	cb_desc *tcb_desc = (cb_desc *)(skb->cb + MAX_DEV_ADDR_SIZE);
-#ifdef _RTL8192_EXT_PATCH_
-	u8 broadcastaddr[6] = {0xff,0xff,0xff,0xff,0xff,0xff};
-	u8 is_broadcast_data = 0;
-#endif
 	if (skb_headroom(skb) < CCMP_HDR_LEN ||
 	    skb_tailroom(skb) < CCMP_MIC_LEN ||
 	    skb->len < hdr_len)
@@ -282,17 +275,6 @@ static int rtllib_ccmp_encrypt(struct sk_buff *skb, int hdr_len, void *priv)
 
 
 	hdr = (struct rtllib_hdr_4addr *) skb->data;
-#ifdef _RTL8192_EXT_PATCH_
-	if(tcb_desc->badhoc == 0){
-		if(memcmp(hdr->addr1,broadcastaddr,6) == 0){
-			is_broadcast_data = 1;
-			tcb_desc->bHwSec = 0;
-		}
-		if(is_multicast_ether_addr(hdr->addr1)){
-			tcb_desc->bHwSec = 0;
-		}
-	}
-#endif
 	if (!tcb_desc->bHwSec)
 	{
 		int blocks, last, len;
@@ -375,7 +357,6 @@ static int rtllib_ccmp_decrypt(struct sk_buff *skb, int hdr_len, void *priv)
 	pn[4] = pos[1];
 	pn[5] = pos[0];
 	pos += 8;
-#ifndef _RTL8192_EXT_PATCH_
 	if (memcmp(pn, key->rx_pn, CCMP_PN_LEN) <= 0) {
 		if (net_ratelimit()) {
 			printk(KERN_DEBUG "CCMP: replay detected: STA=" MAC_FMT
@@ -387,9 +368,7 @@ static int rtllib_ccmp_decrypt(struct sk_buff *skb, int hdr_len, void *priv)
 		key->dot11RSNAStatsCCMPReplays++;
 		return -4;
 	}
-#endif
-	if (!tcb_desc->bHwSec)
-	{
+	if (!tcb_desc->bHwSec) {
 		size_t data_len = skb->len - hdr_len - CCMP_HDR_LEN - CCMP_MIC_LEN;
 		u8 *mic = skb->data + skb->len - CCMP_MIC_LEN;
 		u8 *b0 = key->rx_b0;

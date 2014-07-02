@@ -136,56 +136,7 @@ void rtl8192_hw_wakeup_wq(void *data)
 #define MAX_SLEEP_TIME 10000
 void rtl8192_hw_to_sleep(struct net_device *dev, u32 th, u32 tl)
 {
-#ifdef _RTL8192_EXT_PATCH_
 	struct r8192_priv *priv = rtllib_priv(dev);
-	u32 rb = jiffies, sleep_cost = MSECS(8+16+7), delta = 0;
-	unsigned long flags;
-
-	if((tl > rb) && (th > 0))
-		return;
-
-	spin_lock_irqsave(&priv->ps_lock,flags);
-
-	if (tl >= sleep_cost)
-		tl -= sleep_cost;
-	else if (th > 0) {
-		tl = 0xffffffff - sleep_cost + tl;
-		th--;
-	} else {
-		spin_unlock_irqrestore(&priv->ps_lock,flags);
-		return;
-	}
-
-	if (tl > rb) {
-		delta = tl - rb;
-	} else if (th > 0) {
-		delta = 0xffffffff - rb + tl;
-		th --;
-	} else {
-		spin_unlock_irqrestore(&priv->ps_lock,flags);
-		return;
-	}
-
-	if (delta <= MSECS(MIN_SLEEP_TIME)) {
-		spin_unlock_irqrestore(&priv->ps_lock,flags);
-		printk("too short to sleep::%x, %x, %lx\n",tl, rb,  MSECS(MIN_SLEEP_TIME));
-		return;
-	}
-
-	if(delta > MSECS(MAX_SLEEP_TIME)) {
-		spin_unlock_irqrestore(&priv->ps_lock,flags);
-		printk("========>too long to sleep:%x, %x, %lx\n", tl, rb,  MSECS(MAX_SLEEP_TIME));
-		return;
-	}
-
-	//printk("==============>%s(): wake up time is %d,%d\n",__FUNCTION__,delta,jiffies_to_msecs(delta));
-	queue_delayed_work_rsl(priv->rtllib->wq,&priv->rtllib->hw_wakeup_wq,delta); //PowerSave is not supported if kernel version is below 2.6.20
-	queue_delayed_work_rsl(priv->rtllib->wq, (void *)&priv->rtllib->hw_sleep_wq,0);
-
-	spin_unlock_irqrestore(&priv->ps_lock,flags);
-#else
-	struct r8192_priv *priv = rtllib_priv(dev);
-
 	u32 rb = jiffies;
 	unsigned long flags;
 
@@ -223,7 +174,6 @@ void rtl8192_hw_to_sleep(struct net_device *dev, u32 th, u32 tl)
 	queue_delayed_work_rsl(priv->rtllib->wq,
 			(void *)&priv->rtllib->hw_sleep_wq,0);
 	spin_unlock_irqrestore(&priv->ps_lock,flags);
-#endif
 }
 #endif
 
@@ -434,15 +384,8 @@ bool MgntActSet_802_11_PowerSaveMode(struct net_device *dev,	u8 rtPsMode)
 	//u8 RpwmVal, FwPwrMode;
 
 	// Currently, we do not change power save mode on IBSS mode.
-#ifdef _RTL8192_EXT_PATCH_
-	if((priv->rtllib->iw_mode == IW_MODE_ADHOC) || (priv->rtllib->iw_mode == IW_MODE_MASTER)
-		|| (priv->rtllib->iw_mode == IW_MODE_MESH))
-#else
 	if(priv->rtllib->iw_mode == IW_MODE_ADHOC)
-#endif
-	{
 		return false;
-	}
 
 	//
 	// <RJ_NOTE> If we make HW to fill up the PwrMgt bit for us,
@@ -543,18 +486,13 @@ void LeisurePSEnter(struct net_device *dev)
 	RT_TRACE(COMP_PS, "pPSC->bLeisurePs = %d, ieee->ps = %d,pPSC->LpsIdleCount is %d,RT_CHECK_FOR_HANG_PERIOD is %d\n",
 		pPSC->bLeisurePs, priv->rtllib->ps,pPSC->LpsIdleCount,RT_CHECK_FOR_HANG_PERIOD);
 
-#ifdef _RTL8192_EXT_PATCH_
-	if(!((priv->rtllib->iw_mode == IW_MODE_INFRA) && (priv->rtllib->state == RTLLIB_LINKED))
-		|| (priv->rtllib->iw_mode == IW_MODE_ADHOC) || (priv->rtllib->iw_mode == IW_MODE_MASTER)
-		|| (priv->rtllib->iw_mode == IW_MODE_MESH))
-#else
-	if(!((priv->rtllib->iw_mode == IW_MODE_INFRA) && (priv->rtllib->state == RTLLIB_LINKED))
-		|| (priv->rtllib->iw_mode == IW_MODE_ADHOC) || (priv->rtllib->iw_mode == IW_MODE_MASTER))
-#endif
+	if (!((priv->rtllib->iw_mode == IW_MODE_INFRA) &&
+	    (priv->rtllib->state == RTLLIB_LINKED)) ||
+	    (priv->rtllib->iw_mode == IW_MODE_ADHOC) ||
+	    (priv->rtllib->iw_mode == IW_MODE_MASTER))
 		return;
 
-	if (pPSC->bLeisurePs)
-	{
+	if (pPSC->bLeisurePs) {
 		// Idle for a while if we connect to AP a while ago.
 		if(pPSC->LpsIdleCount >= RT_CHECK_FOR_HANG_PERIOD) //  4 Sec
 		{
