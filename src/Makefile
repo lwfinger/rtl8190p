@@ -64,15 +64,9 @@ install: modules
 	install -p -m 644 r8190_pci.ko $(MODDESTDIR)
 
 	depmod -a
-	@#copy firmware img to target fold
-	$(shell [ -d "$(IMG_DIR)/`uname -r`" ] && cp -fr $(RTL819x_FIRM_DIR)/$(NIC_SELECT) $(IMG_DIR)/`uname -r`/.)
-	$(shell [ ! -d "$(IMG_DIR)/`uname -r`" ] && cp -fr $(RTL819x_FIRM_DIR)/$(NIC_SELECT) $(IMG_DIR)/.)
 uninstall:
 	$(shell [ -d $(MODDESTDIR) ] && rm -f $(MODDESTDIR)/r8190_pci.ko)
 	depmod -a
-	@#delete the firmware img
-	@rm -fr /lib/firmware/$(NIC_SELECT)
-	@rm -fr /lib/firmware/`uname -r`/$(NIC_SELECT)
 
 .PHONY:clean
 clean:
@@ -83,10 +77,3 @@ clean:
 	rm -fr Module.markers
 	rm -fr modules.order
 	rm -fr tags
-	rm -fr rtl8192c/*.mod.c rtl8192c/*.mod rtl8192c/*.o rtl8192c/.*.cmd rtl8192c/*.ko rtl8192c/*~
-	rm -fr rtl8192c/.tmp_versions
-	rm -fr rtl8192c/Modules.symvers
-	rm -fr rtl8192c/Module.symvers
-	rm -fr rtl8192c/Module.markers
-	rm -fr rtl8192c/modules.order
-	rm -fr rtl8192c/tags

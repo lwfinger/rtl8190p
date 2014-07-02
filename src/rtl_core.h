@@ -76,7 +76,6 @@
 #include "rtl8192e.h"
 #endif
 
-#include "r8192S_mp.h"
 #include "rtl_debug.h"
 #include "rtl_eeprom.h"
 #include "rtl_ps.h"
