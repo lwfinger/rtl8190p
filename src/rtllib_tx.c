@@ -182,30 +182,15 @@ inline int rtllib_put_snap(u8 *data, u16 h_proto)
 	return SNAP_SIZE + sizeof(u16);
 }
 
-#ifdef _RTL8192_EXT_PATCH_
-int rtllib_encrypt_fragment(
-	struct rtllib_device *ieee,
-	struct sk_buff *frag,
-	int hdr_len,
-	u8 is_mesh)
-#else
 int rtllib_encrypt_fragment(
 	struct rtllib_device *ieee,
 	struct sk_buff *frag,
 	int hdr_len)
-#endif
 {
 	struct rtllib_crypt_data* crypt = NULL;
 	int res;
 
-#ifdef _RTL8192_EXT_PATCH_
-	if(is_mesh)
-		crypt = ieee->cryptlist[0]->crypt[ieee->mesh_txkeyidx];
-	else
-		crypt = ieee->sta_crypt[ieee->tx_keyidx];
-#else
 	crypt = ieee->crypt[ieee->tx_keyidx];
-#endif
 
 	if (!(crypt && crypt->ops))
 	{
@@ -402,10 +387,7 @@ void rtllib_tx_query_agg_cap(struct rtllib_device* ieee, struct sk_buff* skb, cb
 			else
 				goto FORCED_AGG_SETTING;
 		}
-#ifndef _RTL8192_EXT_PATCH_
-		if (ieee->iw_mode == IW_MODE_INFRA)
-#endif
-		{
+		if (ieee->iw_mode == IW_MODE_INFRA) {
 			tcb_desc->bAMPDUEnable = true;
 			tcb_desc->ampdu_factor = pHTInfo->CurrentAMPDUFactor;
 			tcb_desc->ampdu_density = pHTInfo->CurrentMPDUDensity;
@@ -667,23 +649,12 @@ void rtllib_txrate_selectmode(struct rtllib_device* ieee, cb_desc* tcb_desc)
 		tcb_desc->bTxUseDriverAssingedRate = true;
 	if(!tcb_desc->bTxDisableRateFallBack || !tcb_desc->bTxUseDriverAssingedRate)
 	{
-#ifdef _RTL8192_EXT_PATCH_
-		if ((ieee->iw_mode == IW_MODE_INFRA || ieee->iw_mode == IW_MODE_ADHOC)
-			|| (ieee->iw_mode == IW_MODE_MESH))
-#else
 		if (ieee->iw_mode == IW_MODE_INFRA || ieee->iw_mode == IW_MODE_ADHOC)
-#endif
 			tcb_desc->RATRIndex = 0;
 	}
 #if defined(RTL8192U) || defined(RTL8192SU) || defined(RTL8192SE)
 	if(ieee->iw_mode == IW_MODE_ADHOC)
 		tcb_desc->RATRIndex = ratr_index;
-#endif
-
-#ifdef _RTL8192_EXT_PATCH_
-	if(ieee->bUseRAMask){
-		tcb_desc->macId =0;
-	}
 #endif
 }
 
@@ -979,10 +950,7 @@ int rtllib_xmit_inter(struct sk_buff *skb, struct net_device *dev)
 	cb_desc *tcb_desc_skb;
 	u8 bIsSptAmsdu = false;
 #endif
-
 	bool	bdhcp =false;
-#ifndef _RTL8192_EXT_PATCH_
-#endif
 	spin_lock_irqsave(&ieee->lock, flags);
 
 	/* If there is no driver handler to take the TXB, dont' bother
@@ -1068,11 +1036,7 @@ int rtllib_xmit_inter(struct sk_buff *skb, struct net_device *dev)
 						printk("===>DHCP Protocol start tx DHCP pkt src port:%d, dest port:%d!!\n", ((u8 *)udp)[1],((u8 *)udp)[3]);
 
 						bdhcp = true;
-#ifdef _RTL8192_EXT_PATCH_
 						ieee->LPSDelayCnt = 100;
-#else
-						ieee->LPSDelayCnt = 100;
-#endif
 					}
 				}
 			}else if(ETH_P_ARP == ether_type){
@@ -1086,11 +1050,7 @@ int rtllib_xmit_inter(struct sk_buff *skb, struct net_device *dev)
 
 		skb->priority = rtllib_classify(skb, IsAmsdu);
 
-#ifdef _RTL8192_EXT_PATCH_
-		crypt = ieee->sta_crypt[ieee->tx_keyidx];
-#else
 		crypt = ieee->crypt[ieee->tx_keyidx];
-#endif
 		encrypt = !(ether_type == ETH_P_PAE && ieee->ieee802_1x) &&
 			ieee->host_encrypt && crypt && crypt->ops;
 
@@ -1131,13 +1091,7 @@ int rtllib_xmit_inter(struct sk_buff *skb, struct net_device *dev)
 		else
 			fc |= RTLLIB_STYPE_DATA;
 
-#ifdef _RTL8192_EXT_PATCH_
-		if ((ieee->iw_mode == IW_MODE_INFRA)
-			|| (ieee->iw_mode == IW_MODE_MESH) )
-#else
-		if (ieee->iw_mode == IW_MODE_INFRA)
-#endif
-		{
+		if (ieee->iw_mode == IW_MODE_INFRA) {
 			fc |= RTLLIB_FCTL_TODS;
 			/* To DS: Addr1 = BSSID, Addr2 = SA,
 			Addr3 = DA */
@@ -1256,13 +1210,6 @@ int rtllib_xmit_inter(struct sk_buff *skb, struct net_device *dev)
 		for (i = 0; i < nr_frags; i++) {
 			skb_frag = txb->fragments[i];
 			tcb_desc = (cb_desc *)(skb_frag->cb + MAX_DEV_ADDR_SIZE);
-#ifdef _RTL8192_EXT_PATCH_
-			tcb_desc->mesh_pkt = 0;
-			if(ieee->iw_mode == IW_MODE_ADHOC)
-				tcb_desc->badhoc = 1;
-			else
-				tcb_desc->badhoc = 0;
-#endif
 			if(qos_actived){
 				skb_frag->priority = skb->priority;
 				tcb_desc->queue_index =  UP2AC(skb->priority);
@@ -1325,11 +1272,7 @@ int rtllib_xmit_inter(struct sk_buff *skb, struct net_device *dev)
 			/* Encryption routine will move the header forward in order
 			* to insert the IV between the header and the payload */
 			if (encrypt)
-#ifdef _RTL8192_EXT_PATCH_
-				rtllib_encrypt_fragment(ieee, skb_frag, hdr_len, 0);
-#else
 				rtllib_encrypt_fragment(ieee, skb_frag, hdr_len);
-#endif
 			if (ieee->config &
 			(CFG_RTLLIB_COMPUTE_FCS | CFG_RTLLIB_RESERVE_FCS))
 				skb_put(skb_frag, 4);
@@ -1516,10 +1459,5 @@ EXPORT_SYMBOL_RSL(rtllib_txb_free);
 #ifdef ENABLE_AMSDU
 EXPORT_SYMBOL_RSL(AMSDU_Aggregation);
 EXPORT_SYMBOL_RSL(AMSDU_GetAggregatibleList);
-#endif
-#ifdef _RTL8192_EXT_PATCH_
-EXPORT_SYMBOL_RSL(rtllib_query_seqnum);
-EXPORT_SYMBOL_RSL(rtllib_alloc_txb);
-EXPORT_SYMBOL_RSL(rtllib_encrypt_fragment);
 #endif
 #endif
