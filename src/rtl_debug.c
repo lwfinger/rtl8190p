@@ -29,9 +29,6 @@
 #include "r8190_rtl8256.h" /* RTL8225 Radio frontend */
 #include "r819xE_cmdpkt.h"
 
-#ifdef _RTL8192_EXT_PATCH_
-#include "../../mshclass/msh_class.h"
-#endif
 /* this is only for debugging */
 void print_buffer(u32 *buffer, int len)
 {

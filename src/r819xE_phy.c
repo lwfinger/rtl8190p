@@ -1190,15 +1190,10 @@ void rtl8192_phy_FinishSwChnlNow(struct net_device *dev, u8 channel)
 	struct r8192_priv *priv = rtllib_priv(dev);
 	u32	delay = 0;
 
-	while(!rtl8192_phy_SwChnlStepByStep(dev,channel,&priv->SwChnlStage,&priv->SwChnlStep,&delay))
-	{
+	while(!rtl8192_phy_SwChnlStepByStep(dev,channel,&priv->SwChnlStage,&priv->SwChnlStep,&delay)) {
 		if(delay>0)
 			msleep(delay);
-#ifdef _RTL8192_EXT_PATCH_
-		if((!priv->up) && (!priv->mesh_up))
-#else
 		if(!priv->up)
-#endif
 		        break;
 	}
 }
@@ -1220,12 +1215,7 @@ u8 rtl8192_phy_SwChnl(struct net_device* dev, u8 channel)
 {
 	struct r8192_priv *priv = rtllib_priv(dev);
 	RT_TRACE(COMP_PHY, "=====>%s()\n", __FUNCTION__);
-#ifdef _RTL8192_EXT_PATCH_
-	if((!priv->up) && (!priv->mesh_up))
-#else
-	if(!priv->up)
-#endif
-	{
+	if(!priv->up) {
 		RT_TRACE(COMP_ERR, "%s(): ERR !! driver is not up\n",__FUNCTION__);
 		return false;
 	}
@@ -1265,14 +1255,8 @@ u8 rtl8192_phy_SwChnl(struct net_device* dev, u8 channel)
 
 	priv->SwChnlStage=0;
 	priv->SwChnlStep=0;
-#ifdef _RTL8192_EXT_PATCH_
-	if((priv->up) || (priv->mesh_up))
-#else
 	if(priv->up)
-#endif
-	{
-	rtl8192_SwChnl_WorkItem(dev);
-	}
+		rtl8192_SwChnl_WorkItem(dev);
         priv->SwChnlInProgress = false;
 	return true;
 }
@@ -1393,12 +1377,7 @@ void rtl8192_SetBWModeWorkItem(struct net_device *dev)
 		priv->SetBWModeInProgress= false;
 		return;
 	}
-#ifdef _RTL8192_EXT_PATCH_
-	if((!priv->up) && (!priv->mesh_up))
-#else
-	if(!priv->up)
-#endif
-	{
+	if(!priv->up) {
 		RT_TRACE(COMP_ERR,"%s(): ERR!! driver is not up\n",__FUNCTION__);
 		return;
 	}
@@ -1550,26 +1529,20 @@ void InitialGain819xPci(struct net_device *dev, u8 Operation)
 	u32					BitMask;
 	u8					initial_gain;
 
-#ifdef _RTL8192_EXT_PATCH_
-	if((priv->up) || (priv->mesh_up))
-#else
-	if(priv->up)
-#endif
-	{
-		switch(Operation)
-		{
-			case IG_Backup:
+	if(priv->up) {
+		switch(Operation) {
+		case IG_Backup:
 			RT_TRACE(COMP_SCAN, "IG_Backup, backup the initial gain.\n");
-				initial_gain = SCAN_RX_INITIAL_GAIN;
-				BitMask = bMaskByte0;
-				if(dm_digtable.dig_algorithm == DIG_ALGO_BY_FALSE_ALARM)
-					rtl8192_setBBreg(dev, UFWP, bMaskByte1, 0x8);
-				priv->initgain_backup.xaagccore1 = (u8)rtl8192_QueryBBReg(dev, rOFDM0_XAAGCCore1, BitMask);
-				priv->initgain_backup.xbagccore1 = (u8)rtl8192_QueryBBReg(dev, rOFDM0_XBAGCCore1, BitMask);
-				priv->initgain_backup.xcagccore1 = (u8)rtl8192_QueryBBReg(dev, rOFDM0_XCAGCCore1, BitMask);
-				priv->initgain_backup.xdagccore1 = (u8)rtl8192_QueryBBReg(dev, rOFDM0_XDAGCCore1, BitMask);
-				BitMask  = bMaskByte2;
-				priv->initgain_backup.cca		= (u8)rtl8192_QueryBBReg(dev, rCCK0_CCA, BitMask);
+			initial_gain = SCAN_RX_INITIAL_GAIN;
+			BitMask = bMaskByte0;
+			if(dm_digtable.dig_algorithm == DIG_ALGO_BY_FALSE_ALARM)
+				rtl8192_setBBreg(dev, UFWP, bMaskByte1, 0x8);
+			priv->initgain_backup.xaagccore1 = (u8)rtl8192_QueryBBReg(dev, rOFDM0_XAAGCCore1, BitMask);
+			priv->initgain_backup.xbagccore1 = (u8)rtl8192_QueryBBReg(dev, rOFDM0_XBAGCCore1, BitMask);
+			priv->initgain_backup.xcagccore1 = (u8)rtl8192_QueryBBReg(dev, rOFDM0_XCAGCCore1, BitMask);
+			priv->initgain_backup.xdagccore1 = (u8)rtl8192_QueryBBReg(dev, rOFDM0_XDAGCCore1, BitMask);
+			BitMask  = bMaskByte2;
+			priv->initgain_backup.cca		= (u8)rtl8192_QueryBBReg(dev, rCCK0_CCA, BitMask);
 
 			RT_TRACE(COMP_SCAN, "Scan InitialGainBackup 0xc50 is %x\n",priv->initgain_backup.xaagccore1);
 			RT_TRACE(COMP_SCAN, "Scan InitialGainBackup 0xc58 is %x\n",priv->initgain_backup.xbagccore1);
@@ -1578,25 +1551,25 @@ void InitialGain819xPci(struct net_device *dev, u8 Operation)
 			RT_TRACE(COMP_SCAN, "Scan InitialGainBackup 0xa0a is %x\n",priv->initgain_backup.cca);
 
 			RT_TRACE(COMP_SCAN, "Write scan initial gain = 0x%x \n", initial_gain);
-				write_nic_byte(dev, rOFDM0_XAAGCCore1, initial_gain);
-				write_nic_byte(dev, rOFDM0_XBAGCCore1, initial_gain);
-				write_nic_byte(dev, rOFDM0_XCAGCCore1, initial_gain);
-				write_nic_byte(dev, rOFDM0_XDAGCCore1, initial_gain);
-				RT_TRACE(COMP_SCAN, "Write scan 0xa0a = 0x%x \n", POWER_DETECTION_TH);
-				write_nic_byte(dev, 0xa0a, POWER_DETECTION_TH);
-				break;
-			case IG_Restore:
+			write_nic_byte(dev, rOFDM0_XAAGCCore1, initial_gain);
+			write_nic_byte(dev, rOFDM0_XBAGCCore1, initial_gain);
+			write_nic_byte(dev, rOFDM0_XCAGCCore1, initial_gain);
+			write_nic_byte(dev, rOFDM0_XDAGCCore1, initial_gain);
+			RT_TRACE(COMP_SCAN, "Write scan 0xa0a = 0x%x \n", POWER_DETECTION_TH);
+			write_nic_byte(dev, 0xa0a, POWER_DETECTION_TH);
+			break;
+		case IG_Restore:
 			RT_TRACE(COMP_SCAN, "IG_Restore, restore the initial gain.\n");
-				BitMask = 0x7f;
-				if(dm_digtable.dig_algorithm == DIG_ALGO_BY_FALSE_ALARM)
-					rtl8192_setBBreg(dev, UFWP, bMaskByte1, 0x8);
+			BitMask = 0x7f;
+			if(dm_digtable.dig_algorithm == DIG_ALGO_BY_FALSE_ALARM)
+				rtl8192_setBBreg(dev, UFWP, bMaskByte1, 0x8);
 
-				rtl8192_setBBreg(dev, rOFDM0_XAAGCCore1, BitMask, (u32)priv->initgain_backup.xaagccore1);
-				rtl8192_setBBreg(dev, rOFDM0_XBAGCCore1, BitMask, (u32)priv->initgain_backup.xbagccore1);
-				rtl8192_setBBreg(dev, rOFDM0_XCAGCCore1, BitMask, (u32)priv->initgain_backup.xcagccore1);
-				rtl8192_setBBreg(dev, rOFDM0_XDAGCCore1, BitMask, (u32)priv->initgain_backup.xdagccore1);
-				BitMask  = bMaskByte2;
-				rtl8192_setBBreg(dev, rCCK0_CCA, BitMask, (u32)priv->initgain_backup.cca);
+			rtl8192_setBBreg(dev, rOFDM0_XAAGCCore1, BitMask, (u32)priv->initgain_backup.xaagccore1);
+			rtl8192_setBBreg(dev, rOFDM0_XBAGCCore1, BitMask, (u32)priv->initgain_backup.xbagccore1);
+			rtl8192_setBBreg(dev, rOFDM0_XCAGCCore1, BitMask, (u32)priv->initgain_backup.xcagccore1);
+			rtl8192_setBBreg(dev, rOFDM0_XDAGCCore1, BitMask, (u32)priv->initgain_backup.xdagccore1);
+			BitMask  = bMaskByte2;
+			rtl8192_setBBreg(dev, rCCK0_CCA, BitMask, (u32)priv->initgain_backup.cca);
 
 			RT_TRACE(COMP_SCAN, "Scan BBInitialGainRestore 0xc50 is %x\n",priv->initgain_backup.xaagccore1);
 			RT_TRACE(COMP_SCAN, "Scan BBInitialGainRestore 0xc58 is %x\n",priv->initgain_backup.xbagccore1);
@@ -1604,15 +1577,15 @@ void InitialGain819xPci(struct net_device *dev, u8 Operation)
 			RT_TRACE(COMP_SCAN, "Scan BBInitialGainRestore 0xc68 is %x\n",priv->initgain_backup.xdagccore1);
 			RT_TRACE(COMP_SCAN, "Scan BBInitialGainRestore 0xa0a is %x\n",priv->initgain_backup.cca);
 
-				rtl8192_phy_setTxPower(dev,priv->rtllib->current_network.channel);
+			rtl8192_phy_setTxPower(dev,priv->rtllib->current_network.channel);
 
 
-				if(dm_digtable.dig_algorithm == DIG_ALGO_BY_FALSE_ALARM)
-					rtl8192_setBBreg(dev, UFWP, bMaskByte1, 0x1);
-				break;
-			default:
+			if(dm_digtable.dig_algorithm == DIG_ALGO_BY_FALSE_ALARM)
+				rtl8192_setBBreg(dev, UFWP, bMaskByte1, 0x1);
+			break;
+		default:
 			RT_TRACE(COMP_SCAN, "Unknown IG Operation. \n");
-				break;
+			break;
 		}
 	}
 }

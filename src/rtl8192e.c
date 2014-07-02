@@ -893,16 +893,6 @@ start:
 	ulRegRead = (0xFFF00000 & read_nic_dword(dev, RRSR))  | RATE_ALL_OFDM_AG | RATE_ALL_CCK;
 	write_nic_dword(dev, RRSR, ulRegRead);
 	write_nic_dword(dev, RATR0+4*7, (RATE_ALL_OFDM_AG | RATE_ALL_CCK));
-#ifdef _RTL8192_EXT_PATCH_
-	write_nic_dword(dev, RATR0, 0xff7);
-	write_nic_dword(dev, RATR0+4*1, 0x8f0f0000);
-	write_nic_dword(dev, RATR0+4*2, 0x0f0f0000);
-	write_nic_dword(dev, RATR0+4*3, 0x8d0ff000);
-	write_nic_dword(dev, RATR0+4*4, 0x0d0ff000);
-	write_nic_dword(dev, RATR0+4*5, 0x8f0ff007);
-	write_nic_dword(dev, RATR0+4*6, 0x0f0ff007);
-	write_nic_byte(dev, UFWP, 1);//i don't know whether is it needed.
-#endif
 
 	//2Set AckTimeout
 	// TODO: (it value is only for FPGA version). need to be changed!!2006.12.18, by Emily
@@ -1211,24 +1201,6 @@ void rtl8192_link_change(struct net_device *dev)
 	} else {
 		write_nic_byte(dev, 0x173, 0);
 	}
-#ifdef _RTL8192_EXT_PATCH_
-	if (ieee->iw_mode == IW_MODE_MESH) {
-		u16 BcnTimeCfg = 0, BcnCW = 6, BcnIFS = 0xf;
-		write_nic_word(dev, ATIMWND, 2);
-		write_nic_word(dev, BCN_DMATIME, 256);
-		//write_nic_word(dev, BCN_INTERVAL, ieee->current_network.beacon_interval);
-		write_nic_word(dev, BCN_INTERVAL, 100);
-		//BIT15 of BCN_DRV_EARLY_INT will indicate whether software beacon or hw beacon is applied.
-		write_nic_word(dev, BCN_DRV_EARLY_INT, 10);
-		write_nic_byte(dev, BCN_ERR_THRESH, 100);
-
-		BcnTimeCfg |= (BcnCW<<BCN_TCFG_CW_SHIFT);
-		// TODO: BcnIFS may required to be changed on ASIC
-		BcnTimeCfg |= BcnIFS<<BCN_TCFG_IFS;
-
-		write_nic_word(dev, BCN_TCFG, BcnTimeCfg);
-	}
-#endif
 	//update timing params*/
 	//rtl8192_set_chan(dev, priv->chan);
 	//MSR
@@ -1565,13 +1537,6 @@ bool rtl8192_rx_query_status_desc(struct net_device* dev, struct rtllib_rx_stats
 
 		stats->RxIs40MHzPacket = pDrvInfo->BW;
 
-		// ????
-#ifdef _RTL8192_EXT_PATCH_
-		if((priv->rtllib->iw_mode == IW_MODE_MESH)
-				&& (priv->mshobj->ext_patch_translate_rxsignalstuff819xpci))
-			priv->mshobj->ext_patch_translate_rxsignalstuff819xpci(dev,skb, stats, pdesc, pDrvInfo);
-#endif
-
 		TranslateRxSignalStuff819xpci(dev,skb, stats, pdesc, pDrvInfo);
 
 		// Rx A-MPDU */
@@ -1606,12 +1571,6 @@ void rtl8192_halt_adapter(struct net_device *dev, bool reset)
 	for(i = 0; i < MAX_QUEUE_SIZE; i++) {
 		skb_queue_purge(&priv->rtllib->skb_aggQ [i]);
 	}
-#ifdef _RTL8192_EXT_PATCH_
-	for(i = 0; i < MAX_QUEUE_SIZE; i++) {
-		skb_queue_purge(&priv->rtllib->skb_meshaggQ [i]);
-	}
-#endif
-
 	skb_queue_purge(&priv->skb_queue);
 	return;
 }

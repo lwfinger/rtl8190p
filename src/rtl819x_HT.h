@@ -243,9 +243,6 @@ typedef struct _RT_HIGH_THROUGHPUT{
 	u16				nAMSDU_MaxSize;
 	u8				bCurrent_AMSDU_Support;
 	u16				nCurrent_AMSDU_MaxSize;
-#ifdef _RTL8192_EXT_PATCH_
-	u8				bCurrent_Mesh_AMSDU_Support;
-#endif
 
 	u8				bAMPDUEnable;
 	u8				bCurrentAMPDUEnable;
@@ -253,9 +250,6 @@ typedef struct _RT_HIGH_THROUGHPUT{
 	u8				CurrentAMPDUFactor;
 	u8				MPDU_Density;
 	u8				CurrentMPDUDensity;
-#ifdef _RTL8192_EXT_PATCH_
-	u8				bCurrentMeshAMPDUEnable;
-#endif
 
 	HT_AGGRE_MODE_E	ForcedAMPDUMode;
 	u8				ForcedAMPDUFactor;
