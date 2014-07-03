@@ -329,27 +329,15 @@ typedef enum _RT_RF_TYPE_DEF
 
 #define	USB_RPWM			0xFE58
 
-#ifdef RTL8192SE
-#define	RPWM		PCI_RPWM
-#endif
-#ifdef RTL8192SU
-#define	RPWM		USB_RPWM
-#endif
-
-#if 1
 #define		AFR				0x010
 #define		BCN_TCFG			0x062
 #define		RATR0				0x320
-#endif
 #define		UnusedRegister			0x0320
 #define		PSR				UnusedRegister
 #define		DCAM				UnusedRegister
 #define		BBAddr				UnusedRegister
 #define		PhyDataR			UnusedRegister
 #define		UFWP				UnusedRegister
-
-
-
 #define		ISO_MD2PP			BIT0
 #define		ISO_PA2PCIE			BIT3
 #define		ISO_PLL2MD			BIT4
@@ -786,97 +774,8 @@ Default: 00b.
 #define		CCX_NHM_RESULT_READY			BIT16
 #define		CCX_CMD_RESET					0x0
 
-
 #define		HWSET_MAX_SIZE_92S				128
 
-
-
-#ifdef RTL8192SE
-#define		RTL8190_EEPROM_ID		0x8129
-#define		EEPROM_HPON			0x02
-#define		EEPROM_CLK			0x06
-#define		EEPROM_TESTR			0x08
-
-#define		EEPROM_VID			0x0A
-#define		EEPROM_DID			0x0C
-#define		EEPROM_SVID			0x0E
-#define		EEPROM_SMID			0x10
-
-#define		EEPROM_MAC_ADDR			0x12
-#define		EEPROM_NODE_ADDRESS_BYTE_0	0x12
-
-#define		EEPROM_PwDiff			0x54
-
-#define		EEPROM_TxPowerBase			0x50
-#define		EEPROM_TX_PWR_INDEX_RANGE	28
-
-#define		EEPROM_TX_PWR_HT20_DIFF		0x62
-#define		DEFAULT_HT20_TXPWR_DIFF		2
-#define		EEPROM_TX_PWR_OFDM_DIFF		0x65
-
-#define	EEPROM_TxPWRGroup			0x67
-#define		EEPROM_Regulatory				0x6D
-
-#define		TX_PWR_SAFETY_CHK		0x6D
-#define		EEPROM_TxPwIndex_CCK_24G	0x5D
-#define		EEPROM_TxPwIndex_OFDM_24G	0x6B
-#define		EEPROM_HT2T_CH1_A		0x6c
-#define		EEPROM_HT2T_CH7_A		0x6d
-#define		EEPROM_HT2T_CH13_A		0x6e
-#define		EEPROM_HT2T_CH1_B		0x6f
-#define		EEPROM_HT2T_CH7_B		0x70
-#define		EEPROM_HT2T_CH13_B		0x71
-#define		EEPROM_TSSI_A			0x74
-#define		EEPROM_TSSI_B			0x75
-#define		EEPROM_RFInd_PowerDiff			0x76
-#define		EEPROM_Default_LegacyHTTxPowerDiff	0x3
-#define		EEPROM_ThermalMeter			0x77
-#define		EEPROM_BLUETOOTH_COEXIST		0x78
-
-#define	EEPROM_Optional	0x78
-
-#define		EEPROM_CrystalCap			0x79
-#define		EEPROM_ChannelPlan			0x7B
-#define		EEPROM_Version				0x7C
-#define		EEPROM_CustomID				0x7A
-#define		EEPROM_BoardType			0x7E
-
-#define		EEPROM_Default_TSSI			0x0
-#define		EEPROM_Default_TxPowerDiff		0x0
-#define		EEPROM_Default_CrystalCap		0x5
-#define		EEPROM_Default_BoardType		0x02
-#define		EEPROM_Default_TxPower			0x1010
-#define		EEPROM_Default_HT2T_TxPwr		0x10
-
-#define		EEPROM_Default_LegacyHTTxPowerDiff	0x3
-#define		EEPROM_Default_ThermalMeter		0x12
-#define		EEPROM_Default_BlueToothCoexist		0x0
-#define		EEPROM_Default_AntTxPowerDiff		0x0
-#define		EEPROM_Default_TxPwDiff_CrystalCap	0x5
-#define		EEPROM_Default_TxPowerLevel		0x22
-
-#define		EEPROM_CHANNEL_PLAN_FCC			0x0
-#define		EEPROM_CHANNEL_PLAN_IC			0x1
-#define		EEPROM_CHANNEL_PLAN_ETSI		0x2
-#define		EEPROM_CHANNEL_PLAN_SPAIN		0x3
-#define		EEPROM_CHANNEL_PLAN_FRANCE		0x4
-#define		EEPROM_CHANNEL_PLAN_MKK			0x5
-#define		EEPROM_CHANNEL_PLAN_MKK1		0x6
-#define		EEPROM_CHANNEL_PLAN_ISRAEL		0x7
-#define		EEPROM_CHANNEL_PLAN_TELEC		0x8
-#define		EEPROM_CHANNEL_PLAN_GLOBAL_DOMAIN	0x9
-#define		EEPROM_CHANNEL_PLAN_WORLD_WIDE_13	0xA
-#define		EEPROM_CHANNEL_PLAN_NCC				0xB
-#define		EEPROM_CHANNEL_PLAN_BY_HW_MASK	0x80
-
-
-#define		EEPROM_CID_DEFAULT		0x0
-#define		EEPROM_CID_TOSHIBA		0x4
-#define	EEPROM_CID_CCX				0x10
-#define	EEPROM_CID_QMI				0x0D
-#define		EEPROM_CID_WHQL				0xFE
-
-#else
 #define		RTL8190_EEPROM_ID		0x8129
 #define		EEPROM_HPON			0x02
 #define		EEPROM_VID			0x08
@@ -958,7 +857,6 @@ Default: 00b.
 #define		EEPROM_CID_ALPHA				0x1
 #define		EEPROM_CID_TOSHIBA				0x4
 #define		EEPROM_CID_WHQL					0xFE
-#endif
 
 
 #define		FW_DIG_DISABLE				0xfd00cc00

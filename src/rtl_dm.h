@@ -41,11 +41,7 @@
 
 
 #define		DM_DIG_BACKOFF				12
-#ifdef RTL8192SE
-#define		DM_DIG_MAX					0x3e
-#elif defined RTL8190P || defined RTL8192E
 #define		DM_DIG_MAX					0x36
-#endif
 #define		DM_DIG_MIN					0x1c
 #define		DM_DIG_MIN_Netcore			0x12
 
@@ -60,11 +56,7 @@
 #define		RateAdaptiveTH_Low_40M		10
 #define		VeryLowRSSI					15
 
-#ifdef RTL8192SE
-#define		CTSToSelfTHVal				30
-#elif defined RTL8190P || defined RTL8192E
 #define		CTSToSelfTHVal					35
-#endif
 
 #define		WAIotTHVal						25
 
@@ -302,9 +294,7 @@ extern void hal_dm_watchdog(struct net_device *dev);
 extern  void    init_rate_adaptive(struct net_device *dev);
 extern  void    dm_txpower_trackingcallback(void *data);
 
-#ifndef RTL8192SE
 extern  void    dm_cck_txpower_adjust(struct net_device *dev,bool  binch14);
-#endif
 
 extern  void    dm_restore_dynamic_mechanism_state(struct net_device *dev);
 extern  void    dm_backup_dynamic_mechanism_state(struct net_device *dev);
@@ -321,19 +311,9 @@ extern  void    dm_init_edca_turbo(struct net_device *dev);
 extern  void    dm_rf_operation_test_callback(unsigned long data);
 extern  void    dm_rf_pathcheck_workitemcallback(void *data);
 extern  void dm_fsync_timer_callback(unsigned long data);
-#if 0
-extern  bool    dm_check_lbus_status(struct net_device *dev);
-#endif
 extern  void dm_check_fsync(struct net_device *dev);
 extern  void    dm_shadow_init(struct net_device *dev);
 extern  void dm_initialize_txpower_tracking(struct net_device *dev);
 
-#if (defined RTL8192E || defined RTL8192SE)
-extern  void    dm_gpio_change_rf_callback(void *data);
-#endif
-
-
 #endif	/*__R8192UDM_H__ */
-
-
 /* End of r8192U_dm.h */

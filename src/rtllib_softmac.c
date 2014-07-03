@@ -448,22 +448,6 @@ void rtllib_send_beacon_cb(unsigned long _ieee)
 	spin_unlock_irqrestore(&ieee->beacon_lock, flags);
 }
 
-#if defined(RTL8192U) || defined(RTL8192SU) || defined(RTL8192SE)
-void rtllib_ibss_wait_timeout(unsigned long _ieee)
-{
-	struct rtllib_device *ieee =
-		(struct rtllib_device *) _ieee;
-	printk("======>%s():oh oh ibss wait beacon time out, search a new ibss now\n",__FUNCTION__);
-	rtllib_stop_send_beacons(ieee);
-#if LINUX_VERSION_CODE > KERNEL_VERSION(2,5,0)
-	cancel_delayed_work(&ieee->start_ibss_wq);
-	cancel_delayed_work(&ieee->link_change_wq);
-#endif
-	rtllib_stop_scan(ieee);
-	queue_delayed_work_rsl(ieee->wq, &ieee->start_ibss_wq, MSECS(150));
-}
-#endif
-
 void rtllib_send_probe(struct rtllib_device *ieee)
 {
 	struct sk_buff *skb;
@@ -868,10 +852,6 @@ static struct sk_buff* rtllib_probe_resp(struct rtllib_device *ieee, u8 *dest)
 	PRT_HIGH_THROUGHPUT	pHTInfo = ieee->pHTInfo;
 	u8* tmp_generic_ie_buf=NULL;
 	u8 tmp_generic_ie_len=0;
-#if defined(RTL8192U) || defined(RTL8192SU) || defined(RTL8192SE)
-	u8 wmmie[9] = {0};
-	u8 wmm_len = 0;
-#endif
 	if(rate_ex_len > 0) rate_ex_len+=2;
 
 	if(ieee->current_network.capability & WLAN_CAPABILITY_IBSS)
@@ -879,12 +859,6 @@ static struct sk_buff* rtllib_probe_resp(struct rtllib_device *ieee, u8 *dest)
 	else
 		atim_len = 0;
 
-#if 0
-	if(rtllib_is_54g(&ieee->current_network))
-		erp_len = 3;
-	else
-		erp_len = 0;
-#else
       if((ieee->current_network.mode == IEEE_G)
 		||( ieee->current_network.mode == IEEE_N_24G && ieee->pHTInfo->bCurSuppCCK)) {
 		erp_len = 3;
@@ -894,7 +868,6 @@ static struct sk_buff* rtllib_probe_resp(struct rtllib_device *ieee, u8 *dest)
 	}
 	else
 		erp_len = 0;
-#endif
 
 	crypt = ieee->crypt[ieee->tx_keyidx];
 	encrypt = ieee->host_encrypt && crypt && crypt->ops &&
@@ -915,15 +888,6 @@ static struct sk_buff* rtllib_probe_resp(struct rtllib_device *ieee, u8 *dest)
 			HTConstructRT2RTAggElement(ieee, tmp_generic_ie_buf, &tmp_generic_ie_len);
 		}
 	}
-#if defined(RTL8192U) || defined(RTL8192SU) || defined(RTL8192SE)
-	if(ieee->qos_support){
-
-		if(ieee->iw_mode == IW_MODE_ADHOC)
-		{
-		}
-	}
-#endif
-
 	beacon_size = sizeof(struct rtllib_probe_response)+2+
 		ssid_len
 		+3
@@ -932,12 +896,6 @@ static struct sk_buff* rtllib_probe_resp(struct rtllib_device *ieee, u8 *dest)
 		+atim_len
 		+erp_len
 		+wpa_ie_len
-#if defined(RTL8192U) || defined(RTL8192SU) || defined(RTL8192SE)
-		+tmp_ht_cap_len
-		+tmp_ht_info_len
-		+tmp_generic_ie_len
-		+wmm_len
-#endif
 		+ieee->tx_headroom;
 #ifdef USB_USE_ALIGNMENT
         u32 Tmpaddr=0;
@@ -1011,29 +969,12 @@ static struct sk_buff* rtllib_probe_resp(struct rtllib_device *ieee, u8 *dest)
 		*(tag++) = 1;
 		*(tag++) = erpinfo_content;
 	}
-#if defined(RTL8192U) || defined(RTL8192SU) || defined(RTL8192SE)
-	if(tmp_ht_cap_len){
-		*(tag++) = MFIE_TYPE_HT_CAP;
-		*(tag++) = tmp_ht_cap_len - 2;
-		memcpy(tag, tmp_ht_cap_buf, tmp_ht_cap_len - 2);
-		tag += tmp_ht_cap_len - 2;
-	}
-#endif
 	if(rate_ex_len){
 		*(tag++) = MFIE_TYPE_RATES_EX;
 		*(tag++) = rate_ex_len-2;
 		memcpy(tag,ieee->current_network.rates_ex,rate_ex_len-2);
 		tag+=rate_ex_len-2;
 	}
-
-#if defined(RTL8192U) || defined(RTL8192SU) || defined(RTL8192SE)
-	if(tmp_ht_info_len){
-		*(tag++) = MFIE_TYPE_HT_INFO;
-		*(tag++) = tmp_ht_info_len - 2;
-		memcpy(tag, tmp_ht_info_buf, tmp_ht_info_len -2);
-		tag += tmp_ht_info_len - 2;
-	}
-#endif
 
 	if (wpa_ie_len)
 	{
@@ -1044,25 +985,6 @@ static struct sk_buff* rtllib_probe_resp(struct rtllib_device *ieee, u8 *dest)
 		memcpy(tag, ieee->wpa_ie, ieee->wpa_ie_len);
 		tag += ieee->wpa_ie_len;
 	}
-
-#if defined(RTL8192U) || defined(RTL8192SU) || defined(RTL8192SE)
-	if(tmp_generic_ie_len)
-	{
-		(*tag++) = 0xdd;
-		(*tag++) = tmp_generic_ie_len - 2;
-		memcpy(tag,tmp_generic_ie_buf,tmp_generic_ie_len -2);
-		tag += tmp_generic_ie_len -2;
-
-	}
-#endif
-
-#if defined(RTL8192U) || defined(RTL8192SU) || defined(RTL8192SE)
-	if(ieee->qos_support)
-	{
-		if(wmm_len)
-			memcpy(tag,wmmie,wmm_len);
-	}
-#endif
 	return skb;
 }
 
@@ -1971,11 +1893,6 @@ inline void rtllib_softmac_new_net(struct rtllib_device *ieee, struct rtllib_net
 					        ieee->LedControlHandler(ieee->dev, LED_CTL_START_TO_LINK);
 					queue_delayed_work_rsl(ieee->wq, &ieee->associate_procedure_wq, 0);
 				}else{
-#if defined(RTL8192U) || defined(RTL8192SU) || defined(RTL8192SE)
-					ieee->state = RTLLIB_LINKED;
-					ieee->SetWirelessMode(ieee->dev, ieee->current_network.mode);
-					mod_timer(&ieee->ibss_wait_timer,jiffies+(MSECS(20000)));
-#else
 					if(rtllib_is_54g(&ieee->current_network) &&
 						(ieee->modulation & RTLLIB_OFDM_MODULATION)){
 						ieee->rate = 108;
@@ -1988,7 +1905,6 @@ inline void rtllib_softmac_new_net(struct rtllib_device *ieee, struct rtllib_net
 					}
 					memset(ieee->dot11HTOperationalRateSet, 0, 16);
 					ieee->state = RTLLIB_LINKED;
-#endif
 				}
 
 		}
@@ -2158,20 +2074,10 @@ static inline u16 assoc_parse(struct rtllib_device *ieee, struct sk_buff *skb, i
 void rtllib_rx_probe_rq(struct rtllib_device *ieee, struct sk_buff *skb)
 {
 	u8 dest[ETH_ALEN];
-#if defined(RTL8192U) || defined(RTL8192SU) || defined(RTL8192SE)
-	struct sta_info *psta = NULL;
-#endif
 	ieee->softmac_stats.rx_probe_rq++;
 	if (probe_rq_parse(ieee, skb, dest) > 0){
 		ieee->softmac_stats.tx_probe_rs++;
 		rtllib_resp_to_probe(ieee, dest);
-#if defined(RTL8192U) || defined(RTL8192SU) || defined(RTL8192SE)
-		if(ieee->iw_mode == IW_MODE_ADHOC){
-			psta = GetStaInfo(ieee, dest);
-			if(NULL != psta)
-				psta->LastActiveTime = jiffies;
-		}
-#endif
 	}
 }
 static inline void
@@ -3006,15 +2912,7 @@ void rtllib_start_ibss_wq(void *data)
 		}
 
 		ieee->current_network.QoS_Enable = 0;
-#if defined(RTL8192U) || defined(RTL8192SU) || defined(RTL8192SE)
-#ifdef ADHOC_11N
-		ieee->SetWirelessMode(ieee->dev, ieee->mode);
-#else
 		ieee->SetWirelessMode(ieee->dev, IEEE_G);
-#endif
-#else
-		ieee->SetWirelessMode(ieee->dev, IEEE_G);
-#endif
 		ieee->current_network.mode = ieee->mode;
 		ieee->current_network.atim_window = 0;
 		ieee->current_network.capability = WLAN_CAPABILITY_IBSS;
@@ -3030,16 +2928,7 @@ void rtllib_start_ibss_wq(void *data)
 
 	ieee->link_change(ieee->dev);
 
-#if defined(RTL8192U) || defined(RTL8192SU) || defined(RTL8192SE)
-	ieee->SetBeaconRelatedRegistersHandler(ieee->dev);
-
-	if(ieee->pHTInfo->bCurBW40MHz)
-		HTSetConnectBwMode(ieee, HT_CHANNEL_WIDTH_20_40, (ieee->current_network.channel<=6)?HT_EXTCHNL_OFFSET_UPPER:HT_EXTCHNL_OFFSET_LOWER);
-	else
-		HTSetConnectBwMode(ieee, HT_CHANNEL_WIDTH_20, (ieee->current_network.channel<=6)?HT_EXTCHNL_OFFSET_UPPER:HT_EXTCHNL_OFFSET_LOWER);
-#else
 	HTSetConnectBwMode(ieee, HT_CHANNEL_WIDTH_20, HT_EXTCHNL_OFFSET_NO_EXT);
-#endif
 	if(ieee->LedControlHandler != NULL)
 	        ieee->LedControlHandler(ieee->dev,LED_CTL_LINK);
 
@@ -3234,9 +3123,6 @@ void rtllib_stop_protocol(struct rtllib_device *ieee, u8 shutdown)
 
 	rtllib_stop_send_beacons(ieee);
 	del_timer_sync(&ieee->associate_timer);
-#if defined(RTL8192U) || defined(RTL8192SU) || defined(RTL8192SE)
-	del_timer_sync(&ieee->ibss_wait_timer);
-#endif
 #if LINUX_VERSION_CODE > KERNEL_VERSION(2,5,0)
 	cancel_delayed_work(&ieee->associate_retry_wq);
 	cancel_delayed_work(&ieee->start_ibss_wq);
@@ -3399,12 +3285,6 @@ void rtllib_softmac_init(struct rtllib_device *ieee)
 	_setup_timer(&ieee->beacon_timer,
 		    rtllib_send_beacon_cb,
 		    (unsigned long) ieee);
-
-#if defined(RTL8192U) || defined(RTL8192SU) || defined(RTL8192SE)
-	_setup_timer(&ieee->ibss_wait_timer,
-		    rtllib_ibss_wait_timeout,
-		    (unsigned long) ieee);
-#endif
 
 #if LINUX_VERSION_CODE > KERNEL_VERSION(2,5,0)
 #ifdef PF_SYNCTHREAD

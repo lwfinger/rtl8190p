@@ -350,17 +350,6 @@ void rtllib_wx_sync_scan_wq(void *data)
 	msleep(50);
 
 	ieee->InitialGainHandler(ieee->dev,IG_Backup);
-#if defined(RTL8192SE)
-#if(RTL8192S_DISABLE_FW_DM == 0)
-	if (ieee->SetFwCmdHandler) {
-		ieee->SetFwCmdHandler(ieee->dev, FW_CMD_PAUSE_DM_BY_SCAN);
-	}
-#endif
-#endif
-#ifdef RTL8192SU
-	ieee->ScanOperationBackupHandler(ieee->dev,SCAN_OPT_BACKUP);
-#endif
-
 	if (ieee->pHTInfo->bCurrentHTSupport && ieee->pHTInfo->bEnableHT && ieee->pHTInfo->bCurBW40MHz) {
 		b40M = 1;
 		chan_offset = ieee->pHTInfo->CurSTAExtChnlOffset;
@@ -384,16 +373,6 @@ void rtllib_wx_sync_scan_wq(void *data)
 
 	ieee->InitialGainHandler(ieee->dev,IG_Restore);
 
-#if defined(RTL8192SE)
-#if(RTL8192S_DISABLE_FW_DM == 0)
-	if (ieee->SetFwCmdHandler) {
-		ieee->SetFwCmdHandler(ieee->dev, FW_CMD_RESUME_DM_BY_SCAN);
-	}
-#endif
-#endif
-#ifdef RTL8192SU
-	ieee->ScanOperationBackupHandler(ieee->dev,SCAN_OPT_RESTORE);
-#endif
 	ieee->state = RTLLIB_LINKED;
 	ieee->link_change(ieee->dev);
 

@@ -1590,7 +1590,6 @@ void InitialGain819xPci(struct net_device *dev, u8 Operation)
 	}
 }
 
-#ifndef RTL8192SE
 bool
 SetRFPowerState8190(
 	struct net_device* dev,
@@ -1835,6 +1834,5 @@ SetRFPowerState(
 
 	return bResult;
 }
-#endif
 
 #endif

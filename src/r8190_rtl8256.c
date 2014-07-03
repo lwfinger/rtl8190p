@@ -18,13 +18,8 @@
 ******************************************************************************/
 
 #include "rtl_core.h"
-#ifdef RTL8192SE
-#include "r8192S_phyreg.h"
-#include "r8192S_phy.h"
-#else
 #include "r819xE_phyreg.h"
 #include "r819xE_phy.h"
-#endif
 #include "r8190_rtl8256.h"
 
 void PHY_SetRF8256Bandwidth(struct net_device* dev , HT_CHANNEL_WIDTH Bandwidth)
@@ -208,20 +203,16 @@ phy_RF8256_Config_ParaFile_Fail:
 	return false;
 }
 
-#ifndef RTL8192SE
 void PHY_SetRF8256CCKTxPower(struct net_device*	dev, u8	powerlevel)
 {
 	u32	TxAGC=0;
 	struct r8192_priv *priv = rtllib_priv(dev);
-#ifdef RTL8190P
 	u8				byte0, byte1;
 
 	TxAGC |= ((powerlevel<<8)|powerlevel);
 	TxAGC += priv->CCKTxPowerLevelOriginalOffset;
 
-	if(priv->bDynamicTxLowPower == true
-		/*pMgntInfo->bScanInProgress == true*/ )
-	{
+	if(priv->bDynamicTxLowPower == true) {
 		if(priv->CustomerID == RT_CID_819x_Netcore)
 			TxAGC = 0x2222;
 		else
@@ -234,34 +225,16 @@ void PHY_SetRF8256CCKTxPower(struct net_device*	dev, u8	powerlevel)
 		byte0 = 0x24;
 	if(byte1 > 0x24)
 		byte1 = 0x24;
-	if(priv->rf_type == RF_2T4R)
-	{
-			if(priv->RF_C_TxPwDiff > 0)
-			{
-				if( (byte0 + (u8)priv->RF_C_TxPwDiff) > 0x24)
-					byte0 = 0x24 - priv->RF_C_TxPwDiff;
-				if( (byte1 + (u8)priv->RF_C_TxPwDiff) > 0x24)
-					byte1 = 0x24 - priv->RF_C_TxPwDiff;
-			}
+	if(priv->rf_type == RF_2T4R) {
+		if(priv->RF_C_TxPwDiff > 0) {
+			if( (byte0 + (u8)priv->RF_C_TxPwDiff) > 0x24)
+				byte0 = 0x24 - priv->RF_C_TxPwDiff;
+			if( (byte1 + (u8)priv->RF_C_TxPwDiff) > 0x24)
+				byte1 = 0x24 - priv->RF_C_TxPwDiff;
 		}
+	}
 	TxAGC = (byte1<<8) |byte0;
 	write_nic_dword(dev, CCK_TXAGC, TxAGC);
-#else
-	#ifdef RTL8192E
-
-	TxAGC = powerlevel;
-	if(priv->bDynamicTxLowPower == true)
-	{
-		if(priv->CustomerID == RT_CID_819x_Netcore)
-		TxAGC = 0x22;
-	else
-		TxAGC += priv->CckPwEnl;
-	}
-	if(TxAGC > 0x24)
-		TxAGC = 0x24;
-	rtl8192_setBBreg(dev, rTxAGC_CCK_Mcs32, bTxAGCRateCCK, TxAGC);
-	#endif
-#endif
 }
 
 
@@ -380,7 +353,3 @@ void PHY_SetRF8256OFDMTxPower(struct net_device* dev, u8 powerlevel)
 #endif
 	return;
 }
-
-
-
-#endif

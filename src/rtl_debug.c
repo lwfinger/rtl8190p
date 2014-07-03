@@ -318,37 +318,19 @@ static int proc_get_registers_0(char *page, char **start,
 	int max=0xff;
 	page0 = 0x000;
 
-#ifdef RTL8192SE
-	/* This dump the current register page */
-	if(!IS_BB_REG_OFFSET_92S(page0)){
-		len += snprintf(page + len, count - len,
-				"\n####################page %x##################\n ", (page0>>8));
-		for(n=0;n<=max;)
-		{
+	len += snprintf(page + len, count - len,
+			"\n####################page %x##################\n ", (page0>>8));
+	for(n=0;n<=max;) {
+		len += snprintf(page + len, count - len, "\nD:  %2x > ",n);
+		for(i=0;i<16 && n<=max;n++,i++)
 			len += snprintf(page + len, count - len,
-					"\nD:  %2x > ",n);
-			for(i=0;i<16 && n<=max;i++,n++)
-				len += snprintf(page + len, count - len,
-						"%2.2x ",read_nic_byte(dev,(page0|n)));
-		}
-	}else
-#endif
-	{
-		len += snprintf(page + len, count - len,
-				"\n####################page %x##################\n ", (page0>>8));
-		for(n=0;n<=max;)
-		{
-			len += snprintf(page + len, count - len, "\nD:  %2x > ",n);
-			for(i=0;i<16 && n<=max;n++,i++)
-				len += snprintf(page + len, count - len,
-						"%2.2x ",read_nic_byte(dev,(page0|n)));
-		}
+					"%2.2x ",read_nic_byte(dev,(page0|n)));
 	}
 	len += snprintf(page + len, count - len,"\n");
 	*eof = 1;
 	return len;
-
 }
+
 static int proc_get_registers_1(char *page, char **start,
 			  off_t offset, int count,
 			  int *eof, void *data)

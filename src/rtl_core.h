@@ -57,24 +57,11 @@
 #include "dot11d.h"
 #endif
 
-#ifdef RTL8192SE
-#include "r8192S_phy.h"
-#include "r8192S_phyreg.h"
-#include "r8192S_firmware.h"
-#include "r8192SE_hw.h"
-#elif defined RTL8190P || defined RTL8192E
 #include "r819xE_firmware.h"
 #include "r8192E_hw.h"
-#endif
 
-#ifdef RTL8192SE
-#include "rtl8192se.h"
-#include "r8192S_led.h"
-#include "r8192SE_def.h"
-#elif defined RTL8190P || defined RTL8192E
 #include "r8190P_def.h"
 #include "rtl8192e.h"
-#endif
 
 #include "rtl_debug.h"
 #include "rtl_eeprom.h"
@@ -85,13 +72,7 @@
 #define DRV_AUTHOR  "<wlanfae@realtek.com>"
 #define DRV_VERSION "V 1.1"
 
-#ifdef RTL8190P
 #define DRV_NAME "rtl819xP"
-#elif defined RTL8192E
-#define DRV_NAME "rtl819xE"
-#elif defined RTL8192SE
-#define DRV_NAME "rtl819xSE"
-#endif
 
 #if (LINUX_VERSION_CODE > KERNEL_VERSION(2,5,0))
 #define RTL_PCI_DEVICE(vend, dev, cfg) \
@@ -606,9 +587,6 @@ struct rtl819x_ops{
 typedef struct r8192_priv
 {
 	struct pci_dev *pdev;
-#ifdef RTL8192SE
-	struct pci_dev *bridge_pdev;
-#endif
 	//add for handles different nics' operations. WB
 	struct rtl819x_ops* ops;
 	bool bfirst_init;//added by amy 090414
@@ -639,9 +617,6 @@ typedef struct r8192_priv
 	spinlock_t tx_lock;
 	spinlock_t rf_ps_lock;
 	spinlock_t rw_lock;
-#ifdef RTL8192SE_CONFIG_ASPM_OR_D3
-	spinlock_t D3_lock;
-#endif
 #if (LINUX_VERSION_CODE < KERNEL_VERSION(2,6,16))
 	struct semaphore mutex;
 #else

@@ -53,10 +53,6 @@ void print_buffer(u32 *buffer, int len);
 void dump_eprom(struct net_device *dev);
 void rtl8192_dump_reg(struct net_device *dev);
 
-#ifdef RTL8192SE
-void rtl8192se_dump_tx_desc(struct _tx_desc_8192se *pDesc);
-#endif
-
 /* debugfs stuff */
 #ifdef CONFIG_RTLWIFI_DEBUGFS
 int rtl_debug_module_init(struct r8192_priv *priv, const char *name);

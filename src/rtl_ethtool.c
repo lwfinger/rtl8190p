@@ -37,10 +37,6 @@ static void rtl819x_ethtool_get_drvinfo(struct net_device *dev,
 
 	strcpy(info->driver, DRV_NAME);
 	strcpy(info->version, DRV_VERSION);
-#if defined RTL8192SE
-	snprintf(info->fw_version, sizeof(info->fw_version), "%d",
-			priv->pFirmware->FirmwareVersion);
-#endif
 	strcpy(info->bus_info, pci_name(priv->pdev));
 }
 

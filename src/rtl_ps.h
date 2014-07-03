@@ -31,16 +31,6 @@ struct net_device;
 #define RT_CHECK_FOR_HANG_PERIOD 2
 #define INIT_DEFAULT_CHAN	 1
 
-#if defined RTL8192SE  && defined RTL8192SE_CONFIG_ASPM_OR_D3
-#define RT_DISABLE_ASPM(dev)            PlatformDisableASPM(dev)
-#define RT_ENABLE_ASPM(dev)             PlatformEnableASPM(dev)
-#define RT_ENTER_D3(dev, _bTempSetting) PlatformSetPMCSR(dev, 0x03, _bTempSetting)
-#define RT_LEAVE_D3(dev, _bTempSetting) PlatformSetPMCSR(dev, 0, _bTempSetting)
-void PlatformDisableASPM(struct net_device *dev);
-void PlatformEnableASPM(struct net_device *dev);
-u32 PlatformResetPciSpace(struct net_device *dev,u8 Value);
-#endif
-
 #ifdef ENABLE_IPS
 void IPSEnter(struct net_device *dev);
 void IPSLeave(struct net_device *dev);

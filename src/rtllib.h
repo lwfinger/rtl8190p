@@ -222,7 +222,6 @@ static inline void *netdev_priv_rsl(struct net_device *dev)
 /* added for rtl819x tx procedure */
 #define MAX_QUEUE_SIZE		0x10
 
-#if defined(RTL8192SU) || defined(RTL8190P) ||defined(RTL8192U) ||defined(RTL8192E)
 #define BK_QUEUE                               0
 #define BE_QUEUE                               1
 #define VI_QUEUE                               2
@@ -232,18 +231,6 @@ static inline void *netdev_priv_rsl(struct net_device *dev)
 #define MGNT_QUEUE                             6
 #define HIGH_QUEUE                             7
 #define BEACON_QUEUE                           8
-#elif defined(RTL8192SE)
-#define BK_QUEUE                               0
-#define BE_QUEUE                               1
-#define VI_QUEUE                               2
-#define VO_QUEUE                               3
-#define BEACON_QUEUE                          4
-#define TXCMD_QUEUE                            5
-#define MGNT_QUEUE                             6
-#define HIGH_QUEUE                             7
-#define HCCA_QUEUE                             8
-
-#endif
 
 #define LOW_QUEUE                              BE_QUEUE
 #define NORMAL_QUEUE                           MGNT_QUEUE
@@ -2297,13 +2284,6 @@ struct rtllib_device {
 	RT_RF_CHANGE_SOURCE	RfOffReason;
 	bool is_set_key;
 	bool wx_set_enc;
-#if defined(RTL8192U) || defined(RTL8192SU) || defined(RTL8192SE)
-	struct sta_info *peer_assoc_list[PEER_MAX_ASSOC];
-	atomic_t	AsocEntryNum;
-	u64	CurrTsf;
-	u64	TargetTsf;
-	bool	Peer_bCurBW40M;
-#endif
 	PRT_HIGH_THROUGHPUT	pHTInfo;
 	spinlock_t bw_spinlock;
 
@@ -2571,25 +2551,14 @@ struct rtllib_device {
 
 	/* used if IEEE_SOFTMAC_BEACONS is set */
 	struct timer_list beacon_timer;
-#if defined(RTL8192U) || defined(RTL8192SU) || defined(RTL8192SE)
-	struct timer_list ibss_wait_timer;
-#endif
 	work_struct_rsl associate_complete_wq;
 #ifdef ENABLE_IPS
 	work_struct_rsl ips_leave_wq;
-#endif
-#if defined(RTL8192U) || defined(RTL8192SU) || defined(RTL8192SE)
-	delayed_work_struct_rsl check_tsf_wq;
-	delayed_work_struct_rsl update_assoc_sta_info_wq;
 #endif
 	delayed_work_struct_rsl associate_procedure_wq;
 	delayed_work_struct_rsl softmac_scan_wq;
 	delayed_work_struct_rsl associate_retry_wq;
 	delayed_work_struct_rsl start_ibss_wq;
-#ifndef RTL8190P
-	delayed_work_struct_rsl hw_wakeup_wq;
-	delayed_work_struct_rsl hw_sleep_wq;
-#endif
 	delayed_work_struct_rsl link_change_wq;
 	work_struct_rsl wx_sync_scan_wq;
 
@@ -2747,11 +2716,6 @@ struct rtllib_device {
 #endif
 #ifdef ENABLE_LPS
 	void (*LeisurePSLeave)(struct net_device *dev);
-#endif
-#if defined(RTL8192U) || defined(RTL8192SU) || defined(RTL8192SE)
-	void (*SetBeaconRelatedRegistersHandler)(struct net_device* dev);
-	bool (*check_ht_cap)(struct net_device* dev, struct sta_info *sta, struct rtllib_network* net);
-	void (*Adhoc_InitRateAdaptive)(struct net_device *dev,struct sta_info  *pEntry);
 #endif
 	/* This must be the last item so that it points to the data
 	 * allocated beyond this structure by alloc_rtllib */
@@ -3185,10 +3149,6 @@ int rtllib_parse_info_param(struct rtllib_device *ieee,
 		struct rtllib_rx_stats *stats);
 
 void rtllib_indicate_packets(struct rtllib_device *ieee, struct rtllib_rxb** prxbIndicateArray,u8  index);
-#if defined(RTL8192U) || defined(RTL8192SU) || defined(RTL8192SE)
-void IbssAgeFunction(struct rtllib_device *ieee);
-struct sta_info *GetStaInfo(struct rtllib_device *ieee, u8 *addr);
-#endif
 u8 HTFilterMCSRate( struct rtllib_device* ieee, u8* pSupportMCS, u8* pOperateMCS);
 void HTUseDefaultSetting(struct rtllib_device* ieee);
 #define RT_ASOC_RETRY_LIMIT	5

@@ -242,47 +242,7 @@ int r8192_wx_get_adhoc_peers(struct net_device *dev,
 			       struct iw_request_info *info,
 			       union iwreq_data *wrqu, char *extra)
 {
-#ifndef RTL8192SE
 	return 0;
-#else
-	struct r8192_priv *priv = rtllib_priv(dev);
-	struct sta_info * psta = NULL;
-	adhoc_peers_info_t adhoc_peers_info;
-	p_adhoc_peers_info_t  padhoc_peers_info = &adhoc_peers_info; //(p_adhoc_peers_info_t)extra;
-	p_adhoc_peer_entry_t padhoc_peer_entry = NULL;
-	int k=0;
-
-
-	memset(extra, 0, 2047);
-	padhoc_peers_info->num = 0;
-
-	down(&priv->wx_sem);
-
-	for(k=0; k<PEER_MAX_ASSOC; k++)
-	{
-		psta = priv->rtllib->peer_assoc_list[k];
-		if(NULL != psta)
-		{
-			padhoc_peer_entry = &padhoc_peers_info->Entry[padhoc_peers_info->num];
-			memset(padhoc_peer_entry,0, sizeof(adhoc_peer_entry_t));
-			memcpy(padhoc_peer_entry->MacAddr, psta->macaddr, ETH_ALEN);
-			padhoc_peer_entry->WirelessMode = psta->wireless_mode;
-			padhoc_peer_entry->bCurTxBW40MHz = psta->htinfo.bCurTxBW40MHz;
-			padhoc_peers_info->num ++;
-			printk("[%d] MacAddr:"MAC_FMT" \tWirelessMode:%d \tBW40MHz:%d \n", \
-				k, MAC_ARG(padhoc_peer_entry->MacAddr), padhoc_peer_entry->WirelessMode, padhoc_peer_entry->bCurTxBW40MHz);
-			sprintf(extra, "[%d] MacAddr:"MAC_FMT" \tWirelessMode:%d \tBW40MHz:%d \n",  \
-				k, MAC_ARG(padhoc_peer_entry->MacAddr), padhoc_peer_entry->WirelessMode, padhoc_peer_entry->bCurTxBW40MHz);
-		}
-	}
-
-	up(&priv->wx_sem);
-
-	wrqu->data.length = strlen(extra);//sizeof(adhoc_peers_info_t);
-	wrqu->data.flags = 0;
-	return 0;
-
-#endif
 }
 
 
@@ -290,18 +250,6 @@ static int r8191se_wx_get_firm_version(struct net_device *dev,
 		struct iw_request_info *info,
 		struct iw_param *wrqu, char *extra)
 {
-#ifdef RTL8192SE
-        struct r8192_priv *priv = rtllib_priv(dev);
-	u16 firmware_version;
-
-	down(&priv->wx_sem);
-	printk("%s(): Just Support 92SE tmp\n", __FUNCTION__);
-	firmware_version = priv->pFirmware->FirmwareVersion;
-	wrqu->value = firmware_version;
-	wrqu->fixed = 1;
-
-	up(&priv->wx_sem);
-#endif
 	return 0;
 }
 
