@@ -18,23 +18,9 @@
 ******************************************************************************/
 
 #ifdef CONFIG_PM_RTL
-#ifdef RTL8192CE
-#include "rtl_core.h"
-#include "r8192C_hw.h"
-#include "r8192C_phy.h"
-#include "r8192C_phyreg.h"
-#include "r8192C_rtl6052.h"
-#elif defined RTL8192SE
-#include "rtl_core.h"
-#include "r8192SE_hw.h"
-#include "r8192S_phy.h"
-#include "r8192S_phyreg.h"
-#include "r8192S_rtl6052.h"
-#else
 #include "rtl_core.h"
 #include "r8192E_hw.h"
 #include "r8190_rtl8256.h"
-#endif
 #include "rtl_pm.h"
 
 int rtl8192E_save_state (struct pci_dev *dev, pm_message_t state)
@@ -76,7 +62,6 @@ int rtl8192E_suspend (struct pci_dev *pdev, pm_message_t state)
 	// Call MgntActSet_RF_State instead to prevent RF config race condition.
 	// By Bruce, 2008-01-17.
 	//
-#if !(defined RTL8192SE || defined RTL8192CE)
 	if(!priv->rtllib->bSupportRemoteWakeUp) {
 		MgntActSet_RF_State(dev, eRfOff, RF_CHANGE_BY_INIT);
 		// 2006.11.30. System reset bit
@@ -99,7 +84,6 @@ int rtl8192E_suspend (struct pci_dev *pdev, pm_message_t state)
 		//Disable tx, enanble rx
 		write_nic_byte(dev, MacBlkCtrl, 0xa);
 	}
-#endif
 out_pci_suspend:
 	RT_TRACE(COMP_POWER, "r8192E support WOL call??????????????????????\n");
 	printk("r8192E support WOL call??????????????????????\n");

@@ -236,13 +236,6 @@ u8 MgntQuery_MgntFrameTxRate(struct rtllib_device *ieee)
 		rate = 0x0c;
 	else
 		rate = ieee->basic_rate & 0x7f;
-#elif defined RTL8192SE || defined RTL8192SU || defined RTL8192CE
-	if(pHTInfo->IOTAction & HT_IOT_ACT_WA_IOT_Broadcom)
-	{
-		rate = MgntQuery_TxRateExcludeCCKRates(ieee);
-	}
-	else
-		rate = ieee->basic_rate & 0x7f;
 #endif
 
 	if(rate == 0){
@@ -254,15 +247,6 @@ u8 MgntQuery_MgntFrameTxRate(struct rtllib_device *ieee)
 			rate = 0x02;
 	}
 
-	/*
-	if( pMgntInfo->bScanInProgress || (pMgntInfo->bDualModeScanStep!=0) )
-	{
-	if(pMgntInfo->dot11CurrentWirelessMode==WIRELESS_MODE_A)
-	rate = 0x0c;
-	else
-	rate = 0x02;
-	}
-	 */
 	return rate;
 }
 

@@ -243,26 +243,10 @@ static inline void *netdev_priv_rsl(struct net_device *dev)
 #define HIGH_QUEUE                             7
 #define HCCA_QUEUE                             8
 
-#elif defined(RTL8192CE)
-
-#define BK_QUEUE						0
-#define BE_QUEUE						1
-#define VI_QUEUE						2
-#define VO_QUEUE						3
-#define HCCA_QUEUE						4
-#define TXCMD_QUEUE						5
-#define MGNT_QUEUE						6
-#define HIGH_QUEUE						7
-#define BEACON_QUEUE					8
 #endif
 
-#ifdef RTL8192CE
-#define LOW_QUEUE						BE_QUEUE
-#define NORMAL_QUEUE					VO_QUEUE
-#else
 #define LOW_QUEUE                              BE_QUEUE
 #define NORMAL_QUEUE                           MGNT_QUEUE
-#endif
 
 #define AMSDU_SUBHEADER_LEN 14
 #define SWRF_TIMEOUT				50
@@ -2233,36 +2217,6 @@ typedef struct _rate_adaptive
 	u8				PreRATRState;
 
 } rate_adaptive, *prate_adaptive;
-#if defined(RTL8192U) || defined(RTL8192SU) || defined(RTL8192SE) || defined RTL8192CE
-#define PEER_MAX_ASSOC 10
-struct sta_info {
-	u8 macaddr[ETH_ALEN];
-	u16 aid;
-	u8 authentication;
-	u8 encryption;
-	u16 capability;
-	u8 ratr_index;
-	int wireless_mode;
-	RT_HTINFO_STA_ENTRY htinfo;
-	u8 wme_enable;
-	u32 CurDataRate;
-	rate_adaptive     rate_adaptive;
-	u8 bPowerSave;
-	struct sk_buff_head PsQueue;
-	u32	LastActiveTime;
-	u16			StaDataRate;
-	u32			StaSS;
-	u16			RetryFrameCnt;
-	u16			LastRetryCnt;
-	u16			NoRetryFrameCnt;
-	u16			LastNoRetryCnt;
-	int			AvgRetryRate;
-	int			LastRetryRate;
-	u8			txRateIndex;
-	u16			APDataRate;
-	u16			ForcedDataRate;
-} __attribute__ ((packed));
-#endif
 
 #define	NUM_PMKID_CACHE		16
 

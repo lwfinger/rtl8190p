@@ -554,11 +554,7 @@ void rtllib_query_protectionmode(struct rtllib_device* ieee, cb_desc* tcb_desc, 
 			{
 				tcb_desc->bCTSEnable	= true;
 				tcb_desc->rts_rate  =	MGN_24M;
-#if defined(RTL8192SE) || defined(RTL8192SU) || defined RTL8192CE
-				tcb_desc->bRTSEnable = false;
-#else
 				tcb_desc->bRTSEnable = true;
-#endif
 				break;
 			}
 			else if(pHTInfo->IOTAction & (HT_IOT_ACT_FORCED_RTS|HT_IOT_ACT_PURE_N_MODE))
@@ -1000,11 +996,7 @@ int rtllib_xmit_inter(struct sk_buff *skb, struct net_device *dev)
 				}
 
 				if ((skb_queue_len(&ieee->skb_aggQ[queue_index]) != 0)||
-#if defined RTL8192SE || defined RTL8192CE
-				   (ieee->get_nic_desc_num(ieee->dev,queue_index)) > 1||
-#else
 				   (!ieee->check_nic_enough_desc(ieee->dev,queue_index))||
-#endif
 				   (ieee->queue_stop) ||
 				   (ieee->amsdu_in_process))
 				{

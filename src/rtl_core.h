@@ -91,8 +91,6 @@
 #define DRV_NAME "rtl819xE"
 #elif defined RTL8192SE
 #define DRV_NAME "rtl819xSE"
-#elif defined RTL8192CE
-#define DRV_NAME "rtl8192CE"
 #endif
 
 #if (LINUX_VERSION_CODE > KERNEL_VERSION(2,5,0))
@@ -126,81 +124,6 @@ do { if(rt_global_debug_component & component) \
 	printk(KERN_DEBUG DRV_NAME ":" x "\n" , \
 	       ##args);\
 }while(0);
-
-#ifdef RTL8192CE
-#define RT_ASSERT(_Exp,Fmt)				\
-		if(!(_Exp))						\
-		{								\
-			printk("Rtl819x: ");				\
-			printk Fmt;					\
-		}
-// Define PHY-BB/RF/MAC check module bit		--> FPHY
-#define		PHY_BBR				BIT0
-#define		PHY_BBW				BIT1
-#define		PHY_RFR				BIT2
-#define		PHY_RFW				BIT3
-#define		PHY_MACR				BIT4
-#define		PHY_MACW				BIT5
-#define		PHY_ALLR				BIT6
-#define		PHY_ALLW				BIT7
-#define		PHY_TXPWR				BIT8
-#define		PHY_PWRDIFF			BIT9
-// Define debug flag array for common debug print macro. */
-/* Define different debug flag for dedicated service modules in debug flag array. */
-// Each module has independt 32 bit debug flag you cnn define the flag as yout require.
-typedef enum tag_DBGP_Flag_Type_Definition
-{
-	FQoS				= 0,
-	FTX					= 1,
-	FRX					= 2,
-	FSEC				= 3,
-	FMGNT				= 4,
-	FMLME				= 5,
-	FRESOURCE			= 6,
-	FBEACON				= 7,
-	FISR				= 8,
-	FPHY				= 9,
-	FMP					= 10,
-	FEEPROM			= 11,
-	FPWR				= 12,
-	FDM					= 13,
-	FDBGCtrl			= 14,
-	FC2H				= 15,
-	FBT					= 16,
-	FINIT				= 17,
-	DBGP_TYPE_MAX
-}DBGP_FLAG_E;
-// Define init check for module bit		--> FINIT
-#define		INIT_EEPROM				BIT0
-#define		INIT_TxPower				BIT1
-#define		INIT_IQK					BIT2
-#define		EFUSE_READ_ALL			BIT2
-#define		EFUSE_PG					BIT1
-#define		DM_Monitor			BIT2
-#define RTPRINT(dbgtype, dbgflag, printstr)	\
-		{									\
-			{								\
-				printk printstr;				\
-			}								\
-		}
-
-#define RT_PRINT_DATA(_Comp, _TitleString, _HexData, _HexDataLen)			\
-		do {\
-			if((_Comp) & rt_global_debug_component )	\
-			{									\
-				int __i;								\
-				u8*	ptr = (u8*)_HexData;				\
-				printk("Rtl819x: ");						\
-				printk(_TitleString);						\
-				for( __i=0; __i<(int)_HexDataLen; __i++ )				\
-				{								\
-					printk("%02X%s", ptr[__i], (((__i + 1) % 4) == 0)?"  ":" ");	\
-					if (((__i + 1) % 16) == 0)	printk("\n");			\
-				}								\
-				printk("\n");							\
-			} \
-		}while(0);
-#endif
 
 #define RTL819x_DEBUG
 #ifdef RTL819x_DEBUG
@@ -371,13 +294,11 @@ typedef enum{
 	NIC_8192E       = 1,
 	NIC_8190P       = 2,
 	NIC_8192SE      = 4,
-//#ifdef RTL8192CE
 	NIC_8192CE		= 5,
 	NIC_8192CU		= 6,
 	NIC_8192DE		= 7,
 	NIC_8192DU		= 8,
-//#endif
-	} nic_t;
+} nic_t;
 
 typedef	enum _RT_EEPROM_TYPE{
 	EEPROM_93C46,
@@ -679,11 +600,7 @@ struct rtl819x_ops{
 	void (* tx_fill_cmd_descriptor)(struct net_device* dev, tx_desc_cmd * entry, cb_desc * cb_desc, struct sk_buff *skb);
 	bool (* rx_query_status_descriptor)(struct net_device* dev, struct rtllib_rx_stats*  stats, rx_desc *pdesc, struct sk_buff* skb);
 	void (* stop_adapter)(struct net_device *dev, bool reset);
-#if defined RTL8192SE || defined RTL8192CE
-	void (* update_ratr_table)(struct net_device* dev,u8* pMcsRate,struct sta_info* pEntry);
-#else
 	void (* update_ratr_table)(struct net_device* dev);
-#endif
 };
 
 typedef struct r8192_priv
@@ -700,9 +617,6 @@ typedef struct r8192_priv
 	bool bIgnoreSilentReset;
 	u32	SilentResetRxSoltNum;
 	u32	SilentResetRxSlotIndex;
-#if defined RTL8192SE || defined RTL8192CE
-	u32	SilentResetRxStuckEvent[MAX_SILENT_RESET_RX_SLOT_NUM];
-#endif
 	RT_CUSTOMER_ID CustomerID;
 	bool	being_init_adapter;
 	bool	sw_radio_on;
@@ -986,11 +900,7 @@ typedef struct r8192_priv
 	BB_REGISTER_DEFINITION_T	PHYRegDef[4];	//Radio A/B/C/D
 	// Read/write are allow for following hardware information variables
 	u8					pwrGroupCnt;
-#if defined RTL8192SE  || defined RTL8192CE
-	u32	MCSTxPowerLevelOriginalOffset[4][7];
-#else
 	u32	MCSTxPowerLevelOriginalOffset[6];
-#endif
 	u32	CCKTxPowerLevelOriginalOffset;
 	u8	TxPowerLevelCCK[14];			// CCK channel 1~14
 	u8	TxPowerLevelCCK_A[14];			// RF-A, CCK channel 1~14
@@ -1176,11 +1086,6 @@ typedef struct r8192_priv
 	//
 	// LED control.
 	//
-#if defined RTL8192SE || defined RTL8192CE
-	LED_STRATEGY_8190	LedStrategy;
-	LED_8190			SwLed0;
-	LED_8190			SwLed1;
-#endif
 	//define work item by amy 080526
 	delayed_work_struct_rsl update_beacon_wq;
 	delayed_work_struct_rsl watch_dog_wq;
@@ -1226,17 +1131,6 @@ typedef struct r8192_priv
 	u32  MptRCR;
 	//These are for MP
 
-#ifdef RTL8192CE
-	u8	EEPROMTSSI[2];
-	u8	EEPROMPwrLimitHT20[3];
-	u8	EEPROMPwrLimitHT40[3];
-	u8	EEPROMChnlAreaTxPwrCCK[2][3];
-	u8	EEPROMChnlAreaTxPwrHT40_1S[2][3];
-	u8	EEPROMChnlAreaTxPwrHT40_2SDiff[2][3];
-	u8	TxPwrLevelCck[2][14];
-	u8	TxPwrLevelHT40_1S[2][14];		// For HT 40MHZ pwr
-	u8	TxPwrLevelHT40_2S[2][14];		// For HT 40MHZ pwr
-#endif
 	// dm control initial gain flag
 	bool	bDMInitialGainEnable;
         bool    MutualAuthenticationFail;

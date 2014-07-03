@@ -239,8 +239,6 @@ int rtllib_wx_get_rate(struct rtllib_device *ieee,
 		else
 			tmp_rate = HTMcsToDataRate(ieee, 15);
 	}
-#elif defined RTL8192SE || defined RTL8192CE
-	tmp_rate = ieee->rtl_11n_user_show_rates(ieee->dev);
 #else
         tmp_rate = TxCountToDataRate(ieee, ieee->softmac_stats.CurrentShowTxate);
 #endif
@@ -351,9 +349,7 @@ void rtllib_wx_sync_scan_wq(void *data)
 	/* wait for ps packet to be kicked out successfully */
 	msleep(50);
 
-#if !(defined RTL8192SE ||defined RTL8192CE)
 	ieee->InitialGainHandler(ieee->dev,IG_Backup);
-#endif
 #if defined(RTL8192SE)
 #if(RTL8192S_DISABLE_FW_DM == 0)
 	if (ieee->SetFwCmdHandler) {
@@ -386,9 +382,7 @@ void rtllib_wx_sync_scan_wq(void *data)
 		ieee->set_chan(ieee->dev, chan);
 	}
 
-#if !(defined RTL8192SE ||defined RTL8192CE)
 	ieee->InitialGainHandler(ieee->dev,IG_Restore);
-#endif
 
 #if defined(RTL8192SE)
 #if(RTL8192S_DISABLE_FW_DM == 0)
