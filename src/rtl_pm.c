@@ -73,12 +73,10 @@ int rtl8192E_suspend (struct pci_dev *pdev, pm_message_t state)
 		write_nic_dword(dev, WFCRC0, 0xffffffff);
 		write_nic_dword(dev, WFCRC1, 0xffffffff);
 		write_nic_dword(dev, WFCRC2, 0xffffffff);
-#ifdef RTL8190P
 		//GPIO 0 = true
 		ucRegRead = read_nic_byte(dev, GPO);
 		ucRegRead |= BIT0;
 		write_nic_byte(dev, GPO, ucRegRead);
-#endif
 		//Write PMR register
 		write_nic_byte(dev, PMR, 0x5);
 		//Disable tx, enanble rx

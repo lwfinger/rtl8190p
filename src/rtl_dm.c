@@ -158,13 +158,7 @@ static	void dm_Init_WA_Broadcom_IOT(struct net_device *dev);
 static	void	dm_check_edca_turbo(struct net_device *dev);
 
 // DM --> HW RF control
-#if 0
-static	void	dm_check_rfctrl_gpio(struct net_device *dev);
-#endif
 
-#ifndef RTL8190P
-//static	void	dm_gpio_change_rf(struct net_device *dev);
-#endif
 // DM --> Check PBC
 static	void dm_check_pbc_gpio(struct net_device *dev);
 
@@ -752,7 +746,6 @@ static void dm_TXPowerTrackingCallback_TSSI(struct net_device * dev)
 			{
 						//switch(Adapter->HardwareType)
 						{
-							//case HARDWARE_TYPE_RTL8190P:
 								{
 						if(priv->rfc_txpowertrackingindex > 0)
 						{
@@ -797,7 +790,6 @@ static void dm_TXPowerTrackingCallback_TSSI(struct net_device * dev)
 				{
 					//switch(Adapter->HardwareType)
 					{
-						//case HARDWARE_TYPE_RTL8190P:
 							{
 					if(priv->rfc_txpowertrackingindex < (TxBBGainTableLength - 1))
 					{
@@ -817,7 +809,6 @@ static void dm_TXPowerTrackingCallback_TSSI(struct net_device * dev)
 			}else{
 				//switch(Adapter->HardwareType)
 				{
-					//case HARDWARE_TYPE_RTL8190P:
 				priv->CCKPresentAttentuation_difference
 					= priv->rfc_txpowertrackingindex - priv->rfc_txpowertracking_default;
 					//	break;
@@ -1402,24 +1393,6 @@ static void dm_InitializeTXPowerTracking_TSSI(struct net_device *dev)
 	priv->btxpower_trackingInit = false;
 
 }
-#ifndef RTL8190P
-static void dm_InitializeTXPowerTracking_ThermalMeter(struct net_device *dev)
-{
-	struct r8192_priv *priv = rtllib_priv(dev);
-
-	// Tx Power tracking by Theremal Meter require Firmware R/W 3-wire. This mechanism
-	// can be enabled only when Firmware R/W 3-wire is enabled. Otherwise, frequent r/w
-	// 3-wire by driver cause RF goes into wrong state.
-
-	if(priv->rtllib->FwRWRF)
-		priv->btxpower_tracking = true;
-	else
-		priv->btxpower_tracking = false;
-	priv->txpower_count       = 0;
-	priv->btxpower_trackingInit = false;
-	RT_TRACE(COMP_POWER_TRACKING, "pMgntInfo->bTXPowerTracking = %d\n", priv->btxpower_tracking);
-}
-#endif
 
 void dm_initialize_txpower_tracking(struct net_device *dev)
 {
@@ -2060,11 +2033,7 @@ static void dm_ctrl_initgain_byrssi_by_fwfalse_alarm(
 		{
 			// 2008/01/11 MH 40MHZ 90/92 register are not the same. */
 			// 2008/02/05 MH SD3-Jerry 92U/92E PD_TH are the same.
-			#ifdef RTL8190P
 			write_nic_byte(dev, rOFDM0_RxDetector1, 0x40);
-			#else
-				write_nic_byte(dev, (rOFDM0_XATxAFE+3), 0x00);
-				#endif
 		} else
 			write_nic_byte(dev, rOFDM0_RxDetector1, 0x42);
 
@@ -2122,11 +2091,7 @@ static void dm_ctrl_initgain_byrssi_by_fwfalse_alarm(
 		{
 			// 2008/01/11 MH 40MHZ 90/92 register are not the same. */
 			// 2008/02/05 MH SD3-Jerry 92U/92E PD_TH are the same.
-			#ifdef RTL8190P
 			write_nic_byte(dev, rOFDM0_RxDetector1, 0x42);
-			#else
-				write_nic_byte(dev, (rOFDM0_XATxAFE+3), 0x20);
-				#endif
 		}
 		else
 			write_nic_byte(dev, rOFDM0_RxDetector1, 0x44);
@@ -2190,23 +2155,10 @@ static void dm_ctrl_initgain_byrssi_highpwr(
 
 		// 3.1 Higher PD_TH for OFDM for high power state.
 		if (priv->CurrentChannelBW != HT_CHANNEL_WIDTH_20)
-		{
-			#ifdef RTL8190P
 			write_nic_byte(dev, rOFDM0_RxDetector1, 0x41);
-			#else
-				write_nic_byte(dev, (rOFDM0_XATxAFE+3), 0x10);
-				#endif
-
-			/*else if (priv->card_8192 == HARDWARE_TYPE_RTL8190P)
-				write_nic_byte(dev, rOFDM0_RxDetector1, 0x41);
-			*/
-
-		}
 		else
 			write_nic_byte(dev, rOFDM0_RxDetector1, 0x43);
-	}
-	else
-	{
+	} else {
 		if (dm_digtable.dig_highpwr_state == DM_STA_DIG_OFF&&
 			(priv->reset_count == reset_cnt_highpwr))
 			return;
@@ -2218,17 +2170,7 @@ static void dm_ctrl_initgain_byrssi_highpwr(
 		{
 			// 3.2 Recover PD_TH for OFDM for normal power region.
 			if (priv->CurrentChannelBW != HT_CHANNEL_WIDTH_20)
-			{
-				#ifdef RTL8190P
 				write_nic_byte(dev, rOFDM0_RxDetector1, 0x42);
-				#else
-					write_nic_byte(dev, (rOFDM0_XATxAFE+3), 0x20);
-					#endif
-				/*else if (priv->card_8192 == HARDWARE_TYPE_RTL8190P)
-					write_nic_byte(dev, rOFDM0_RxDetector1, 0x42);
-				*/
-
-			}
 			else
 				write_nic_byte(dev, rOFDM0_RxDetector1, 0x44);
 		}
@@ -2465,14 +2407,7 @@ static void dm_pd_th(
 				{
 					// 2008/01/11 MH 40MHZ 90/92 register are not the same. */
 					// 2008/02/05 MH SD3-Jerry 92U/92E PD_TH are the same.
-					#ifdef RTL8190P
 					write_nic_byte(dev, rOFDM0_RxDetector1, 0x40);
-					#else
-						write_nic_byte(dev, (rOFDM0_XATxAFE+3), 0x00);
-						#endif
-					/*else if (priv->card_8192 == HARDWARE_TYPE_RTL8190P)
-						write_nic_byte(dev, rOFDM0_RxDetector1, 0x40);
-					*/
 				}
 				else
 					write_nic_byte(dev, rOFDM0_RxDetector1, 0x42);
@@ -2484,14 +2419,7 @@ static void dm_pd_th(
 				{
 					// 2008/01/11 MH 40MHZ 90/92 register are not the same. */
 					// 2008/02/05 MH SD3-Jerry 92U/92E PD_TH are the same.
-					#ifdef RTL8190P
 					write_nic_byte(dev, rOFDM0_RxDetector1, 0x42);
-					#else
-						write_nic_byte(dev, (rOFDM0_XATxAFE+3), 0x20);
-						#endif
-					/*else if (priv->card_8192 == HARDWARE_TYPE_RTL8190P)
-						write_nic_byte(dev, rOFDM0_RxDetector1, 0x42);
-					*/
 				}
 				else
 					write_nic_byte(dev, rOFDM0_RxDetector1, 0x44);
@@ -2500,16 +2428,7 @@ static void dm_pd_th(
 			{
 				// Higher PD_TH for OFDM for high power state.
 				if (priv->CurrentChannelBW != HT_CHANNEL_WIDTH_20)
-				{
-					#ifdef RTL8190P
 					write_nic_byte(dev, rOFDM0_RxDetector1, 0x41);
-					#else
-						write_nic_byte(dev, (rOFDM0_XATxAFE+3), 0x10);
-						#endif
-					/*else if (priv->card_8192 == HARDWARE_TYPE_RTL8190P)
-						write_nic_byte(dev, rOFDM0_RxDetector1, 0x41);
-					*/
-				}
 				else
 					write_nic_byte(dev, rOFDM0_RxDetector1, 0x43);
 			}
@@ -3392,13 +3311,10 @@ static void dm_EndSWFsync(struct net_device *dev)
 	del_timer_sync(&(priv->fsync_timer));
 
 	// Let Register return to default value;
-	if(priv->bswitch_fsync)
-	{
+	if(priv->bswitch_fsync) {
 		priv->bswitch_fsync  = false;
 
-		#ifdef RTL8190P
-			write_nic_byte(dev, 0xC36, 0x40);
-#endif
+		write_nic_byte(dev, 0xC36, 0x40);
 
 		write_nic_byte(dev, 0xC3e, 0x96);
 	}
@@ -3499,12 +3415,7 @@ void dm_check_fsync(struct net_device *dev)
 		{
 			if(reg_c38_State != RegC38_Fsync_AP_BCM)
 			{	//For broadcom AP we write different default value
-				#ifdef RTL8190P
-					write_nic_byte(dev, rOFDM0_RxDetector3, 0x15);
-				#else
-					write_nic_byte(dev, rOFDM0_RxDetector3, 0x95);
-				#endif
-
+				write_nic_byte(dev, rOFDM0_RxDetector3, 0x15);
 				reg_c38_State = RegC38_Fsync_AP_BCM;
 			}
 		}
@@ -3534,19 +3445,9 @@ void dm_check_fsync(struct net_device *dev)
 				{
 					if(reg_c38_State != RegC38_NonFsync_Other_AP)
 					{
-						#ifdef RTL8190P
-							write_nic_byte(dev, rOFDM0_RxDetector3, 0x10);
-						#else
-							write_nic_byte(dev, rOFDM0_RxDetector3, 0x90);
-						#endif
+						write_nic_byte(dev, rOFDM0_RxDetector3, 0x10);
 
 						reg_c38_State = RegC38_NonFsync_Other_AP;
-					#if 0//cosa
-						if (dev->HardwareType == HARDWARE_TYPE_RTL8190P)
-							DbgPrint("Fsync is idle, rssi<=35, write 0xc38 = 0x%x \n", 0x10);
-						else
-							DbgPrint("Fsync is idle, rssi<=35, write 0xc38 = 0x%x \n", 0x90);
-					#endif
 					}
 				}
 				else if(priv->undecorated_smoothed_pwdb >= (RegC38_TH+5))

@@ -297,7 +297,6 @@ static void rtl8192_read_eeprom_info(struct net_device* dev)
 		}
 		else if(priv->epromtype== EEPROM_93C56)
 		{
-#ifdef RTL8190P
 			// Read CrystalCap from EEPROM
 			if(!priv->AutoloadFailFlag)
 			{
@@ -368,7 +367,6 @@ static void rtl8192_read_eeprom_info(struct net_device* dev)
 			RT_TRACE(COMP_INIT, "priv->EEPROMRfCOfdmChnlTxPwLevel[0] = 0x%x\n", priv->EEPROMRfCOfdmChnlTxPwLevel[0]);
 			RT_TRACE(COMP_INIT, "priv->EEPROMRfCOfdmChnlTxPwLevel[1] = 0x%x\n", priv->EEPROMRfCOfdmChnlTxPwLevel[1]);
 			RT_TRACE(COMP_INIT, "priv->EEPROMRfCOfdmChnlTxPwLevel[2] = 0x%x\n", priv->EEPROMRfCOfdmChnlTxPwLevel[2]);
-#endif
 
 		}
 		//
@@ -712,10 +710,8 @@ start:
 	else
 		RT_TRACE(COMP_ERR, "ERROR in %s(): undefined firmware state(%d)\n", __FUNCTION__,   priv->pFirmware->firmware_status);
 
-#ifdef RTL8190P
 	//2008.06.03, for WOL 90 hw bug
 	ulRegRead &= (~(CPU_GEN_GPIO_UART));
-#endif
 
 	write_nic_dword(dev, CPU_GEN, ulRegRead);
 	//mdelay(100);
@@ -1170,44 +1166,16 @@ void  rtl8192_tx_fill_desc(struct net_device* dev, tx_desc * pdesc, cb_desc * cb
     //
     if(priv->CurrentChannelBW == HT_CHANNEL_WIDTH_20_40)
     {
-        if(cb_desc->bPacketBW)
-        {
+        if(cb_desc->bPacketBW) {
             pTxFwInfo->TxBandwidth = 1;
-#ifdef RTL8190P
             pTxFwInfo->TxSubCarrier = 3;
-#else
-            pTxFwInfo->TxSubCarrier = 0;	//By SD3's Jerry suggestion, use duplicated mode, cosa 04012008
-#endif
-        }
-        else
-        {
+        } else {
             pTxFwInfo->TxBandwidth = 0;
             pTxFwInfo->TxSubCarrier = priv->nCur40MhzPrimeSC;
         }
     } else {
         pTxFwInfo->TxBandwidth = 0;
         pTxFwInfo->TxSubCarrier = 0;
-    }
-
-    if (0)
-    {
-	    TX_FWINFO_T		Tmp_TxFwInfo;
-	    // 2007/07/25 MH  Copy current TX FW info.*/
-	    memcpy((void*)(&Tmp_TxFwInfo), (void*)(pTxFwInfo), sizeof(TX_FWINFO_8190PCI));
-	    printk("&&&&&&&&&&&&&&&&&&&&&&====>print out fwinf\n");
-	    printk("===>enable fwcacl:%d\n", Tmp_TxFwInfo.EnableCPUDur);
-	    printk("===>RTS STBC:%d\n", Tmp_TxFwInfo.RtsSTBC);
-	    printk("===>RTS Subcarrier:%d\n", Tmp_TxFwInfo.RtsSubcarrier);
-	    printk("===>Allow Aggregation:%d\n", Tmp_TxFwInfo.AllowAggregation);
-	    printk("===>TX HT bit:%d\n", Tmp_TxFwInfo.TxHT);
-	    printk("===>Tx rate:%d\n", Tmp_TxFwInfo.TxRate);
-	    printk("===>Received AMPDU Density:%d\n", Tmp_TxFwInfo.RxAMD);
-	    printk("===>Received MPDU Factor:%d\n", Tmp_TxFwInfo.RxMF);
-	    printk("===>TxBandwidth:%d\n", Tmp_TxFwInfo.TxBandwidth);
-	    printk("===>TxSubCarrier:%d\n", Tmp_TxFwInfo.TxSubCarrier);
-
-        printk("<=====**********************out of print\n");
-
     }
 
     // fill tx descriptor */

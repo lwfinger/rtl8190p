@@ -1240,34 +1240,6 @@ static void CCK_Tx_Power_Track_BW_Switch_TSSI(struct net_device *dev	)
 	}
 }
 
-#ifndef RTL8190P
-static void CCK_Tx_Power_Track_BW_Switch_ThermalMeter(struct net_device *dev)
-{
-	struct r8192_priv *priv = rtllib_priv(dev);
-
-	if(priv->rtllib->current_network.channel == 14 && !priv->bcck_in_ch14)
-		priv->bcck_in_ch14 = true;
-	else if(priv->rtllib->current_network.channel != 14 && priv->bcck_in_ch14)
-		priv->bcck_in_ch14 = false;
-
-	switch(priv->CurrentChannelBW)
-	{
-		case HT_CHANNEL_WIDTH_20:
-			if(priv->Record_CCK_20Mindex == 0)
-				priv->Record_CCK_20Mindex = 6;
-			priv->CCK_index = priv->Record_CCK_20Mindex;
-			RT_TRACE(COMP_POWER_TRACKING, "20MHz, CCK_Tx_Power_Track_BW_Switch_ThermalMeter(),CCK_index = %d\n", priv->CCK_index);
-		break;
-
-		case HT_CHANNEL_WIDTH_20_40:
-			priv->CCK_index = priv->Record_CCK_40Mindex;
-			RT_TRACE(COMP_POWER_TRACKING, "40MHz, CCK_Tx_Power_Track_BW_Switch_ThermalMeter(), CCK_index = %d\n", priv->CCK_index);
-		break;
-	}
-	dm_cck_txpower_adjust(dev, priv->bcck_in_ch14);
-}
-#endif
-
 static void CCK_Tx_Power_Track_BW_Switch(struct net_device *dev)
 {
 
@@ -1512,7 +1484,6 @@ SetRFPowerState8190(
 		{
 			case eRfOn:
 				RT_TRACE(COMP_PS, "SetRFPowerState8190() eRfOn !\n");
-				#ifdef RTL8190P
 				if(priv->rf_type == RF_2T4R)
 				{
 					rtl8192_setBBreg(dev, rFPGA0_XA_RFInterfaceOE, BIT4, 0x1);
@@ -1532,24 +1503,7 @@ SetRFPowerState8190(
 					rtl8192_setBBreg(dev, rOFDM1_TRxPathEnable, 0xc, 0x3);
 					rtl8192_setBBreg(dev, rFPGA0_AnalogParameter1, 0x1800, 0x3);
 				}
-				#else
-				write_nic_byte(dev, ANAPAR, 0x37);
-				write_nic_byte(dev, MacBlkCtrl, 0x17);
-				mdelay(1);
-
-				priv->bHwRfOffAction = 0;
-
-				write_nic_byte(dev, BB_RESET, (read_nic_byte(dev, BB_RESET)|BIT0));
-
-				rtl8192_setBBreg(dev, rFPGA0_AnalogParameter2, 0x20000000, 0x1);
-					rtl8192_setBBreg(dev, rFPGA0_AnalogParameter1, 0x60, 0x3);
-				rtl8192_setBBreg(dev, rFPGA0_AnalogParameter1, 0x98, 0x13);
-				rtl8192_setBBreg(dev, rFPGA0_AnalogParameter4, 0xf03, 0xf03);
-
-					rtl8192_setBBreg(dev, rFPGA0_XA_RFInterfaceOE, BIT4, 0x1);
-				rtl8192_setBBreg(dev, rFPGA0_XB_RFInterfaceOE, BIT4, 0x1);
-				#endif
-						break;
+				break;
 
 			case eRfSleep:
 			case eRfOff:
@@ -1607,7 +1561,6 @@ SetRFPowerState8190(
 						}
 					}
 				}
-				#ifdef RTL8190P
 				if(priv->rf_type == RF_2T4R)
 				{
 					rtl8192_setBBreg(dev, rFPGA0_XA_RFInterfaceOE, BIT4, 0x0);
@@ -1618,26 +1571,11 @@ SetRFPowerState8190(
 				rtl8192_setBBreg(dev, rOFDM0_TRxPathEnable, 0xf, 0x0);
 				rtl8192_setBBreg(dev, rOFDM1_TRxPathEnable, 0xf, 0x0);
 				rtl8192_setBBreg(dev, rFPGA0_AnalogParameter1, 0x1e00, 0x0);
-#else
-				rtl8192_setBBreg(dev, rFPGA0_XA_RFInterfaceOE, BIT4, 0x0);
-					rtl8192_setBBreg(dev, rFPGA0_XB_RFInterfaceOE, BIT4, 0x0);
-					rtl8192_setBBreg(dev, rFPGA0_AnalogParameter4, 0xf03, 0x0);
-					rtl8192_setBBreg(dev, rFPGA0_AnalogParameter1, 0x98, 0x0);
-					rtl8192_setBBreg(dev, rFPGA0_AnalogParameter1, 0x60, 0x0);
-					rtl8192_setBBreg(dev, rFPGA0_AnalogParameter2, 0x20000000, 0x0);
-
-
-					write_nic_byte(dev, BB_RESET, (read_nic_byte(dev, BB_RESET)|BIT0));
-					write_nic_byte(dev, MacBlkCtrl, 0x0);
-					write_nic_byte(dev, ANAPAR, 0x07);
-				priv->bHwRfOffAction = 0;
-				#endif
-					break;
-
+				break;
 			default:
-					bResult = false;
-					RT_TRACE(COMP_ERR, "SetRFPowerState8190(): unknow state to set: 0x%X!!!\n", eRFPowerState);
-					break;
+				bResult = false;
+				RT_TRACE(COMP_ERR, "SetRFPowerState8190(): unknow state to set: 0x%X!!!\n", eRFPowerState);
+				break;
 		}
 
 		break;

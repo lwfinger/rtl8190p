@@ -681,7 +681,6 @@ MgntDisconnect(
 	//
 	// Schedule an workitem to wake up for ps mode, 070109, by rcnjko.
 	//
-#if 1
 	if(priv->rtllib->ps != RTLLIB_PS_DISABLED)
 	{
 		//
@@ -690,11 +689,7 @@ MgntDisconnect(
 		//
 		// PlatformScheduleWorkItem( &(pMgntInfo->AwakeWorkItem) );
 		//PlatformSetTimer( dev, &(pMgntInfo->AwakeTimer), 0 );
-#ifndef RTL8190P
-                rtl8192_hw_wakeup(dev);
-#endif
 	}
-#endif
 	// Follow 8180 AP mode, 2005.05.30, by rcnjko.
 #ifdef TO_DO
 	if(pMgntInfo->mActingAsAp)
@@ -1744,10 +1739,6 @@ static void rtl8192_init_priv_task(struct net_device* dev)
 	INIT_DELAYED_WORK_RSL(&priv->rfpath_check_wq,  (void*)dm_rf_pathcheck_workitemcallback, dev);
 	INIT_DELAYED_WORK_RSL(&priv->update_beacon_wq, (void*)rtl8192_update_beacon, dev);
 	INIT_WORK_RSL(&priv->qos_activate, (void*)rtl8192_qos_activate, dev);
-#ifndef RTL8190P
-	INIT_DELAYED_WORK_RSL(&priv->rtllib->hw_wakeup_wq,(void*) rtl8192_hw_wakeup_wq, dev);
-	INIT_DELAYED_WORK_RSL(&priv->rtllib->hw_sleep_wq,(void*) rtl8192_hw_sleep_wq, dev);
-#endif
 	tasklet_init(&priv->irq_rx_tasklet,
 	     (void(*)(unsigned long))rtl8192_irq_rx_tasklet,
 	     (unsigned long)priv);
@@ -2205,9 +2196,7 @@ RESET_START:
 			printk("ieee->state is NOT LINKED\n");
 			rtllib_softmac_stop_protocol(priv->rtllib,true);
 		}
-#ifdef RTL8190P
 		priv->ops->stop_adapter(dev, true);//AMY 090415
-#endif
 		up(&priv->wx_sem);
 		RT_TRACE(COMP_RESET,"%s():<==========down process is finished\n",__FUNCTION__);
 		RT_TRACE(COMP_RESET,"%s():===========>start to up the driver\n",__FUNCTION__);
@@ -2278,10 +2267,8 @@ END:
 		priv->bForcedSilentReset =false;
 		priv->bResetInProgress = false;
 
-#ifdef RTL8190P
 		// For test --> force write UFWP.
 		write_nic_byte(dev, UFWP, 1);	//AMY 090415
-#endif
 		RT_TRACE(COMP_RESET, "Reset finished!! ====>[%d]\n", priv->reset_count);
 	}
 }
@@ -3081,7 +3068,6 @@ rtl8190_process_cck_rxpathsel(
 	struct rtllib_rx_stats * pprevious_stats
 	)
 {
-#ifdef RTL8190P	//Only 90P 2T4R need to check
 	char				last_cck_adc_pwdb[4]={0,0,0,0};
 	u8				i;
 //cosa add for Rx path selection
@@ -3132,7 +3118,6 @@ rtl8190_process_cck_rxpathsel(
 				}
 			}
 		}
-#endif
 }
 
 // 2008/01/22 MH We can not delcare RSSI/EVM total value of sliding window to
@@ -3523,13 +3508,10 @@ void rtl8192_query_rxphystatus(
 		// (2)PWDB, Average PWDB cacluated by hardware (for rate adaptive)
 		//
 		u8 report;//, cck_agc_rpt;
-#ifdef RTL8190P
 		u8 tmp_pwdb;
 		char cck_adc_pwdb[4];
-#endif
 		priv->stats.numqry_phystatusCCK++;
 
-#ifdef RTL8190P	//Only 90P 2T4R need to check
 		if(priv->rf_type == RF_2T4R && DM_RxPathSelTable.Enable && bpacket_match_bssid)
 		{
 			for(i=RF90_PATH_A; i<RF90_PATH_MAX; i++)
@@ -3541,7 +3523,6 @@ void rtl8192_query_rxphystatus(
 				//DbgPrint("RF-%d tmp_pwdb = 0x%x, cck_adc_pwdb = %d", i, tmp_pwdb, cck_adc_pwdb[i]);
 			}
 		}
-#endif
 
 		if(!reg824_bit9)
 		{
@@ -3633,11 +3614,7 @@ void rtl8192_query_rxphystatus(
 
 			//Fixed by Jacken from Bryant 2008-03-20
 			//Original value is 106
-#ifdef RTL8190P	   //Modify by Jacken 2008/03/31
 			rx_pwr[i] = ((pofdm_buf->trsw_gain_X[i]&0x3F)*2) - 106;
-#else
-			rx_pwr[i] = ((pofdm_buf->trsw_gain_X[i]&0x3F)*2) - 110;
-#endif
 
 			//Get Rx snr value in DB
 			tmp_rxsnr = pofdm_buf->rxsnr_X[i];
@@ -4133,11 +4110,6 @@ void rtl8192_cancel_deferred_work(struct r8192_priv* priv)
 #if LINUX_VERSION_CODE > KERNEL_VERSION(2,5,0)
 	cancel_delayed_work(&priv->watch_dog_wq);
 	cancel_delayed_work(&priv->update_beacon_wq);
-#ifndef RTL8190P
-//	cancel_delayed_work(&priv->rtllib->hw_wakeup_wq);
-	cancel_delayed_work(&priv->rtllib->hw_sleep_wq);
-	//cancel_delayed_work(&priv->gpio_change_rf_wq);//lzm 090323
-#endif
 #endif
 
 #if LINUX_VERSION_CODE >=KERNEL_VERSION(2,6,22)
@@ -4327,11 +4299,6 @@ int rtl8192_down(struct net_device *dev, bool shutdownrf)
 	//	flush_scheduled_work();
 	del_timer_sync(&priv->watch_dog_timer);
 	rtl8192_cancel_deferred_work(priv);
-#ifndef RTL8190P
-#if LINUX_VERSION_CODE > KERNEL_VERSION(2,5,0)
-	cancel_delayed_work(&priv->rtllib->hw_wakeup_wq);
-#endif
-#endif
 
 	rtllib_softmac_stop_protocol(priv->rtllib,true);
 	//added by amy 090420
@@ -4782,7 +4749,6 @@ bool rtl8192_pci_findadapter(struct pci_dev *pdev, struct net_device *dev)
 	if (DeviceID == HAL_HW_PCI_8190_DEVICE_ID ||DeviceID == HAL_HW_PCI_0045_DEVICE_ID ||
 		DeviceID == HAL_HW_PCI_0046_DEVICE_ID ||DeviceID == HAL_HW_PCI_DLINK_DEVICE_ID){
 		printk("Adapter(8190 PCI) is found - DeviceID=%x\n", DeviceID);
-		//priv->HardwareType=HARDWARE_TYPE_RTL8190P;
 		priv->ops->nic_type = priv->card_8192 = NIC_8190P;
 	} else if (DeviceID == HAL_HW_PCI_8192_DEVICE_ID ||DeviceID == HAL_HW_PCI_0044_DEVICE_ID ||
 		DeviceID == HAL_HW_PCI_0047_DEVICE_ID || DeviceID == HAL_HW_PCI_8192SE_DEVICE_ID ||

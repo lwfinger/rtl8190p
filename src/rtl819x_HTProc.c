@@ -1043,29 +1043,10 @@ void HTOnAssocRsp(struct rtllib_device *ieee)
 		}
 	}
 
-#if 0
 	if(pHTInfo->MPDU_Density > pPeerHTCap->MPDUDensity)
 		pHTInfo->CurrentMPDUDensity = pHTInfo->MPDU_Density;
 	else
 		pHTInfo->CurrentMPDUDensity = pPeerHTCap->MPDUDensity;
-	if(ieee->pairwise_key_type != KEY_TYPE_NA )
-		pHTInfo->CurrentMPDUDensity	= 7;
-#else
-	if(pHTInfo->MPDU_Density > pPeerHTCap->MPDUDensity)
-		pHTInfo->CurrentMPDUDensity = pHTInfo->MPDU_Density;
-	else
-		pHTInfo->CurrentMPDUDensity = pPeerHTCap->MPDUDensity;
-#endif
-#ifndef RTL8190P
-	if(pHTInfo->IOTAction & HT_IOT_ACT_TX_USE_AMSDU_8K)
-#else
-	if( 0 )
-#endif
-	{
-		pHTInfo->bCurrentAMPDUEnable = false;
-		pHTInfo->ForcedAMSDUMode = HT_AGG_FORCE_ENABLE;
-		pHTInfo->ForcedAMSDUMaxSize = 7935;
-	}
 	pHTInfo->bCurRxReorderEnable = pHTInfo->bRegRxReorderEnable;
 
 

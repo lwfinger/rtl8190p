@@ -1,10 +1,8 @@
-NIC_SELECT = RTL8190P
-
 CC = gcc
 KVER  := $(shell uname -r)
 MODDESTDIR := /lib/modules/$(KVER)/kernel/drivers/net/wireless/
 
-EXTRA_CFLAGS += -DRTL8190P -DHAVE_NET_DEVICE_OPS
+EXTRA_CFLAGS += -DHAVE_NET_DEVICE_OPS
 EXTRA_CFLAGS+=-DEEPROM_OLD_FORMAT_SUPPORT=1
 EXTRA_CFLAGS += -DUSE_FW_SOURCE_IMG_FILE
 #it will fail to compile in suse linux enterprise 10 sp2. This flag is to solve this problem.
