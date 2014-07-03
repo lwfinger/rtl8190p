@@ -17,7 +17,6 @@
  * wlanfae <wlanfae@realtek.com>
 ******************************************************************************/
 #include <linux/interrupt.h>
-#ifdef ENABLE_DOT11D
 #include "dot11d.h"
 
 typedef struct _CHANNEL_LIST
@@ -260,6 +259,4 @@ EXPORT_SYMBOL_RSL(DOT11D_GetMaxTxPwrInDbm);
 EXPORT_SYMBOL_RSL(DOT11D_ScanComplete);
 EXPORT_SYMBOL_RSL(IsLegalChannel);
 EXPORT_SYMBOL_RSL(ToLegalChannel);
-#endif
-
 #endif

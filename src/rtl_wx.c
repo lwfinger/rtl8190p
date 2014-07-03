@@ -20,9 +20,7 @@
 #include <linux/string.h>
 #include <linux/interrupt.h>
 #include "rtl_core.h"
-#ifdef ENABLE_DOT11D
 #include "dot11d.h"
-#endif
 
 #ifdef CONFIG_MP
 #include "r8192S_mp.h"
@@ -468,11 +466,7 @@ static int rtl8192_wx_get_range(struct net_device *dev,
 
 	for (i = 0, val = 0; i < 14; i++) {
 		// Include only legal frequencies for some countries
-#ifdef ENABLE_DOT11D
 		if ((GET_DOT11D_INFO(priv->rtllib)->channel_map)[i+1]) {
-#else
-		if ((priv->rtllib->channel_map)[i+1]) {
-#endif
 		        range->freq[val].i = i + 1;
 			range->freq[val].m = rtllib_wlan_frequencies[i] * 100000;
 			range->freq[val].e = 1;

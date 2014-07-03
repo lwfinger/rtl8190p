@@ -19,7 +19,6 @@
 #ifndef __INC_DOT11D_H
 #define __INC_DOT11D_H
 
-#ifdef ENABLE_DOT11D
 #include "rtllib.h"
 
 
@@ -80,5 +79,5 @@ u8 DOT11D_GetMaxTxPwrInDbm(struct rtllib_device *dev, u8 Channel);
 void DOT11D_ScanComplete(struct rtllib_device *dev);
 int IsLegalChannel(struct rtllib_device *dev, u8 channel);
 int ToLegalChannel(struct rtllib_device *dev, u8 channel);
-#endif
+
 #endif

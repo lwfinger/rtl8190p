@@ -44,9 +44,7 @@
 #include <linux/interrupt.h>
 
 #include "rtllib.h"
-#ifdef ENABLE_DOT11D
 #include "dot11d.h"
-#endif
 static inline void rtllib_monitor_rx(struct rtllib_device *ieee,
 					struct sk_buff *skb,
 					struct rtllib_rx_stats *rx_stats)
@@ -1608,7 +1606,6 @@ static const char *get_info_element_string(u16 id)
 }
 #endif
 
-#ifdef ENABLE_DOT11D
 static inline void rtllib_extract_country_ie(
 	struct rtllib_device *ieee,
 	struct rtllib_info_element *info_element,
@@ -1636,7 +1633,6 @@ static inline void rtllib_extract_country_ie(
 	}
 
 }
-#endif
 
 int rtllib_parse_info_param(struct rtllib_device *ieee,
 		struct rtllib_info_element *info_element,
@@ -2138,13 +2134,11 @@ int rtllib_parse_info_param(struct rtllib_device *ieee,
 			       "QoS Error need to parse QOS_PARAMETER IE\n");
 			break;
 
-#ifdef ENABLE_DOT11D
 		case MFIE_TYPE_COUNTRY:
 			RTLLIB_DEBUG_SCAN("MFIE_TYPE_COUNTRY: %d bytes\n",
 					     info_element->len);
 			rtllib_extract_country_ie(ieee, info_element, network, network->bssid);
 			break;
-#endif
 		default:
 			RTLLIB_DEBUG_MGMT
 			    ("Unsupported info element: %s (%d)\n",
@@ -2252,10 +2246,8 @@ static inline int rtllib_network_init(
 #endif
 	network->SignalStrength = stats->SignalStrength;
 	network->RSSI = stats->SignalStrength;
-#ifdef ENABLE_DOT11D
 	network->CountryIeLen = 0;
 	memset(network->CountryIeBuf, 0, MAX_IE_LEN);
-#endif
 	HTInitializeBssDesc(&network->bssht);
 	if (stats->freq == RTLLIB_52GHZ_BAND) {
 		/* for A band (No DS info) */
@@ -2472,10 +2464,8 @@ static inline void update_network(struct rtllib_network *dst,
 	dst->Turbo_Enable = src->Turbo_Enable;
 #endif
 
-#ifdef ENABLE_DOT11D
 	dst->CountryIeLen = src->CountryIeLen;
 	memcpy(dst->CountryIeBuf, src->CountryIeBuf, src->CountryIeLen);
-#endif
 
 	dst->bWithAironetIE = src->bWithAironetIE;
 	dst->bCkipSupported = src->bCkipSupported;
@@ -2548,8 +2538,6 @@ static inline void rtllib_process_probe_response(
 		goto free_network;
 	}
 
-#ifdef ENABLE_DOT11D
-
 	if (!IsLegalChannel(ieee, network->channel))
 		goto free_network;
 
@@ -2582,7 +2570,6 @@ static inline void rtllib_process_probe_response(
 			}
 		}
 	}
-#endif
 
 	/* The network parsed correctly -- so now we scan our known networks
 	 * to see if we can find it in our list.

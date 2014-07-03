@@ -1870,10 +1870,8 @@ struct rtllib_network {
 #ifdef THOMAS_TURBO
 	u8 Turbo_Enable;
 #endif
-#ifdef ENABLE_DOT11D
 	u16 CountryIeLen;
 	u8 CountryIeBuf[MAX_IE_LEN];
-#endif
 	BSS_HT	bssht;
 	bool broadcom_cap_exist;
 	bool realtek_cap_exit;
@@ -2094,7 +2092,6 @@ typedef u32 RT_RF_CHANGE_SOURCE;
 #define RF_CHANGE_BY_IPS BIT28
 #define RF_CHANGE_BY_INIT	0
 
-#ifdef ENABLE_DOT11D
 typedef enum
 {
 	COUNTRY_CODE_FCC = 0,
@@ -2112,7 +2109,6 @@ typedef enum
 	COUNTRY_CODE_TELEC_NETGEAR = 12,
 	COUNTRY_CODE_MAX
 }country_code_type_t;
-#endif
 
 typedef enum _SCAN_OPERATION_BACKUP_OPT{
 	SCAN_OPT_BACKUP=0,
@@ -2431,15 +2427,11 @@ struct rtllib_device {
         u16 prev_seq_ctl;       /* used to drop duplicate frames */
 
 	/* map of allowed channels. 0 is dummy */
-#ifdef ENABLE_DOT11D
 	void* pDot11dInfo;
 	bool bGlobalDomain;
 
 	u8   IbssStartChnl;
 	u8   ibss_maxjoin_chal;
-#else
-	int channel_map[MAX_CHANNEL_NUMBER+1];
-#endif
 	int rate;       /* current rate */
 	int basic_rate;
 	u32	currentRate;

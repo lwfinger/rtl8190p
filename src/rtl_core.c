@@ -1757,7 +1757,6 @@ static void rtl8192_init_priv_task(struct net_device* dev)
 short rtl8192_get_channel_map(struct net_device * dev)
 {
 	struct r8192_priv *priv = rtllib_priv(dev);
-#ifdef ENABLE_DOT11D
 	//acturally 8225 & 8256 rf chip only support B,G,24N mode
 	if ((priv->rf_chip != RF_8225) && (priv->rf_chip != RF_8256)
 			&& (priv->rf_chip != RF_6052)) {
@@ -1773,24 +1772,6 @@ short rtl8192_get_channel_map(struct net_device * dev)
 
 	Dot11d_Init(priv->rtllib);
 	Dot11d_Channelmap(priv->ChannelPlan, priv->rtllib);
-#else
-	int ch,i;
-	//Set Default Channel Plan
-	if(!channels){
-		DMESG("No channels, aborting");
-		return -1;
-	}
-
-	ch = channels;
-	priv->ChannelPlan = 0;//hikaru
-	 // set channels 1..14 allowed in given locale
-	for (i = 1; i <= 14; i++) {
-		(priv->rtllib->channel_map)[i] = (u8)(ch & 0x01);
-		ch >>= 1;
-	}
-	priv->rtllib->IbssStartChnl= 10;
-	priv->rtllib->ibss_maxjoin_chal = 14;
-#endif
 	return 0;
 }
 

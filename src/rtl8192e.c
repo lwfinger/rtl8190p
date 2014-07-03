@@ -525,10 +525,8 @@ static void rtl8192_read_eeprom_info(struct net_device* dev)
 	//Avoid the channel plan array overflow, by Bruce, 2007-08-27.
 	if(priv->ChannelPlan > CHANNEL_PLAN_LEN - 1)
 		priv->ChannelPlan = 0; //FCC
-#ifdef ENABLE_DOT11D
 	// force to world wide 13
 	priv->ChannelPlan = COUNTRY_CODE_WORLD_WIDE_13;
-#endif
 
 #ifdef TO_DO_LIST
 	switch(priv->CustomerID) {

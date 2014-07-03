@@ -23,10 +23,7 @@
 #include "r8190_rtl8256.h"
 #include "r819xE_phy.h"
 #include "rtl_dm.h"
-#ifdef ENABLE_DOT11D
 #include "dot11d.h"
-#endif
-
 #include "r8190P_hwimg.h"
 
 static u32 RF_CHANNEL_TABLE_ZEBRA[] = {
@@ -990,13 +987,10 @@ u8 rtl8192_phy_SwChnlStepByStep(struct net_device *dev, u8 channel, u8* stage, u
 
 	RT_TRACE(COMP_TRACE, "====>%s()====stage:%d, step:%d, channel:%d\n", __FUNCTION__, *stage, *step, channel);
 
-#ifdef ENABLE_DOT11D
-	if (!IsLegalChannel(priv->rtllib, channel))
-	{
+	if (!IsLegalChannel(priv->rtllib, channel)) {
 		RT_TRACE(COMP_ERR, "=============>set to illegal channel:%d\n", channel);
 		return true;
 	}
-#endif
 
 	{
 		PreCommonCmdCnt = 0;

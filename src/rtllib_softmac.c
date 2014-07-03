@@ -21,9 +21,7 @@
 #include <linux/interrupt.h>
 #include <asm/uaccess.h>
 #include "rtllib.h"
-#ifdef ENABLE_DOT11D
 #include "dot11d.h"
-#endif
 
 #ifdef RTK_DMP_PLATFORM
 #include <linux/usb_setting.h>
@@ -470,10 +468,8 @@ void rtllib_send_probe_requests(struct rtllib_device *ieee)
 void rtllib_softmac_scan_syncro(struct rtllib_device *ieee)
 {
 	short ch = 0;
-#ifdef ENABLE_DOT11D
 	u8 channel_map[MAX_CHANNEL_NUMBER+1];
 	memcpy(channel_map, GET_DOT11D_INFO(ieee)->channel_map, MAX_CHANNEL_NUMBER+1);
-#endif
 	ieee->be_scan_inprogress = true;
 	down(&ieee->scan_sem);
 
@@ -483,11 +479,7 @@ void rtllib_softmac_scan_syncro(struct rtllib_device *ieee)
 			ch++;
 			if (ch > MAX_CHANNEL_NUMBER)
 				goto out; /* scan completed */
-#ifdef ENABLE_DOT11D
 		} while(!channel_map[ch]);
-#else
-		}while(!ieee->channel_map[ch]);
-#endif
 
 		/* this fuction can be called in two situations
 		 * 1- We have switched to ad-hoc mode and we are
@@ -515,10 +507,8 @@ void rtllib_softmac_scan_syncro(struct rtllib_device *ieee)
 			goto out;
 		}
 		ieee->set_chan(ieee->dev, ch);
-#ifdef ENABLE_DOT11D
 		if(channel_map[ch] == 1)
-#endif
-		rtllib_send_probe_requests(ieee);
+			rtllib_send_probe_requests(ieee);
 
 		/* this prevent excessive time wait when we
 		 * need to wait for a syncro scan to end..
@@ -535,10 +525,8 @@ out:
 	else{
 		ieee->actscanning = false;
 		ieee->sync_scan_hurryup = 0;
-#ifdef ENABLE_DOT11D
 		if(IS_DOT11D_ENABLE(ieee))
 			DOT11D_ScanComplete(ieee);
-#endif
 		up(&ieee->scan_sem);
 		ieee->be_scan_inprogress = false;
 	}
@@ -552,12 +540,10 @@ out:
 void rtllib_softmac_scan_wq(void *data)
 {
 	struct rtllib_device *ieee = container_of_dwork_rsl(data, struct rtllib_device, softmac_scan_wq);
-
 	u8 last_channel = ieee->current_network.channel;
-#ifdef ENABLE_DOT11D
 	u8 channel_map[MAX_CHANNEL_NUMBER+1];
+
 	memcpy(channel_map, GET_DOT11D_INFO(ieee)->channel_map, MAX_CHANNEL_NUMBER+1);
-#endif
 	if(!ieee->ieee_up)
 		return;
         if(ieee->eRFPowerState == eRfOff)
@@ -576,27 +562,17 @@ void rtllib_softmac_scan_wq(void *data)
 			(ieee->current_network.channel + 1) % MAX_CHANNEL_NUMBER;
 		if (ieee->scan_watch_dog++ > MAX_CHANNEL_NUMBER)
 		{
-		#ifdef ENABLE_DOT11D
 			if (!channel_map[ieee->current_network.channel]);
-		#else
-			if (!ieee->channel_map[ieee->current_network.channel]);
-		#endif
 				ieee->current_network.channel = 6;
 				goto out; /* no good chans */
 		}
 	}
-#ifdef ENABLE_DOT11D
 	while(!channel_map[ieee->current_network.channel]);
-#else
-	while(!ieee->channel_map[ieee->current_network.channel]);
-#endif
 	if (ieee->scanning == 0 )
 		goto out;
 	ieee->set_chan(ieee->dev, ieee->current_network.channel);
-#ifdef ENABLE_DOT11D
 	if(channel_map[ieee->current_network.channel] == 1)
-#endif
-	rtllib_send_probe_requests(ieee);
+		rtllib_send_probe_requests(ieee);
 
 #if LINUX_VERSION_CODE > KERNEL_VERSION(2,5,40)
 	queue_delayed_work_rsl(ieee->wq, &ieee->softmac_scan_wq, MSECS(RTLLIB_SOFTMAC_SCAN_TIME));
@@ -608,10 +584,8 @@ void rtllib_softmac_scan_wq(void *data)
 	up(&ieee->scan_sem);
 	return;
 out:
-#ifdef ENABLE_DOT11D
 	if(IS_DOT11D_ENABLE(ieee))
 		DOT11D_ScanComplete(ieee);
-#endif
 	ieee->current_network.channel = last_channel;
 	ieee->actscanning = false;
 	ieee->scan_watch_dog = 0;
@@ -703,15 +677,10 @@ void rtllib_start_scan(struct rtllib_device *ieee)
 #endif
 
 
-#ifdef ENABLE_DOT11D
-	if(IS_DOT11D_ENABLE(ieee) )
-	{
+	if(IS_DOT11D_ENABLE(ieee) ) {
 		if(IS_COUNTRY_IE_VALID(ieee))
-		{
 			RESET_CIE_WATCHDOG(ieee);
-		}
 	}
-#endif
 	if (ieee->softmac_features & IEEE_SOFTMAC_SCAN){
 		if (ieee->scanning == 0){
 			ieee->scanning = 1;
@@ -737,7 +706,6 @@ void rtllib_softmac_scan_cb(unsigned long _dev)
 /* called with wx_sem held */
 void rtllib_start_scan_syncro(struct rtllib_device *ieee)
 {
-#ifdef ENABLE_DOT11D
 	if(IS_DOT11D_ENABLE(ieee) )
 	{
 		if(IS_COUNTRY_IE_VALID(ieee))
@@ -745,7 +713,6 @@ void rtllib_start_scan_syncro(struct rtllib_device *ieee)
 			RESET_CIE_WATCHDOG(ieee);
 		}
 	}
-#endif
 	ieee->sync_scan_hurryup = 0;
 	if (ieee->softmac_features & IEEE_SOFTMAC_SCAN)
 		rtllib_softmac_scan_syncro(ieee);
@@ -2864,9 +2831,7 @@ void rtllib_start_ibss_wq(void *data)
 	/* the network definitively is not here.. create a new cell */
 	if (ieee->state == RTLLIB_NOLINK){
 		printk("creating new IBSS cell\n");
-#ifdef ENABLE_DOT11D
 		ieee->current_network.channel = ieee->IbssStartChnl;
-#endif
 		if(!ieee->wap_set)
 			rtllib_randomize_cell(ieee);
 
@@ -2951,7 +2916,6 @@ inline void rtllib_start_ibss(struct rtllib_device *ieee)
 void rtllib_start_bss(struct rtllib_device *ieee)
 {
 	unsigned long flags;
-#ifdef ENABLE_DOT11D
 	if(IS_DOT11D_ENABLE(ieee) && !IS_COUNTRY_IE_VALID(ieee))
 	{
 		if(! ieee->bGlobalDomain)
@@ -2959,7 +2923,6 @@ void rtllib_start_bss(struct rtllib_device *ieee)
 			return;
 		}
 	}
-#endif
 	/* check if we have already found the net we
 	 * are interested in (if any).
 	 * if not (we are disassociated and we are not
@@ -2997,10 +2960,8 @@ void rtllib_disassociate(struct rtllib_device *ieee)
 
 	if (ieee->data_hard_stop)
 			ieee->data_hard_stop(ieee->dev);
-#ifdef ENABLE_DOT11D
 	if(IS_DOT11D_ENABLE(ieee))
 		Dot11d_Reset(ieee);
-#endif
 	ieee->state = RTLLIB_NOLINK;
 	ieee->is_set_key = false;
 	ieee->wap_set = 0;
@@ -3176,11 +3137,7 @@ void rtllib_start_protocol(struct rtllib_device *ieee)
 			ch++;
 			if (ch > MAX_CHANNEL_NUMBER)
 				return; /* no channel found */
-#ifdef ENABLE_DOT11D
 		}while(!GET_DOT11D_INFO(ieee)->channel_map[ch]);
-#else
-		}while(!ieee->channel_map[ch]);
-#endif
 		ieee->current_network.channel = ch;
 	}
 
@@ -3223,12 +3180,10 @@ void rtllib_softmac_init(struct rtllib_device *ieee)
 	for(i = 0; i < 5; i++) {
 	  ieee->seq_ctrl[i] = 0;
 	}
-#ifdef ENABLE_DOT11D
 	ieee->pDot11dInfo = kmalloc(sizeof(RT_DOT11D_INFO), GFP_ATOMIC);
 	if (!ieee->pDot11dInfo)
 		RTLLIB_DEBUG(RTLLIB_DL_ERR, "can't alloc memory for DOT11D\n");
 	memset(ieee->pDot11dInfo, 0, sizeof(RT_DOT11D_INFO));
-#endif
 	ieee->LinkDetectInfo.SlotIndex = 0;
 	ieee->LinkDetectInfo.SlotNum = 2;
 	ieee->LinkDetectInfo.NumRecvBcnInPeriod=0;
@@ -3316,13 +3271,11 @@ void rtllib_softmac_init(struct rtllib_device *ieee)
 void rtllib_softmac_free(struct rtllib_device *ieee)
 {
 	down(&ieee->wx_sem);
-#ifdef ENABLE_DOT11D
 	if(NULL != ieee->pDot11dInfo)
 	{
 		kfree(ieee->pDot11dInfo);
 		ieee->pDot11dInfo = NULL;
 	}
-#endif
 	del_timer_sync(&ieee->associate_timer);
 
 #if LINUX_VERSION_CODE > KERNEL_VERSION(2,5,0)

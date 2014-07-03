@@ -53,9 +53,7 @@
 #endif
 #include "rtllib.h"
 
-#ifdef ENABLE_DOT11D
 #include "dot11d.h"
-#endif
 
 #include "r819xE_firmware.h"
 #include "r8192E_hw.h"
