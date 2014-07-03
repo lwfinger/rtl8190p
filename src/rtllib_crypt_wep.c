@@ -17,14 +17,7 @@
 #include <linux/skbuff.h>
 #include <asm/string.h>
 #include <linux/interrupt.h>
-#ifdef _RTL8192_EXT_PATCH_
-#include <linux/etherdevice.h>
-#endif
 #include "rtllib.h"
-
-#if (LINUX_VERSION_CODE > KERNEL_VERSION(2,6,20))
-#endif
-
 
 #if defined(BUILT_IN_CRYPTO) || (LINUX_VERSION_CODE < KERNEL_VERSION(2,5,0))
 #include "rtl_crypto.h"
@@ -162,30 +155,12 @@ static int prism2_wep_encrypt(struct sk_buff *skb, int hdr_len, void *priv)
 	#endif
 	u32 crc;
 	u8 *icv;
-#ifdef _RTL8192_EXT_PATCH_
-	u8 broadcastaddr[6] = {0xff,0xff,0xff,0xff,0xff,0xff};
-	struct rtllib_hdr_3addr* tmp_header = (struct rtllib_hdr_3addr*)(skb->data);
-	u8 is_broadcast_data = 0;
-	u8 is_multicast_data = 0;
-#endif
 	struct scatterlist sg;
 	if (skb_headroom(skb) < 4 || skb_tailroom(skb) < 4 ||
 	    skb->len < hdr_len){
 		printk("Error!!!headroom=%d tailroom=%d skblen=%d hdr_len=%d\n",skb_headroom(skb),skb_tailroom(skb),skb->len,hdr_len);
 		return -1;
 	}
-#ifdef _RTL8192_EXT_PATCH_
-	if(tcb_desc->badhoc==0){
-		if(memcmp(tmp_header->addr1,broadcastaddr,6) == 0){
-			is_broadcast_data = 1;
-			tcb_desc->bHwSec = 0;
-		}
-		if(is_multicast_ether_addr(tmp_header->addr1)){
-			is_multicast_data = 1;
-			tcb_desc->bHwSec = 0;
-		}
-	}
-#endif
 	len = skb->len - hdr_len;
 	pos = skb_push(skb, 4);
 	memmove(pos, pos + 4, hdr_len);

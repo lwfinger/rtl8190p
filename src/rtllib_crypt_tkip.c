@@ -19,9 +19,6 @@
 #include <linux/if_ether.h>
 #include <linux/if_arp.h>
 #include <asm/string.h>
-#ifdef _RTL8192_EXT_PATCH_
-#include <linux/etherdevice.h>
-#endif
 #include <linux/interrupt.h>
 #include "rtllib.h"
 
@@ -388,10 +385,6 @@ static int rtllib_tkip_encrypt(struct sk_buff *skb, int hdr_len, void *priv)
 	#endif
 	u8 rc4key[16],  *icv;
 	u32 crc;
-#ifdef _RTL8192_EXT_PATCH_
-	u8 broadcastaddr[6] = {0xff,0xff,0xff,0xff,0xff,0xff};
-	u8 is_broadcast_data = 0;
-#endif
 	struct scatterlist sg;
 
 	if (skb_headroom(skb) < 8 || skb_tailroom(skb) < 4 ||
@@ -399,31 +392,8 @@ static int rtllib_tkip_encrypt(struct sk_buff *skb, int hdr_len, void *priv)
 		return -1;
 
 	hdr = (struct rtllib_hdr_4addr *) skb->data;
-#ifdef _RTL8192_EXT_PATCH_
-	if(tcb_desc->badhoc == 0){
-		if(memcmp(hdr->addr1,broadcastaddr,6) == 0){
-			is_broadcast_data = 1;
-			tcb_desc->bHwSec = 0;
-		}
-		if(is_multicast_ether_addr(hdr->addr1)){
-			tcb_desc->bHwSec = 0;
-		}
-	}
-#endif
-#if 0
-printk("@@ tkey\n");
-printk("%x|", ((u32*)tkey->key)[0]);
-printk("%x|", ((u32*)tkey->key)[1]);
-printk("%x|", ((u32*)tkey->key)[2]);
-printk("%x|", ((u32*)tkey->key)[3]);
-printk("%x|", ((u32*)tkey->key)[4]);
-printk("%x|", ((u32*)tkey->key)[5]);
-printk("%x|", ((u32*)tkey->key)[6]);
-printk("%x\n", ((u32*)tkey->key)[7]);
-#endif
 
-	if (!tcb_desc->bHwSec)
-	{
+	if (!tcb_desc->bHwSec) {
 		if (!tkey->tx_phase1_done) {
 			tkip_mixing_phase1(tkey->tx_ttak, tkey->key, hdr->addr2,
 					tkey->tx_iv32);

@@ -817,45 +817,29 @@ void HTResetIOTSetting(
 }
 
 
-#ifdef _RTL8192_EXT_PATCH_
-void HTConstructCapabilityElement(struct rtllib_device* ieee, u8* posHTCap, u8* len, u8 IsEncrypt, u8 bIsBcn)
-#else
 void HTConstructCapabilityElement(struct rtllib_device* ieee, u8* posHTCap, u8* len, u8 IsEncrypt)
-#endif
 {
 	PRT_HIGH_THROUGHPUT	pHT = ieee->pHTInfo;
 	PHT_CAPABILITY_ELE	pCapELE = NULL;
 
-	if ((posHTCap == NULL) || (pHT == NULL))
-	{
+	if ((posHTCap == NULL) || (pHT == NULL)) {
 		RTLLIB_DEBUG(RTLLIB_DL_ERR, "posHTCap or pHTInfo can't be null in HTConstructCapabilityElement()\n");
 		return;
 	}
 	memset(posHTCap, 0, *len);
-	if(pHT->ePeerHTSpecVer == HT_SPEC_VER_EWC)
-	{
+	if(pHT->ePeerHTSpecVer == HT_SPEC_VER_EWC) {
 		u8	EWC11NHTCap[] = {0x00, 0x90, 0x4c, 0x33};
 		memcpy(posHTCap, EWC11NHTCap, sizeof(EWC11NHTCap));
 		pCapELE = (PHT_CAPABILITY_ELE)&(posHTCap[4]);
-	}else
-	{
+	}else {
 		pCapELE = (PHT_CAPABILITY_ELE)posHTCap;
 	}
 
 	pCapELE->AdvCoding		= 0;
 	if(ieee->GetHalfNmodeSupportByAPsHandler(ieee->dev))
-	{
 		pCapELE->ChlWidth = 0;
-	}
 	else
-	{
-#ifdef _RTL8192_EXT_PATCH_
-		if(bIsBcn)
-			pCapELE->ChlWidth = (pHT->bCurBW40MHz?1:0);
-		else
-#endif
-			pCapELE->ChlWidth = (pHT->bRegBW40MHz?1:0);
-	}
+		pCapELE->ChlWidth = (pHT->bRegBW40MHz?1:0);
 
 	pCapELE->MimoPwrSave		= pHT->SelfMimoPs;
 	pCapELE->GreenField		= 0;
@@ -931,24 +915,9 @@ void HTConstructInfoElement(struct rtllib_device* ieee, u8* posHTInfo, u8* len, 
 	}
 
 	memset(posHTInfo, 0, *len);
-#ifdef _RTL8192_EXT_PATCH_
-	if ((ieee->iw_mode == IW_MODE_ADHOC) || (ieee->iw_mode == IW_MODE_MASTER) ||(ieee->iw_mode == IW_MODE_MESH) )
-#else
-	if ( (ieee->iw_mode == IW_MODE_ADHOC) || (ieee->iw_mode == IW_MODE_MASTER))
-#endif
-	{
+	if ( (ieee->iw_mode == IW_MODE_ADHOC) || (ieee->iw_mode == IW_MODE_MASTER)) {
 		pHTInfoEle->ControlChl			= ieee->current_network.channel;
-#ifdef _RTL8192_EXT_PATCH_
-		if((!ieee->only_mesh) && (ieee->iw_mode == IW_MODE_MESH) && (ieee->state == RTLLIB_LINKED))
-			pHTInfoEle->ExtChlOffset			= ((pHT->bRegBW40MHz == false)?HT_EXTCHNL_OFFSET_NO_EXT:
-												ieee->APExtChlOffset);
-		else if(ieee->iw_mode == IW_MODE_MESH)
-			pHTInfoEle->ExtChlOffset			= ((pHT->bRegBW40MHz == false)?HT_EXTCHNL_OFFSET_NO_EXT:
-											(ieee->current_mesh_network.channel<=6)?
-												HT_EXTCHNL_OFFSET_UPPER:HT_EXTCHNL_OFFSET_LOWER);
-		else
-#endif
-			pHTInfoEle->ExtChlOffset			= ((pHT->bRegBW40MHz == false)?HT_EXTCHNL_OFFSET_NO_EXT:
+		pHTInfoEle->ExtChlOffset			= ((pHT->bRegBW40MHz == false)?HT_EXTCHNL_OFFSET_NO_EXT:
 											(ieee->current_network.channel<=6)?
 												HT_EXTCHNL_OFFSET_UPPER:HT_EXTCHNL_OFFSET_LOWER);
 		pHTInfoEle->RecommemdedTxWidth	= pHT->bRegBW40MHz;
@@ -1147,9 +1116,6 @@ void HTOnAssocRsp(struct rtllib_device *ieee)
 	else
 		pPeerHTInfo = (PHT_INFORMATION_ELE)(pHTInfo->PeerHTInfoBuf);
 
-#ifdef _RTL8192_EXT_PATCH_
-	ieee->APExtChlOffset = (HT_EXTCHNL_OFFSET)(pPeerHTInfo->ExtChlOffset);
-#endif
 	RTLLIB_DEBUG_DATA(RTLLIB_DL_DATA|RTLLIB_DL_HT, pPeerHTCap, sizeof(HT_CAPABILITY_ELE));
 	HTSetConnectBwMode(ieee, (HT_CHANNEL_WIDTH)(pPeerHTCap->ChlWidth), (HT_EXTCHNL_OFFSET)(pPeerHTInfo->ExtChlOffset));
 #if defined RTL8192SE || defined RTL8192SU || defined RTL8192CE
@@ -1281,9 +1247,6 @@ void HTInitializeHTInfo(struct rtllib_device* ieee)
 
 	pHTInfo->bCurrent_AMSDU_Support = false;
 	pHTInfo->nCurrent_AMSDU_MaxSize = pHTInfo->nAMSDU_MaxSize;
-#ifdef _RTL8192_EXT_PATCH_
-	pHTInfo->bCurrent_Mesh_AMSDU_Support = true;
-#endif
 	pHTInfo->CurrentMPDUDensity = pHTInfo->MPDU_Density;
 	pHTInfo->CurrentAMPDUFactor = pHTInfo->AMPDU_Factor;
 
@@ -1498,10 +1461,6 @@ void HTUseDefaultSetting(struct rtllib_device* ieee)
 		pHTInfo->bCurShortGI20MHz= pHTInfo->bRegShortGI20MHz;
 
 		pHTInfo->bCurShortGI40MHz= pHTInfo->bRegShortGI40MHz;
-#ifdef _RTL8192_EXT_PATCH_
-		ieee->current_mesh_network.qos_data.supported = 1;
-		ieee->current_mesh_network.qos_data.active = ieee->current_mesh_network.qos_data.supported;
-#endif
 
 #ifdef ENABLE_AMSDU
 		if(ieee->iw_mode == IW_MODE_ADHOC)
@@ -1510,13 +1469,6 @@ void HTUseDefaultSetting(struct rtllib_device* ieee)
 			ieee->current_network.qos_data.active = ieee->current_network.qos_data.supported;
 			pHTInfo->bCurrent_AMSDU_Support = 1;
 		}
-#ifdef _RTL8192_EXT_PATCH_
-		else if(ieee->iw_mode == IW_MODE_MESH)
-		{
-			pHTInfo->bCurrent_Mesh_AMSDU_Support = 1;
-			pHTInfo->bCurrent_AMSDU_Support = pHTInfo->bAMSDU_Support;
-		}
-#endif
 		else
 			pHTInfo->bCurrent_AMSDU_Support = pHTInfo->bAMSDU_Support;
 #else
@@ -1527,13 +1479,6 @@ void HTUseDefaultSetting(struct rtllib_device* ieee)
 #ifdef ENABLE_AMSDU
 		if(ieee->iw_mode == IW_MODE_ADHOC)
 			pHTInfo->bCurrentAMPDUEnable = 0;
-#ifdef _RTL8192_EXT_PATCH_
-		else if(ieee->iw_mode == IW_MODE_MESH)
-		{
-			pHTInfo->bCurrentMeshAMPDUEnable = 0;
-			pHTInfo->bCurrentAMPDUEnable = pHTInfo->bAMPDUEnable;
-		}
-#endif
 		else
 			pHTInfo->bCurrentAMPDUEnable = pHTInfo->bAMPDUEnable;
 #else
@@ -1646,11 +1591,4 @@ EXPORT_SYMBOL_RSL(HTFilterMCSRate);
 EXPORT_SYMBOL_RSL(HTGetHighestMCSRate);
 EXPORT_SYMBOL_RSL(MCS_FILTER_ALL);
 EXPORT_SYMBOL_RSL(MCS_FILTER_1SS);
-#ifdef _RTL8192_EXT_PATCH_
-EXPORT_SYMBOL_RSL(HTSetConnectBwMode);
-EXPORT_SYMBOL_RSL(HTConstructCapabilityElement);
-EXPORT_SYMBOL_RSL(HTConstructRT2RTAggElement);
-EXPORT_SYMBOL_RSL(HTUseDefaultSetting);
-EXPORT_SYMBOL_RSL(HTConstructInfoElement);
-#endif
 #endif
