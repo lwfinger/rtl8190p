@@ -1273,168 +1273,115 @@ int rtllib_rx(struct rtllib_device *ieee, struct sk_buff *skb,
 			ieee->bis_any_nonbepkts = true;
 		}
 	}
-#ifdef _RTL8192_EXT_PATCH_
-	if((fc & (WIFI_MESH_TYPE | RTLLIB_FCTL_FROMDS | RTLLIB_FCTL_TODS))
-		== (WIFI_MESH_TYPE | RTLLIB_FCTL_FROMDS | RTLLIB_FCTL_TODS))
+	/* skb: hdr + (possible reassembled) full plaintext payload */
+	payload = skb->data + hdrlen;
+	rxb = (struct rtllib_rxb*)kmalloc(sizeof(struct rtllib_rxb),GFP_ATOMIC);
+	if(rxb == NULL)
 	{
-		if(ieee->iw_mode == IW_MODE_MESH){
-			rxb = (struct rtllib_rxb*)kmalloc(sizeof(struct rtllib_rxb),GFP_ATOMIC);
-			if(rxb == NULL)
-			{
-				printk("%s(): kmalloc rxb error\n",__FUNCTION__);
-				goto rx_dropped;
-			}
-			memset(rxb, 0, sizeof(struct rtllib_rxb));
-			if(msh_parse_subframe(ieee, skb, rxb)==0){
-				/* only to free rxb, and not submit the packets to upper layer */
-				for(i =0; i < rxb->nr_subframes; i++) {
-					if(rxb->subframes[i])
-						dev_kfree_skb(rxb->subframes[i]);
-				}
-				kfree(rxb);
-				rxb = NULL;
-				goto rx_dropped;
-			}
-			ret = msh_rx_process_dataframe(ieee,rxb,rx_stats);
-			if(ret < 0) {
-				for(i =0; i < rxb->nr_subframes; i++) {
-					if(rxb->subframes[i])
-						dev_kfree_skb(rxb->subframes[i]);
-				}
-				kfree(rxb);
-				rxb = NULL;
-				goto rx_dropped;
-			}else{
-				kfree(rxb);
-				rxb = NULL;
-			}
-		}else
-			goto rx_dropped;
-	}else{
-#endif
-		/* skb: hdr + (possible reassembled) full plaintext payload */
-		payload = skb->data + hdrlen;
-		rxb = (struct rtllib_rxb*)kmalloc(sizeof(struct rtllib_rxb),GFP_ATOMIC);
-		if(rxb == NULL)
-		{
-			RTLLIB_DEBUG(RTLLIB_DL_ERR,"%s(): kmalloc rxb error\n",__FUNCTION__);
-			goto rx_dropped;
+		RTLLIB_DEBUG(RTLLIB_DL_ERR,"%s(): kmalloc rxb error\n",__FUNCTION__);
+		goto rx_dropped;
+	}
+	/* to parse amsdu packets */
+	/* qos data packets & reserved bit is 1 */
+	if(parse_subframe(ieee,skb,rx_stats,rxb,src,dst) == 0) {
+		/* only to free rxb, and not submit the packets to upper layer */
+		for(i =0; i < rxb->nr_subframes; i++) {
+			dev_kfree_skb(rxb->subframes[i]);
 		}
-		/* to parse amsdu packets */
-		/* qos data packets & reserved bit is 1 */
-		if(parse_subframe(ieee,skb,rx_stats,rxb,src,dst) == 0) {
-			/* only to free rxb, and not submit the packets to upper layer */
-			for(i =0; i < rxb->nr_subframes; i++) {
-				dev_kfree_skb(rxb->subframes[i]);
-			}
-			kfree(rxb);
-			rxb = NULL;
-			goto rx_dropped;
-		}
+		kfree(rxb);
+		rxb = NULL;
+		goto rx_dropped;
+	}
 
 #if !defined(RTL8192SU) && !defined(RTL8192U)
 #ifdef ENABLE_LPS
-		if(unicast_packet)
-		{
-			if (type == RTLLIB_FTYPE_DATA)
+	if(unicast_packet) {
+		if (type == RTLLIB_FTYPE_DATA) {
+			if(ieee->bIsAggregateFrame)
+				ieee->LinkDetectInfo.NumRxUnicastOkInPeriod+=rxb->nr_subframes;
+			else
+				ieee->LinkDetectInfo.NumRxUnicastOkInPeriod++;
+
+			if((ieee->state == RTLLIB_LINKED) /*&& !MgntInitAdapterInProgress(pMgntInfo)*/)
 			{
-
-				if(ieee->bIsAggregateFrame)
-					ieee->LinkDetectInfo.NumRxUnicastOkInPeriod+=rxb->nr_subframes;
-				else
-					ieee->LinkDetectInfo.NumRxUnicastOkInPeriod++;
-
-				if((ieee->state == RTLLIB_LINKED) /*&& !MgntInitAdapterInProgress(pMgntInfo)*/)
+				if(	((ieee->LinkDetectInfo.NumRxUnicastOkInPeriod +ieee->LinkDetectInfo.NumTxOkInPeriod) > 8 ) ||
+					(ieee->LinkDetectInfo.NumRxUnicastOkInPeriod > 2) )
 				{
-					if(	((ieee->LinkDetectInfo.NumRxUnicastOkInPeriod +ieee->LinkDetectInfo.NumTxOkInPeriod) > 8 ) ||
-						(ieee->LinkDetectInfo.NumRxUnicastOkInPeriod > 2) )
-					{
 #ifdef ENABLE_LPS
-						if(ieee->LeisurePSLeave)
-							ieee->LeisurePSLeave(dev);
+					if(ieee->LeisurePSLeave)
+						ieee->LeisurePSLeave(dev);
 #endif
-					}
 				}
 			}
 		}
-#endif
-#endif
-		ieee->last_rx_ps_time = jiffies;
-		if(ieee->pHTInfo->bCurRxReorderEnable == false ||pTS == NULL){
-			for(i = 0; i<rxb->nr_subframes; i++) {
-				struct sk_buff *sub_skb = rxb->subframes[i];
-
-				if (sub_skb) {
-					/* convert hdr + possible LLC headers into Ethernet header */
-					ethertype = (sub_skb->data[6] << 8) | sub_skb->data[7];
-					if (sub_skb->len >= 8 &&
-							((memcmp(sub_skb->data, rfc1042_header, SNAP_SIZE) == 0 &&
-							  ethertype != ETH_P_AARP && ethertype != ETH_P_IPX) ||
-							 memcmp(sub_skb->data, bridge_tunnel_header, SNAP_SIZE) == 0)) {
-						/* remove RFC1042 or Bridge-Tunnel encapsulation and
-						 * replace EtherType */
-						skb_pull(sub_skb, SNAP_SIZE);
-						memcpy(skb_push(sub_skb, ETH_ALEN), src, ETH_ALEN);
-						memcpy(skb_push(sub_skb, ETH_ALEN), dst, ETH_ALEN);
-					} else {
-						u16 len;
-						/* Leave Ethernet header part of hdr and full payload */
-						len = htons(sub_skb->len);
-						memcpy(skb_push(sub_skb, 2), &len, 2);
-						memcpy(skb_push(sub_skb, ETH_ALEN), src, ETH_ALEN);
-						memcpy(skb_push(sub_skb, ETH_ALEN), dst, ETH_ALEN);
-					}
-
-					stats->rx_packets++;
-					stats->rx_bytes += sub_skb->len;
-					if(is_multicast_ether_addr(dst)) {
-						stats->multicast++;
-					}
-
-					/* Indicat the packets to upper layer */
-					memset(sub_skb->cb, 0, sizeof(sub_skb->cb));
-#ifdef _RTL8192_EXT_PATCH_
-					sub_skb->protocol = eth_type_trans(sub_skb, sub_skb->dev);
-#else
-					sub_skb->protocol = eth_type_trans(sub_skb, dev);
-					sub_skb->dev = dev;
-#endif
-#ifdef TCP_CSUM_OFFLOAD_RX
-					if ( rx_stats->tcp_csum_valid)
-						sub_skb->ip_summed = CHECKSUM_UNNECESSARY;
-					else
-						sub_skb->ip_summed = CHECKSUM_NONE;
-#else
-					sub_skb->ip_summed = CHECKSUM_NONE; /* 802.11 crc not sufficient */
-#endif
-
-					netif_rx(sub_skb);
-				}
-			}
-			kfree(rxb);
-			rxb = NULL;
-
-		}
-		else
-		{
-			RTLLIB_DEBUG(RTLLIB_DL_REORDER,"%s(): REORDER ENABLE AND PTS not NULL, and we will enter RxReorderIndicatePacket()\n",__FUNCTION__);
-#ifdef TCP_CSUM_OFFLOAD_RX
-			rxb->tcp_csum_valid = rx_stats->tcp_csum_valid;
-#endif
-			RxReorderIndicatePacket(ieee, rxb, pTS, SeqNum);
-		}
-#ifdef _RTL8192_EXT_PATCH_
 	}
 #endif
+#endif
+	ieee->last_rx_ps_time = jiffies;
+	if(ieee->pHTInfo->bCurRxReorderEnable == false ||pTS == NULL){
+		for(i = 0; i<rxb->nr_subframes; i++) {
+			struct sk_buff *sub_skb = rxb->subframes[i];
+
+			if (sub_skb) {
+				/* convert hdr + possible LLC headers into Ethernet header */
+				ethertype = (sub_skb->data[6] << 8) | sub_skb->data[7];
+				if (sub_skb->len >= 8 &&
+						((memcmp(sub_skb->data, rfc1042_header, SNAP_SIZE) == 0 &&
+						  ethertype != ETH_P_AARP && ethertype != ETH_P_IPX) ||
+						 memcmp(sub_skb->data, bridge_tunnel_header, SNAP_SIZE) == 0)) {
+					/* remove RFC1042 or Bridge-Tunnel encapsulation and
+					 * replace EtherType */
+					skb_pull(sub_skb, SNAP_SIZE);
+					memcpy(skb_push(sub_skb, ETH_ALEN), src, ETH_ALEN);
+					memcpy(skb_push(sub_skb, ETH_ALEN), dst, ETH_ALEN);
+				} else {
+					u16 len;
+					/* Leave Ethernet header part of hdr and full payload */
+					len = htons(sub_skb->len);
+					memcpy(skb_push(sub_skb, 2), &len, 2);
+					memcpy(skb_push(sub_skb, ETH_ALEN), src, ETH_ALEN);
+					memcpy(skb_push(sub_skb, ETH_ALEN), dst, ETH_ALEN);
+				}
+
+				stats->rx_packets++;
+				stats->rx_bytes += sub_skb->len;
+				if(is_multicast_ether_addr(dst)) {
+					stats->multicast++;
+				}
+
+				/* Indicat the packets to upper layer */
+				memset(sub_skb->cb, 0, sizeof(sub_skb->cb));
+				sub_skb->protocol = eth_type_trans(sub_skb, dev);
+				sub_skb->dev = dev;
+#ifdef TCP_CSUM_OFFLOAD_RX
+				if ( rx_stats->tcp_csum_valid)
+					sub_skb->ip_summed = CHECKSUM_UNNECESSARY;
+				else
+					sub_skb->ip_summed = CHECKSUM_NONE;
+#else
+				sub_skb->ip_summed = CHECKSUM_NONE; /* 802.11 crc not sufficient */
+#endif
+
+				netif_rx(sub_skb);
+			}
+		}
+		kfree(rxb);
+		rxb = NULL;
+
+	}
+	else
+	{
+		RTLLIB_DEBUG(RTLLIB_DL_REORDER,"%s(): REORDER ENABLE AND PTS not NULL, and we will enter RxReorderIndicatePacket()\n",__FUNCTION__);
+#ifdef TCP_CSUM_OFFLOAD_RX
+		rxb->tcp_csum_valid = rx_stats->tcp_csum_valid;
+#endif
+		RxReorderIndicatePacket(ieee, rxb, pTS, SeqNum);
+	}
 #ifndef JOHN_NOCPY
 	dev_kfree_skb(skb);
 #endif
 
  rx_exit:
-#ifdef NOT_YET
-	if (sta)
-		hostap_handle_sta_release(sta);
-#endif
 	return 1;
 
  rx_dropped:
@@ -1450,8 +1397,6 @@ int rtllib_rx(struct rtllib_device *ieee, struct sk_buff *skb,
 	 * hardware as a DMA target */
 	return 0;
 }
-
-
 
 #define MGMT_FRAME_FIXED_PART_LENGTH            0x24
 
@@ -2131,19 +2076,7 @@ int rtllib_parse_info_param(struct rtllib_device *ieee,
 						network->wzc_ie_len);
 #endif
 			}
-#ifdef _RTL8192_EXT_PATCH_
-			if(info_element->len > 4  &&
-				info_element->data[0] == 0x48 &&
-				info_element->data[1] == 0x4F &&
-				info_element->data[2] == 0x53 &&
-				info_element->data[3] == 0x54)
-			{
-				network->hostname_len = info_element->len - 4;
-				memcpy(network->hostname, (info_element->data+4), network->hostname_len);
-			}
-#endif
 			break;
-
 		case MFIE_TYPE_RSN:
 			RTLLIB_DEBUG_MGMT("MFIE_TYPE_RSN: %d bytes\n",
 					     info_element->len);
@@ -2152,7 +2085,6 @@ int rtllib_parse_info_param(struct rtllib_device *ieee,
 			memcpy(network->rsn_ie, info_element,
 			       network->rsn_ie_len);
 			break;
-
 		case MFIE_TYPE_HT_CAP:
 			RTLLIB_DEBUG_SCAN("MFIE_TYPE_HT_CAP: %d bytes\n",
 					     info_element->len);
@@ -2223,65 +2155,6 @@ int rtllib_parse_info_param(struct rtllib_device *ieee,
 			rtllib_extract_country_ie(ieee, info_element, network, network->bssid);
 			break;
 #endif
-#ifdef _RTL8192_EXT_PATCH_
-		case MFIE_TYPE_MESH_ID:
-			network->mesh_id_len = min(info_element->len, (u8)MAX_MESH_ID_LEN);
-			memcpy(network->mesh_id, info_element->data, network->mesh_id_len);
-			if (network->mesh_id_len < MAX_MESH_ID_LEN) {
-				memset(network->mesh_id + network->mesh_id_len, 0,
-					MAX_MESH_ID_LEN - network->mesh_id_len);
-			}
-			RTLLIB_DEBUG_MGMT("MFIE_TYPE_MESH_ID: '%s'len=%d.\n", network->mesh_id,
-					network->mesh_id_len);
-			break;
-
-		case MFIE_TYPE_MESH_CONFIGURATION:
-			network->mesh_config_len = min(info_element->len, (u8)MESH_CONF_TOTAL_LEN);
-			memcpy(network->mesh_config.path_proto_id, info_element->data + 1, 4);
-			memcpy(network->mesh_config.path_metric_id, info_element->data + 5, 4);
-			memcpy(network->mesh_config.congest_ctl_mode, info_element->data + 9, 4);
-			memcpy(network->mesh_config.mesh_capability, info_element->data + 17, 2);
-			break;
-#endif
-/* TODO */
-#if 0
-			/* 802.11h */
-		case MFIE_TYPE_POWER_CONSTRAINT:
-			network->power_constraint = info_element->data[0];
-			network->flags |= NETWORK_HAS_POWER_CONSTRAINT;
-			break;
-
-		case MFIE_TYPE_CSA:
-			network->power_constraint = info_element->data[0];
-			network->flags |= NETWORK_HAS_CSA;
-			break;
-
-		case MFIE_TYPE_QUIET:
-			network->quiet.count = info_element->data[0];
-			network->quiet.period = info_element->data[1];
-			network->quiet.duration = info_element->data[2];
-			network->quiet.offset = info_element->data[3];
-			network->flags |= NETWORK_HAS_QUIET;
-			break;
-
-		case MFIE_TYPE_IBSS_DFS:
-			if (network->ibss_dfs)
-				break;
-			network->ibss_dfs = kmemdup(info_element->data,
-						    info_element->len,
-						    GFP_ATOMIC);
-			if (!network->ibss_dfs)
-				return 1;
-			network->flags |= NETWORK_HAS_IBSS_DFS;
-			break;
-
-		case MFIE_TYPE_TPC_REPORT:
-			network->tpc_report.transmit_power =
-			    info_element->data[0];
-			network->tpc_report.link_margin = info_element->data[1];
-			network->flags |= NETWORK_HAS_TPC_REPORT;
-			break;
-#endif
 		default:
 			RTLLIB_DEBUG_MGMT
 			    ("Unsupported info element: %s (%d)\n",
@@ -2298,65 +2171,36 @@ int rtllib_parse_info_param(struct rtllib_device *ieee,
 
 	if(!network->atheros_cap_exist && !network->broadcom_cap_exist &&
 		!network->cisco_cap_exist && !network->ralink_cap_exist && !network->bssht.bdRT2RTAggregation)
-	{
 		network->unknown_cap_exist = true;
-	}
 	else
-	{
 		network->unknown_cap_exist = false;
-	}
 	return 0;
 }
 
-static inline u8 rtllib_SignalStrengthTranslate(
-	u8  CurrSS
-	)
+static inline u8 rtllib_SignalStrengthTranslate(u8  CurrSS)
 {
 	u8 RetSS;
 
 	if(CurrSS >= 71 && CurrSS <= 100)
-	{
 		RetSS = 90 + ((CurrSS - 70) / 3);
-	}
 	else if(CurrSS >= 41 && CurrSS <= 70)
-	{
 		RetSS = 78 + ((CurrSS - 40) / 3);
-	}
 	else if(CurrSS >= 31 && CurrSS <= 40)
-	{
 		RetSS = 66 + (CurrSS - 30);
-	}
 	else if(CurrSS >= 21 && CurrSS <= 30)
-	{
 		RetSS = 54 + (CurrSS - 20);
-	}
 	else if(CurrSS >= 5 && CurrSS <= 20)
-	{
 		RetSS = 42 + (((CurrSS - 5) * 2) / 3);
-	}
 	else if(CurrSS == 4)
-	{
 		RetSS = 36;
-	}
 	else if(CurrSS == 3)
-	{
 		RetSS = 27;
-	}
 	else if(CurrSS == 2)
-	{
 		RetSS = 18;
-	}
 	else if(CurrSS == 1)
-	{
 		RetSS = 9;
-	}
 	else
-	{
 		RetSS = CurrSS;
-	}
-
-
-
 	return RetSS;
 }
 
@@ -2370,11 +2214,7 @@ long rtllib_translate_todbm(u8 signal_strength_index	)
 	return signal_power;
 }
 
-#ifdef _RTL8192_EXT_PATCH_
-extern int rtllib_network_init(
-#else
 static inline int rtllib_network_init(
-#endif
 	struct rtllib_device *ieee,
 	struct rtllib_probe_response *beacon,
 	struct rtllib_network *network,
@@ -2426,10 +2266,6 @@ static inline int rtllib_network_init(
 	network->CountryIeLen = 0;
 	memset(network->CountryIeBuf, 0, MAX_IE_LEN);
 #endif
-#ifdef _RTL8192_EXT_PATCH_
-	memset(network->hostname, 0, MAX_HOST_NAME_LENGTH);
-	network->hostname_len = 0;
-#endif
 	HTInitializeBssDesc(&network->bssht);
 	if (stats->freq == RTLLIB_52GHZ_BAND) {
 		/* for A band (No DS info) */
@@ -2470,17 +2306,10 @@ static inline int rtllib_network_init(
 	}
 
 	if(network->bssht.bdSupportHT){
-#ifdef _RTL8192_EXT_PATCH_
-		if(network->mode == IEEE_A)
-			network->mode |= IEEE_N_5G;
-		else if(network->mode & (IEEE_G | IEEE_B))
-			network->mode |= IEEE_N_24G;
-#else
 		if(network->mode == IEEE_A)
 			network->mode = IEEE_N_5G;
 		else if(network->mode & (IEEE_G | IEEE_B))
 			network->mode = IEEE_N_24G;
-#endif
 	}
 	if (rtllib_is_empty_essid(network->ssid, network->ssid_len))
 		network->flags |= NETWORK_EMPTY_ESSID;
@@ -2858,18 +2687,6 @@ static inline void rtllib_process_probe_response(
 		return;
 	}
 
-#ifdef _RTL8192_EXT_PATCH_
-	if(ieee->ext_patch_rtllib_process_probe_response_1) {
-		/* 2 deonte the normal beacon packet,
-		 * discard it under mesh only mode  */
-		if(ieee->ext_patch_rtllib_process_probe_response_1(ieee, beacon, stats) != 2){
-			goto free_network;
-		} else if((ieee->iw_mode == IW_MODE_MESH)&&ieee->only_mesh) {
-			goto free_network;
-		}
-	}
-#endif
-
 	RTLLIB_DEBUG_SCAN(
 		"'%s' (" MAC_FMT "): %c%c%c%c %c%c%c%c-%c%c%c%c %c%c%c%c\n",
 		escape_essid(info_element->data, info_element->len),
@@ -3096,9 +2913,6 @@ no_alloc:
 				     RTLLIB_STYPE_PROBE_RESP ?
 				     "PROBE RESPONSE" : "BEACON");
 #endif
-#ifdef _RTL8192_EXT_PATCH_
-		network->ext_entry = target->ext_entry;
-#endif
 		memcpy(target, network, sizeof(*target));
 		list_add_tail(&target->list, &ieee->network_list);
 		if(ieee->softmac_features & IEEE_SOFTMAC_ASSOCIATE)
@@ -3210,10 +3024,6 @@ void rtllib_rx_mgt(struct rtllib_device *ieee,
                      ieee->state == RTLLIB_LINKED)){
                 rtllib_rx_probe_rq(ieee, skb);
             }
-#ifdef _RTL8192_EXT_PATCH_
-			if((ieee->iw_mode == IW_MODE_MESH) && ieee->ext_patch_rtllib_rx_mgt_on_probe_req )
-				ieee->ext_patch_rtllib_rx_mgt_on_probe_req( ieee, (struct rtllib_probe_request *)header, stats);
-#endif
             break;
     }
 }
@@ -3224,9 +3034,5 @@ EXPORT_SYMBOL_RSL(rtllib_rx);
 #if defined(RTL8192U) || defined(RTL8192SU) || defined(RTL8192SE)
 EXPORT_SYMBOL_RSL(IbssAgeFunction);
 EXPORT_SYMBOL_RSL(GetStaInfo);
-#endif
-#ifdef _RTL8192_EXT_PATCH_
-EXPORT_SYMBOL_RSL(rtllib_network_init);
-EXPORT_SYMBOL_RSL(rtllib_parse_info_param);
 #endif
 #endif
