@@ -50,13 +50,8 @@ static struct modes_unit rtllib_modes[] = {
 	{"b",1},
 	{"g",1},
 	{"?",1},
-#ifdef _RTL8192_EXT_PATCH_
-	{"n",5},
-	{"n",4},
-#else
 	{"N-24G",5},
 	{"N-5G",4},
-#endif
 };
 
 #define MAX_CUSTOM_LEN 64
@@ -338,15 +333,9 @@ int rtllib_wx_get_scan(struct rtllib_device *ieee,
 	return err;
 }
 
-#ifdef _RTL8192_EXT_PATCH_
-int rtllib_wx_set_encode(struct rtllib_device *ieee,
-			    struct iw_request_info *info,
-			    union iwreq_data *wrqu, char *keybuf, u8 is_mesh)
-#else
 int rtllib_wx_set_encode(struct rtllib_device *ieee,
 			    struct iw_request_info *info,
 			    union iwreq_data *wrqu, char *keybuf)
-#endif
 {
 	struct iw_point *erq = &(wrqu->encoding);
 	struct net_device *dev = ieee->dev;
@@ -366,24 +355,12 @@ int rtllib_wx_set_encode(struct rtllib_device *ieee,
 		key_provided = 1;
 	} else {
 		key_provided = 0;
-#ifdef _RTL8192_EXT_PATCH_
-		if(is_mesh)
-			key = ieee->mesh_txkeyidx;
-		else
-#endif
 		key = ieee->tx_keyidx;
 	}
 
 	RTLLIB_DEBUG_WX("Key: %d [%s]\n", key, key_provided ?
 			   "provided" : "default");
-#ifdef _RTL8192_EXT_PATCH_
-	if(is_mesh)
-		crypt = &ieee->cryptlist[0]->crypt[key];
-	else
-		crypt = &ieee->sta_crypt[key];
-#else
 	crypt = &ieee->crypt[key];
-#endif
 	if (erq->flags & IW_ENCODE_DISABLED) {
 		if (key_provided && *crypt) {
 			RTLLIB_DEBUG_WX("Disabling encryption on key %d.\n",
@@ -395,29 +372,11 @@ int rtllib_wx_set_encode(struct rtllib_device *ieee,
 		/* Check all the keys to see if any are still configured,
 		 * and if no key index was provided, de-init them all */
 		for (i = 0; i < WEP_KEYS; i++) {
-#ifdef _RTL8192_EXT_PATCH_
-			bool null_crypt = false;
-			if(is_mesh)
-				null_crypt = (ieee->cryptlist[0]->crypt[i] != NULL) ? true:false;
-			else
-				null_crypt = (ieee->sta_crypt[i] != NULL) ? true:false;
-			if (null_crypt)
-#else
-				if (ieee->crypt[i] != NULL)
-#endif
-				{
-					if (key_provided)
-						break;
-#ifdef _RTL8192_EXT_PATCH_
-					if(is_mesh)
-						rtllib_crypt_delayed_deinit(ieee, &ieee->cryptlist[0]->crypt[i]);
-					else
-						rtllib_crypt_delayed_deinit(ieee, &ieee->sta_crypt[i]);
-#else
-					rtllib_crypt_delayed_deinit(ieee, &ieee->crypt[i]);
-#endif
-
-				}
+			if (ieee->crypt[i] != NULL) {
+				if (key_provided)
+					break;
+				rtllib_crypt_delayed_deinit(ieee, &ieee->crypt[i]);
+			}
 		}
 
 		if (i == WEP_KEYS) {
@@ -499,13 +458,7 @@ int rtllib_wx_set_encode(struct rtllib_device *ieee,
 		 * explicitely set */
 		if (key == sec.active_key)
 			sec.flags |= SEC_ACTIVE_KEY;
-#ifdef _RTL8192_EXT_PATCH_
-		if(is_mesh)
-			ieee->mesh_txkeyidx = key;
-		else
-#endif
 		ieee->tx_keyidx = key;
-
 	} else {
 		len = (*crypt)->ops->get_key(sec.keys[key], WEP_KEY_LEN,
 					     NULL, (*crypt)->priv);
@@ -527,22 +480,11 @@ int rtllib_wx_set_encode(struct rtllib_device *ieee,
 		if (key_provided) {
 			RTLLIB_DEBUG_WX(
 				"Setting key %d to default Tx key.\n", key);
-#ifdef _RTL8192_EXT_PATCH_
-			if(is_mesh)
-				ieee->mesh_txkeyidx = key;
-			else
-#endif
 			ieee->tx_keyidx = key;
 			sec.active_key = key;
 			sec.flags |= SEC_ACTIVE_KEY;
 		}
 	}
-#ifdef _RTL8192_EXT_PATCH_
-	if ((ieee->iw_mode == IW_MODE_MESH)&&(is_mesh)&&ieee->ext_patch_rtllib_create_crypt_for_peer)
-	{
-		ieee->ext_patch_rtllib_create_crypt_for_peer(ieee);
-	}
-#endif
  done:
 	ieee->open_wep = !(erq->flags & IW_ENCODE_RESTRICTED);
 	ieee->auth_mode = ieee->open_wep ? WLAN_AUTH_OPEN : WLAN_AUTH_SHARED_KEY;
@@ -573,15 +515,9 @@ int rtllib_wx_set_encode(struct rtllib_device *ieee,
 	return 0;
 }
 
-#ifdef _RTL8192_EXT_PATCH_
-int rtllib_wx_get_encode(struct rtllib_device *ieee,
-			    struct iw_request_info *info,
-			    union iwreq_data *wrqu, char *keybuf, u8 is_mesh)
-#else
 int rtllib_wx_get_encode(struct rtllib_device *ieee,
 			    struct iw_request_info *info,
 			    union iwreq_data *wrqu, char *keybuf)
-#endif
 {
 	struct iw_point *erq = &(wrqu->encoding);
 	int len, key;
@@ -598,21 +534,9 @@ int rtllib_wx_get_encode(struct rtllib_device *ieee,
 			return -EINVAL;
 		key--;
 	} else {
-#ifdef _RTL8192_EXT_PATCH_
-		if(is_mesh)
-			key = ieee->mesh_txkeyidx;
-		else
-#endif
 		key = ieee->tx_keyidx;
 	}
-#ifdef _RTL8192_EXT_PATCH_
-	if(is_mesh)
-		crypt = ieee->cryptlist[0]->crypt[key];
-	else
-		crypt = ieee->sta_crypt[key];
-#else
 	crypt = ieee->crypt[key];
-#endif
 
 	erq->flags = key + 1;
 
@@ -643,15 +567,9 @@ int rtllib_wx_get_encode(struct rtllib_device *ieee,
 	return 0;
 }
 #if (WIRELESS_EXT >= 18)
-#ifdef _RTL8192_EXT_PATCH_
-int rtllib_wx_set_encode_ext(struct rtllib_device *ieee,
-                               struct iw_request_info *info,
-                               union iwreq_data *wrqu, char *extra, u8 is_mesh)
-#else
 int rtllib_wx_set_encode_ext(struct rtllib_device *ieee,
                                struct iw_request_info *info,
                                union iwreq_data *wrqu, char *extra)
-#endif
 {
 	int ret = 0;
 	struct net_device *dev = ieee->dev;
@@ -672,43 +590,19 @@ int rtllib_wx_set_encode_ext(struct rtllib_device *ieee,
                         return -EINVAL;
                 idx--;
 	} else{
-#ifdef _RTL8192_EXT_PATCH_
-		if(is_mesh)
-			idx = ieee->mesh_txkeyidx;
-		else
-#endif
-			idx = ieee->tx_keyidx;
+		idx = ieee->tx_keyidx;
 	}
 	if (ext->ext_flags & IW_ENCODE_EXT_GROUP_KEY) {
-#ifdef _RTL8192_EXT_PATCH_
-		if(is_mesh)
-			crypt = &ieee->cryptlist[0]->crypt[idx];
-		else
-			crypt = &ieee->sta_crypt[idx];
-#else
 		crypt = &ieee->crypt[idx];
-#endif
 		group_key = 1;
 	} else {
 		/* some Cisco APs use idx>0 for unicast in dynamic WEP */
 		if (idx != 0 && ext->alg != IW_ENCODE_ALG_WEP)
                         return -EINVAL;
-#ifdef _RTL8192_EXT_PATCH_
-		if ((ieee->iw_mode == IW_MODE_INFRA)||
-			((ieee->iw_mode == IW_MODE_MESH) && (ieee->only_mesh == 0))){
-			if(is_mesh)
-				crypt = &ieee->cryptlist[0]->crypt[idx];
-			else
-				crypt = &ieee->sta_crypt[idx];
-		}
-		else
-			return -EINVAL;
-#else
 		if (ieee->iw_mode == IW_MODE_INFRA)
 			crypt = &ieee->crypt[idx];
 		else
 			return -EINVAL;
-#endif
 	}
 
 	sec.flags |= SEC_ENABLED;
@@ -717,17 +611,9 @@ int rtllib_wx_set_encode_ext(struct rtllib_device *ieee,
 		if (*crypt)
 			rtllib_crypt_delayed_deinit(ieee, crypt);
 
-		for (i = 0; i < WEP_KEYS; i++)
-		{
-#ifdef _RTL8192_EXT_PATCH_
-			if ((is_mesh)&&(ieee->cryptlist[0]->crypt[i] != NULL))
-				break;
-			if ((!is_mesh)&&(ieee->sta_crypt[i] != NULL))
-				break;
-#else
+		for (i = 0; i < WEP_KEYS; i++) {
 			if (ieee->crypt[i] != NULL)
 				break;
-#endif
 		}
 		if (i == WEP_KEYS) {
 			sec.enabled = 0;
@@ -815,20 +701,6 @@ int rtllib_wx_set_encode_ext(struct rtllib_device *ieee,
                 *crypt = new_crypt;
 
 	}
-#ifdef _RTL8192_EXT_PATCH_
-	if ((ieee->iw_mode == IW_MODE_MESH)&&(is_mesh))
-	{
-		int j;
-		for (j=1; j<MAX_MP; j++)
-		{
-			struct rtllib_crypt_data ** crypttmp =  &ieee->cryptlist[j]->crypt[idx];
-			if (*crypttmp == NULL)
-				break;
-			if (*crypttmp && (*crypttmp)->ops != ops)
-				rtllib_crypt_delayed_deinit(ieee, crypttmp);
-		}
-	}
-#endif
 
         if (ext->key_len > 0 && (*crypt)->ops->set_key &&
             (*crypt)->ops->set_key(ext->key, ext->key_len, ext->rx_seq,
@@ -838,23 +710,11 @@ int rtllib_wx_set_encode_ext(struct rtllib_device *ieee,
                 ret = -EINVAL;
                 goto done;
         }
-#if 1
         if (ext->ext_flags & IW_ENCODE_EXT_SET_TX_KEY) {
-#ifdef _RTL8192_EXT_PATCH_
-			if(is_mesh)
-				ieee->mesh_txkeyidx = idx;
-			else
-#endif
                 ieee->tx_keyidx = idx;
                 sec.active_key = idx;
                 sec.flags |= SEC_ACTIVE_KEY;
         }
-#ifdef _RTL8192_EXT_PATCH_
-	if ((ieee->iw_mode == IW_MODE_MESH)&&(is_mesh)&&ieee->ext_patch_rtllib_create_crypt_for_peer)
-	{
-		ieee->ext_patch_rtllib_create_crypt_for_peer(ieee);
-	}
-#endif
         if (ext->alg != IW_ENCODE_ALG_NONE) {
                 sec.key_sizes[idx] = ext->key_len;
                 sec.flags |= (1 << idx);
@@ -872,7 +732,6 @@ int rtllib_wx_set_encode_ext(struct rtllib_device *ieee,
                 if (group_key)
                         sec.flags &= ~SEC_LEVEL;
         }
-#endif
 done:
         if (ieee->set_security)
                 ieee->set_security(ieee->dev, &sec);
@@ -886,15 +745,9 @@ done:
         return ret;
 }
 
-#ifdef _RTL8192_EXT_PATCH_
-int rtllib_wx_get_encode_ext(struct rtllib_device *ieee,
-			       struct iw_request_info *info,
-			       union iwreq_data *wrqu, char *extra, u8 is_mesh)
-#else
 int rtllib_wx_get_encode_ext(struct rtllib_device *ieee,
 			       struct iw_request_info *info,
 			       union iwreq_data *wrqu, char *extra)
-#endif
 {
 	struct iw_point *encoding = &wrqu->encoding;
 	struct iw_encode_ext *ext = (struct iw_encode_ext *)extra;
@@ -911,30 +764,14 @@ int rtllib_wx_get_encode_ext(struct rtllib_device *ieee,
 			return -EINVAL;
 		idx--;
 	} else{
-#ifdef _RTL8192_EXT_PATCH_
-		if(is_mesh)
-			idx = ieee->mesh_txkeyidx;
-		else
-#endif
-			idx = ieee->tx_keyidx;
+		idx = ieee->tx_keyidx;
 	}
 	if (!(ext->ext_flags & IW_ENCODE_EXT_GROUP_KEY) &&
 	    (ext->alg != IW_ENCODE_ALG_WEP))
-#ifdef _RTL8192_EXT_PATCH_
-		if (idx != 0 || !((ieee->iw_mode == IW_MODE_INFRA) || ((ieee->iw_mode == IW_MODE_MESH) && (ieee->only_mesh == 0))))
-#else
 		if (idx != 0 || (ieee->iw_mode != IW_MODE_INFRA))
-#endif
 			return -EINVAL;
 
-#ifdef _RTL8192_EXT_PATCH_
-	if(is_mesh)
-		crypt = ieee->cryptlist[0]->crypt[idx];
-	else
-		crypt = ieee->sta_crypt[idx];
-#else
 	crypt = ieee->crypt[idx];
-#endif
 
 	encoding->flags = idx + 1;
 	memset(ext, 0, sizeof(*ext));
@@ -963,213 +800,6 @@ int rtllib_wx_get_encode_ext(struct rtllib_device *ieee,
 
 	return 0;
 }
-#ifdef _RTL8192_EXT_PATCH_
-int rtllib_mesh_set_encode_ext(struct rtllib_device *ieee,
-                               struct iw_point *encoding, struct iw_encode_ext *ext, int entry)
-{
-	int ret = 0;
-#if LINUX_VERSION_CODE > KERNEL_VERSION(2,5,0)
-	struct net_device *dev = ieee->dev;
-        int i, idx;
-        int group_key = 0;
-        const char *alg, *module;
-        struct rtllib_crypto_ops *ops;
-        struct rtllib_crypt_data **crypt;
-
-        struct rtllib_security sec = {
-                .flags = 0,
-        };
-        idx = encoding->flags & IW_ENCODE_INDEX;
-	printk("idx in set enc %d \n",idx);
-
-        if (idx) {
-                if (idx < 1 || idx > WEP_KEYS)
-                        return -EINVAL;
-                idx--;
-        } else
-                idx = ieee->tx_keyidx;
-
-
-        if (ext->ext_flags & IW_ENCODE_EXT_GROUP_KEY) {
-
-		crypt = &ieee->cryptlist[0]->crypt[idx];
-		printk("Get crypt for GTK.\n");
-                group_key = 1;
-        } else {
-                /* some Cisco APs use idx>0 for unicast in dynamic WEP */
-		printk("not group key, flags:%x, ext->alg:%d\n", ext->ext_flags, ext->alg);
-		if (idx != 0 && ext->alg != IW_ENCODE_ALG_WEP)
-			return -EINVAL;
-		if ((ieee->iw_mode == IW_MODE_INFRA) || (ieee->mesh_started==1))
-		{
-			crypt = &ieee->cryptlist[entry]->crypt[idx];
-			if(*crypt == NULL )
-				printk("&ieee->cryptlist[%d]->crypt[%d] is  NULL.\n",entry,idx);
-		}
-                else
-                        return -EINVAL;
-        }
-
-        sec.flags |= SEC_ENABLED;
-        if ((encoding->flags & IW_ENCODE_DISABLED) ||
-            ext->alg == IW_ENCODE_ALG_NONE) {
-                if (*crypt){
-			printk("=====>%s():DISABLE crypt is not NULL\n",__FUNCTION__);
-			rtllib_crypt_delayed_deinit(ieee, crypt);
-		}
-#ifdef _RTL8192_EXT_PATCH_
-		if(1)
-		{
-			int j;
-			for (j=1; j<MAX_MP; j++)
-			{
-				struct rtllib_crypt_data ** crypttmp =  &ieee->cryptlist[j]->crypt[idx];
-				if (*crypttmp == NULL)
-					continue;
-				printk("======>crypt is not NULL\n");
-				rtllib_crypt_delayed_deinit(ieee, crypttmp);
-			}
-		}
-#endif
-
-                for (i = 0; i < WEP_KEYS; i++)
-
-                if (ieee->cryptlist[0]->crypt[i] != NULL)
-	                break;
-
-                if (i == WEP_KEYS) {
-                        sec.enabled = 0;
-                        sec.level = SEC_LEVEL_0;
-                        sec.flags |= SEC_LEVEL;
-                }
-                goto done;
-        }
-
-	sec.enabled = 1;
-#if 0
-        if (group_key ? !ieee->host_mc_decrypt :
-            !(ieee->host_encrypt || ieee->host_decrypt ||
-              ieee->host_encrypt_msdu))
-                goto skip_host_crypt;
-#endif
-        switch (ext->alg) {
-        case IW_ENCODE_ALG_WEP:
-                alg = "WEP";
-                module = "rtllib_crypt_wep";
-                break;
-        case IW_ENCODE_ALG_TKIP:
-                alg = "TKIP";
-                module = "rtllib_crypt_tkip";
-                break;
-        case IW_ENCODE_ALG_CCMP:
-                alg = "CCMP";
-                module = "rtllib_crypt_ccmp";
-                break;
-        default:
-                RTLLIB_DEBUG_WX("%s: unknown crypto alg %d\n",
-                                   dev->name, ext->alg);
-                ret = -EINVAL;
-                goto done;
-        }
-	printk("alg name:%s\n",alg);
-
-	 ops = rtllib_get_crypto_ops(alg);
-        if (ops == NULL) {
-                request_module("%s",module);
-                ops = rtllib_get_crypto_ops(alg);
-        }
-        if (ops == NULL) {
-                RTLLIB_DEBUG_WX("%s: unknown crypto alg %d\n",
-                                   dev->name, ext->alg);
-		printk("========>unknown crypto alg %d\n", ext->alg);
-                ret = -EINVAL;
-                goto done;
-        }
-
-        if (*crypt == NULL || (*crypt)->ops != ops) {
-
-                struct rtllib_crypt_data *new_crypt;
-		printk("Create new crypt struct.\n ");
-
-                rtllib_crypt_delayed_deinit(ieee, crypt);
-
-#if (LINUX_VERSION_CODE > KERNEL_VERSION(2,6,13))
-                new_crypt = kzalloc(sizeof(*new_crypt), GFP_KERNEL);
-#else
-                new_crypt = kmalloc(sizeof(*new_crypt), GFP_KERNEL);
-		memset(new_crypt,0,sizeof(*new_crypt));
-#endif
-                if (new_crypt == NULL) {
-                        ret = -ENOMEM;
-                        goto done;
-                }
-                new_crypt->ops = ops;
-#ifdef BUILT_IN_RTLLIB
-		if (new_crypt->ops)
-#else
-		if (new_crypt->ops && try_module_get(new_crypt->ops->owner))
-#endif
-		{
-			new_crypt->priv = new_crypt->ops->init(idx);
-		}
-                if (new_crypt->priv == NULL) {
-                        kfree(new_crypt);
-                        ret = -EINVAL;
-                        goto done;
-                }
-                *crypt = new_crypt;
-
-	}
-
-	printk("key_len %x \n",ext->key_len);
-
-        if (ext->key_len > 0 && (*crypt)->ops->set_key &&
-            (*crypt)->ops->set_key(ext->key, ext->key_len, ext->rx_seq,
-                                   (*crypt)->priv) < 0) {
-                RTLLIB_DEBUG_WX("%s: key setting failed\n", dev->name);
-		printk("key setting failed\n");
-                ret = -EINVAL;
-                goto done;
-        }
-#if 1
-        if (ext->ext_flags & IW_ENCODE_EXT_SET_TX_KEY) {
-                ieee->mesh_txkeyidx = idx;
-                sec.active_key = idx;
-                sec.flags |= SEC_ACTIVE_KEY;
-        }
-
-        if (ext->alg != IW_ENCODE_ALG_NONE) {
-                sec.key_sizes[idx] = ext->key_len;
-                sec.flags |= (1 << idx);
-                if (ext->alg == IW_ENCODE_ALG_WEP) {
-                        sec.flags |= SEC_LEVEL;
-                        sec.level = SEC_LEVEL_1;
-                } else if (ext->alg == IW_ENCODE_ALG_TKIP) {
-                        sec.flags |= SEC_LEVEL;
-                        sec.level = SEC_LEVEL_2;
-                } else if (ext->alg == IW_ENCODE_ALG_CCMP) {
-                        sec.flags |= SEC_LEVEL;
-                        sec.level = SEC_LEVEL_3;
-                }
-                /* Don't set sec level for group keys. */
-                if (group_key)
-                        sec.flags &= ~SEC_LEVEL;
-        }
-#endif
-done:
-        if (ieee->set_security)
-                ieee->set_security(ieee->dev, &sec);
-
-	 if (ieee->reset_on_keychange &&
-            ieee->iw_mode != IW_MODE_INFRA &&
-            ieee->reset_port && ieee->reset_port(dev)) {
-                RTLLIB_DEBUG_WX("%s: reset_port failed\n", dev->name);
-                return -EINVAL;
-        }
-#endif
-        return ret;
-}
-#endif
 
 int rtllib_wx_set_mlme(struct rtllib_device *ieee,
                                struct iw_request_info *info,
@@ -1190,20 +820,13 @@ int rtllib_wx_set_mlme(struct rtllib_device *ieee,
 			/* leave break out intentionly */
 
 		case IW_MLME_DISASSOC:
-#ifdef _RTL8192_EXT_PATCH_
-			if(!((ieee->iw_mode == IW_MODE_MESH) && (ieee->only_mesh == 1)))
-			{
-#endif
-				if(deauth == true) {
-					printk("disauth packet !\n");
-				} else {
-					printk("dis associate packet!\n");
-				}
-				SendDisassociation(ieee,deauth,mlme->reason_code);
-				rtllib_disassociate(ieee);
-#ifdef _RTL8192_EXT_PATCH_
+			if(deauth == true) {
+				printk("disauth packet !\n");
+			} else {
+				printk("dis associate packet!\n");
 			}
-#endif
+			SendDisassociation(ieee,deauth,mlme->reason_code);
+			rtllib_disassociate(ieee);
 			break;
 		default:
 			up(&ieee->wx_sem);
@@ -1335,7 +958,4 @@ EXPORT_SYMBOL_RSL(rtllib_wx_get_encode_ext);
 EXPORT_SYMBOL_RSL(rtllib_wx_get_scan);
 EXPORT_SYMBOL_RSL(rtllib_wx_set_encode);
 EXPORT_SYMBOL_RSL(rtllib_wx_get_encode);
-#endif
-#ifdef _RTL8192_EXT_PATCH_
-EXPORT_SYMBOL_RSL(rtllib_mesh_set_encode_ext);
 #endif

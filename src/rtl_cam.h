@@ -31,34 +31,14 @@ struct net_device;
 void CamResetAllEntry(struct net_device* dev);
 void EnableHWSecurityConfig8192(struct net_device *dev);
 void setKey(struct net_device *dev, u8 EntryNo, u8 KeyIndex, u16 KeyType, u8 *MacAddr, u8 DefaultKey, u32 *KeyContent );
-#ifdef _RTL8192_EXT_PATCH_
-void set_swcam(struct net_device *dev, u8 EntryNo, u8 KeyIndex, u16 KeyType, u8 *MacAddr, u8 DefaultKey, u32 *KeyContent, u8 is_mesh);//added by amy 090415
-#else
 void set_swcam(struct net_device *dev, u8 EntryNo, u8 KeyIndex, u16 KeyType, u8 *MacAddr, u8 DefaultKey, u32 *KeyContent );//added by amy 090415
-#endif
 void CamPrintDbgReg(struct net_device* dev);
-
-#ifdef _RTL8192_EXT_PATCH_
-void CamDeleteOneEntry(struct net_device *dev, u8 EntryNo);
-void CamRestoreEachIFEntry(struct net_device* dev,u8 is_mesh);
-#endif
 
 u32 read_cam(struct net_device *dev, u8 addr);
 void write_cam(struct net_device *dev, u8 addr, u32 data);
 
 void CamRestoreAllEntry(struct net_device *dev);
-#ifdef _RTL8192_EXT_PATCH_
-void reset_IFswcam(struct net_device *dev, u8 is_mesh);
-void CamRestoreEachIFEntry(struct net_device* dev,u8 is_mesh);
-int rtl8192_set_key_for_AP(struct rtllib_device *ieee);
-#endif
 
 void CAM_read_entry(struct net_device *dev, u32 iIndex);
-
-#ifdef _RTL8192_EXT_PATCH_
-u8 rtl8192_get_free_hwsec_cam_entry(struct rtllib_device *ieee, u8 *sta_addr);
-void rtl8192_del_hwsec_cam_entry(struct rtllib_device *ieee, u8 *sta_addr);
-int meshdev_set_key_for_peer(struct net_device *dev, u8 *Addr, u8 KeyIndex, u16 KeyType, u32 *KeyContent);
-#endif
 
 #endif

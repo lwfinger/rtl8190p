@@ -229,77 +229,16 @@ rtllib_rx_frame_mgmt(struct rtllib_device *ieee, struct sk_buff *skb,
 
 	rx_stats->len = skb->len;
 	rtllib_rx_mgt(ieee,skb,rx_stats);
-#ifdef _RTL8192_EXT_PATCH_
-	if(ieee->iw_mode == IW_MODE_MESH){
-		if ((stype != RTLLIB_STYPE_MANAGE_ACT) && (memcmp(hdr->addr1, ieee->dev->dev_addr, ETH_ALEN)))
-		{
-			dev_kfree_skb_any(skb);
-			return 0;
-		}
-	}
-	else
-#endif
-	{
-		if ((memcmp(hdr->addr1, ieee->dev->dev_addr, ETH_ALEN)))
-		{
-			dev_kfree_skb_any(skb);
-			return 0;
-		}
+	if ((memcmp(hdr->addr1, ieee->dev->dev_addr, ETH_ALEN))) {
+		dev_kfree_skb_any(skb);
+		return 0;
 	}
 	rtllib_rx_frame_softmac(ieee, skb, rx_stats, type, stype);
 
 	dev_kfree_skb_any(skb);
 
 	return 0;
-
-	#ifdef NOT_YET
-	if (ieee->iw_mode == IW_MODE_MASTER) {
-		printk(KERN_DEBUG "%s: Master mode not yet suppported.\n",
-		       ieee->dev->name);
-		return 0;
-/*
-  hostap_update_sta_ps(ieee, (struct hostap_rtllib_hdr_4addr *)
-  skb->data);*/
-	}
-
-	if (ieee->hostapd && type == RTLLIB_TYPE_MGMT) {
-		if (stype == WLAN_FC_STYPE_BEACON &&
-		    ieee->iw_mode == IW_MODE_MASTER) {
-			struct sk_buff *skb2;
-			/* Process beacon frames also in kernel driver to
-			 * update STA(AP) table statistics */
-			skb2 = skb_clone(skb, GFP_ATOMIC);
-			if (skb2)
-				hostap_rx(skb2->dev, skb2, rx_stats);
-		}
-
-		/* send management frames to the user space daemon for
-		 * processing */
-		ieee->apdevstats.rx_packets++;
-		ieee->apdevstats.rx_bytes += skb->len;
-		prism2_rx_80211(ieee->apdev, skb, rx_stats, PRISM2_RX_MGMT);
-		return 0;
-	}
-
-	    if (ieee->iw_mode == IW_MODE_MASTER) {
-		if (type != WLAN_FC_TYPE_MGMT && type != WLAN_FC_TYPE_CTRL) {
-			printk(KERN_DEBUG "%s: unknown management frame "
-			       "(type=0x%02x, stype=0x%02x) dropped\n",
-			       skb->dev->name, type, stype);
-			return -1;
-		}
-
-		hostap_rx(skb->dev, skb, rx_stats);
-		return 0;
-	}
-
-	printk(KERN_DEBUG "%s: hostap_rx_frame_mgmt: management frame "
-	       "received in non-Host AP mode\n", skb->dev->name);
-	return -1;
-	#endif
 }
-
-
 
 #ifndef CONFIG_CRDA
 /* See IEEE 802.1H for LLC/SNAP encapsulation/decapsulation */
@@ -362,17 +301,10 @@ rtllib_rx_frame_decrypt(struct rtllib_device* ieee, struct sk_buff *skb,
 
 	if (crypt == NULL || crypt->ops->decrypt_mpdu == NULL)
 		return 0;
-#if 1
-	if (ieee->hwsec_active)
-	{
+	if (ieee->hwsec_active) {
 		cb_desc *tcb_desc = (cb_desc *)(skb->cb+ MAX_DEV_ADDR_SIZE);
 		tcb_desc->bHwSec = 1;
-#ifdef _RTL8192_EXT_PATCH_
-		if(ieee->need_sw_enc)
-			tcb_desc->bHwSec = 0;
-#endif
 	}
-#endif
 	hdr = (struct rtllib_hdr_4addr *) skb->data;
 	hdrlen = rtllib_get_hdrlen(le16_to_cpu(hdr->frame_ctl));
 
@@ -417,14 +349,9 @@ rtllib_rx_frame_decrypt_msdu(struct rtllib_device* ieee, struct sk_buff *skb,
 
 	if (crypt == NULL || crypt->ops->decrypt_msdu == NULL)
 		return 0;
-	if (ieee->hwsec_active)
-	{
+	if (ieee->hwsec_active) {
 		cb_desc *tcb_desc = (cb_desc *)(skb->cb+ MAX_DEV_ADDR_SIZE);
 		tcb_desc->bHwSec = 1;
-#ifdef _RTL8192_EXT_PATCH_
-		if(ieee->need_sw_enc)
-			tcb_desc->bHwSec = 0;
-#endif
 	}
 
 	hdr = (struct rtllib_hdr_4addr *) skb->data;
@@ -442,13 +369,6 @@ rtllib_rx_frame_decrypt_msdu(struct rtllib_device* ieee, struct sk_buff *skb,
 
 	return 0;
 }
-
-#ifdef _RTL8192_EXT_PATCH_
-static inline int rtllib_has_retry(u16 fc)
-{
-    return ((fc&RTLLIB_FCTL_RETRY)!=0);
-}
-#endif
 
 /* this function is stolen from ipw2200 driver*/
 #define IEEE_PACKET_RETRY_TIME (5*HZ)
@@ -509,53 +429,11 @@ static int is_duplicate_packet(struct rtllib_device *ieee,
 		last_time = &entry->packet_time[tid];
 		break;
 	}
-
 	case IW_MODE_INFRA:
 		last_seq = &ieee->last_rxseq_num[tid];
 		last_frag = &ieee->last_rxfrag_num[tid];
 		last_time = &ieee->last_packet_time[tid];
-
 		break;
-
-#ifdef _RTL8192_EXT_PATCH_
-	case IW_MODE_MESH:
-		/* Drop duplicate 802.11 retransmissions (IEEE 802.11 Chap. 9.2.9) */
-		if(!is_multicast_ether_addr(header->addr1)){
-			struct list_head *p;
-			struct ieee_mesh_seq *entry = NULL;
-			u8 *mac = header->addr2;
-			int index = mac[5] % IEEE_IBSS_MAC_HASH_SIZE;
-			list_for_each(p, &ieee->mesh_mac_hash[index]) {
-				entry = list_entry(p, struct ieee_mesh_seq, list);
-				if (!memcmp(entry->mac, mac, ETH_ALEN))
-					break;
-			}
-
-			if (p == &ieee->mesh_mac_hash[index]) {
-				entry = kmalloc(sizeof(struct ieee_mesh_seq), GFP_ATOMIC);
-				if (!entry) {
-					printk(KERN_WARNING "Cannot malloc new mac entry\n");
-					return 0;
-				}
-				memcpy(entry->mac, mac, ETH_ALEN);
-				entry->seq_num[tid] = header->seq_ctl;
-				entry->packet_time[tid] = jiffies;
-				list_add(&entry->list, &ieee->mesh_mac_hash[index]);
-				return 0;
-			}
-			last_seq = &entry->seq_num[tid];
-			last_time = &entry->packet_time[tid];
-
-			if (unlikely(rtllib_has_retry(fc) &&
-				*last_seq == header->seq_ctl)) {
-				goto drop;
-			} else {
-				*last_seq = header->seq_ctl;
-			}
-			*last_time = jiffies;
-		}
-		return 0;
-#endif
 	default:
 		return 0;
 	}
@@ -649,12 +527,8 @@ void rtllib_indicate_packets(struct rtllib_device *ieee, struct rtllib_rxb** prx
 				stats->rx_bytes += sub_skb->len;
 
 				memset(sub_skb->cb, 0, sizeof(sub_skb->cb));
-#ifdef _RTL8192_EXT_PATCH_
-				sub_skb->protocol = eth_type_trans(sub_skb, sub_skb->dev);
-#else
 				sub_skb->protocol = eth_type_trans(sub_skb, ieee->dev);
 				sub_skb->dev = ieee->dev;
-#endif
 #ifdef TCP_CSUM_OFFLOAD_RX
 				if ( prxb->tcp_csum_valid)
 					sub_skb->ip_summed = CHECKSUM_UNNECESSARY;
@@ -966,11 +840,6 @@ u8 parse_subframe(struct rtllib_device* ieee,struct sk_buff *skb,
 	}
 }
 
-#ifdef _RTL8192_EXT_PATCH_
-extern u8 msh_parse_subframe(struct rtllib_device *ieee,struct sk_buff *skb, struct rtllib_rxb *rxb);
-extern int msh_rx_process_dataframe(struct rtllib_device *ieee, struct rtllib_rxb *rxb, struct rtllib_rx_stats *rx_stats);
-#endif
-
 /* All received frames are sent to this function. @skb contains the frame in
  * IEEE 802.11 format, i.e., in the format it was sent over air.
  * This function is called only as a tasklet (software IRQ). */
@@ -1007,9 +876,7 @@ int rtllib_rx(struct rtllib_device *ieee, struct sk_buff *skb,
 	bool unicast_packet = false;
 	int i;
 	struct rtllib_rxb* rxb = NULL;
-#ifdef _RTL8192_EXT_PATCH_
-	int multicast = 0, ret = 0;
-#endif
+
 	hdr = (struct rtllib_hdr_4addr *)skb->data;
 	stats = &ieee->stats;
 
@@ -1018,22 +885,11 @@ int rtllib_rx(struct rtllib_device *ieee, struct sk_buff *skb,
 		       dev->name);
 		goto rx_dropped;
 	}
-#ifdef _RTL8192_EXT_PATCH_
-	multicast = is_multicast_ether_addr(hdr->addr1)|is_broadcast_ether_addr(hdr->addr1);
-	if (!multicast &&\
-			compare_ether_addr(dev->dev_addr, hdr->addr1) != 0) {
-		goto rx_dropped;
-	}
-#else
-#endif
 	fc = le16_to_cpu(hdr->frame_ctl);
 	type = WLAN_FC_GET_TYPE(fc);
 	stype = WLAN_FC_GET_STYPE(fc);
 	sc = le16_to_cpu(hdr->seq_ctl);
 	frag = WLAN_GET_SEQ_FRAG(sc);
-#ifdef _RTL8192_EXT_PATCH_
-	ieee->need_sw_enc = 0;
-#endif
 	hdrlen = rtllib_get_hdrlen(fc);
 	if(skb->len < hdrlen){
 		printk("%s():ERR!!! skb->len is smaller than hdrlen\n",__FUNCTION__);
@@ -1074,7 +930,6 @@ int rtllib_rx(struct rtllib_device *ieee, struct sk_buff *skb,
 		return 1;
 	}
 #endif
-#ifndef _RTL8192_EXT_PATCH_
 	if (ieee->host_decrypt) {
 		int idx = 0;
 		if (skb->len >= hdrlen + 3)
@@ -1113,24 +968,10 @@ int rtllib_rx(struct rtllib_device *ieee, struct sk_buff *skb,
 			goto rx_dropped;
 		}
 	}
-#endif
 
 	if (skb->len < RTLLIB_DATA_HDR3_LEN)
 		goto rx_dropped;
 
-#ifdef _RTL8192_EXT_PATCH_
-	if( (ieee->pHTInfo->bCurRxReorderEnable == false) ||
-		!ieee->current_network.qos_data.active||
-		!IsDataFrame(skb->data) ||
-		IsLegacyDataFrame(skb->data) ||
-		multicast) {
-		if (!multicast) {
-			if (is_duplicate_packet(ieee, hdr)){
-				goto rx_dropped;
-			}
-		}
-	}
-#else
 	if( (ieee->pHTInfo->bCurRxReorderEnable == false) ||
 		!ieee->current_network.qos_data.active ||
 		!IsDataFrame(skb->data) ||
@@ -1140,9 +981,7 @@ int rtllib_rx(struct rtllib_device *ieee, struct sk_buff *skb,
 				goto rx_dropped;
 			}
 		}
-	}
-#endif
-	else {
+	} else {
 		PRX_TS_RECORD pRxTS = NULL;
 		if (GetTs(ieee, (PTS_COMMON_INFO*) &pRxTS, hdr->addr2,
 			(u8)Frame_QoSTID((u8*)(skb->data)), RX_DIR, true)) {
@@ -1158,10 +997,6 @@ int rtllib_rx(struct rtllib_device *ieee, struct sk_buff *skb,
 			goto rx_dropped;
 		}
 	}
-#ifdef _RTL8192_EXT_PATCH_
-	if((ieee->iw_mode == IW_MODE_MESH) && ieee->ext_patch_rtllib_rx_mgt_update_expire)
-		ieee->ext_patch_rtllib_rx_mgt_update_expire( ieee, skb );
-#endif
 	if (type == RTLLIB_FTYPE_MGMT) {
 		if (rtllib_rx_frame_mgmt(ieee, skb, rx_stats, type, stype))
 			goto rx_dropped;
@@ -1186,11 +1021,7 @@ int rtllib_rx(struct rtllib_device *ieee, struct sk_buff *skb,
 			goto rx_dropped;
 		memcpy(dst, hdr->addr3, ETH_ALEN);
 		memcpy(src, hdr->addr4, ETH_ALEN);
-#ifdef _RTL8192_EXT_PATCH_
-		memcpy(bssid, ieee->current_mesh_network.bssid, ETH_ALEN);
-#else
 		memcpy(bssid, ieee->current_network.bssid, ETH_ALEN);
-#endif
 		break;
 	case 0:
 		memcpy(dst, hdr->addr1, ETH_ALEN);
@@ -1255,73 +1086,45 @@ int rtllib_rx(struct rtllib_device *ieee, struct sk_buff *skb,
 				type, stype, skb->len);
 		goto rx_dropped;
 	}
-#ifdef _RTL8192_EXT_PATCH_
-	if(ieee->iw_mode == IW_MODE_MESH) {
-		/* check whether it exists the mesh entry for data packet */
-		if(ieee->ext_patch_rtllib_is_mesh&&\
-				(false ==ieee->ext_patch_rtllib_is_mesh(ieee,hdr->addr2))) {
-			if(ieee->only_mesh) {
+	/* network filter more precisely */
+	switch (ieee->iw_mode) {
+	case IW_MODE_ADHOC:
+		/* packets from our adapter are dropped (echo) */
+		if (!memcmp(hdr->addr2, dev->dev_addr, ETH_ALEN))
+			goto rx_dropped;
+
+		/* {broad,multi}cast packets to our BSSID go through */
+		if (is_multicast_ether_addr(hdr->addr1)) {
+			if(!memcmp(hdr->addr3, ieee->current_network.bssid, ETH_ALEN))
+				break;
+			else
 				goto rx_dropped;
-			} else if(memcmp(bssid, ieee->current_network.bssid, ETH_ALEN)) {
+		}
+
+		/* packets not to our adapter, just discard it */
+		if (memcmp(hdr->addr1, dev->dev_addr, ETH_ALEN))
+			goto rx_dropped;
+		break;
+	case IW_MODE_INFRA:
+		/* packets from our adapter are dropped (echo) */
+		if (!memcmp(hdr->addr3, dev->dev_addr, ETH_ALEN))
+			goto rx_dropped;
+
+		/* {broad,multi}cast packets to our BSS go through */
+		if (is_multicast_ether_addr(hdr->addr1)) {
+			if (!memcmp(hdr->addr2, ieee->current_network.bssid, ETH_ALEN)) {
+				break;
+			} else {
 				goto rx_dropped;
 			}
 		}
-	} else
-#endif
-	{
-#if 0
-		/* check bssid under none mesh mode */
-		if (memcmp(bssid, ieee->current_network.bssid, ETH_ALEN)) {
+
+		/* packets to our adapter go through */
+		if (memcmp(hdr->addr1, dev->dev_addr, ETH_ALEN))
 			goto rx_dropped;
-		}
-#endif
-		/* network filter more precisely */
-		switch (ieee->iw_mode) {
-			case IW_MODE_ADHOC:
-				/* packets from our adapter are dropped (echo) */
-				if (!memcmp(hdr->addr2, dev->dev_addr, ETH_ALEN))
-					goto rx_dropped;
-
-				/* {broad,multi}cast packets to our BSSID go through */
-				if (is_multicast_ether_addr(hdr->addr1)) {
-					if(!memcmp(hdr->addr3, ieee->current_network.bssid, ETH_ALEN))
-						break;
-					else
-						goto rx_dropped;
-				}
-
-				/* packets not to our adapter, just discard it */
-				if (memcmp(hdr->addr1, dev->dev_addr, ETH_ALEN))
-					goto rx_dropped;
-
-				break;
-
-			case IW_MODE_INFRA:
-				/* packets from our adapter are dropped (echo) */
-				if (!memcmp(hdr->addr3, dev->dev_addr, ETH_ALEN))
-					goto rx_dropped;
-
-				/* {broad,multi}cast packets to our BSS go through */
-				if (is_multicast_ether_addr(hdr->addr1)) {
-					if (!memcmp(hdr->addr2, ieee->current_network.bssid, ETH_ALEN)) {
-						break;
-					} else {
-						goto rx_dropped;
-					}
-				}
-
-				/* packets to our adapter go through */
-				if (memcmp(hdr->addr1, dev->dev_addr, ETH_ALEN))
-					goto rx_dropped;
-
-				break;
-		}
-
-
+		break;
 	}
-
-	if ((ieee->iw_mode == IW_MODE_INFRA)  && (ieee->sta_sleep == 1)
-		&& (ieee->polling)) {
+	if ((ieee->iw_mode == IW_MODE_INFRA)  && (ieee->sta_sleep == 1) && (ieee->polling)) {
 		if (WLAN_FC_MORE_DATA(fc)) {
 			/* more data bit is set, let's request a new frame from the AP */
 			rtllib_sta_ps_send_pspoll_frame(ieee);
@@ -1337,152 +1140,6 @@ int rtllib_rx(struct rtllib_device *ieee, struct sk_buff *skb,
 	}
 #endif
 	/* skb: hdr + (possibly fragmented, possibly encrypted) payload */
-#ifdef _RTL8192_EXT_PATCH_
-	if (ieee->host_decrypt) {
-		int idx = 0;
-		if (skb->len >= hdrlen + 3)
-			idx = skb->data[hdrlen + 3] >> 6;
-		if (ieee->iw_mode == IW_MODE_MESH)
-		{
-			if (ieee->mesh_sec_type == 1) {
-			if(ieee->mesh_security_setting==1 ||ieee->mesh_security_setting==3)
-			{
-				bool find_crypt = false;
-				i = rtllib_find_MP(ieee, hdr->addr2, 0);
-				if(is_multicast_ether_addr(((struct rtllib_hdr_3addr*)skb->data)->addr1) || is_broadcast_ether_addr(((struct rtllib_hdr_3addr*)skb->data)->addr1))
-				{
-					if(ieee->only_mesh){
-						if(i != -1){
-							i=0;
-						}
-						else
-						{
-							printk("err find crypt\n");
-							goto rx_dropped;
-						}
-					}
-					else
-					{
-						if(i != -1){
-							i=0;
-						}
-						else
-						{
-							find_crypt = true;
-							crypt = ieee->sta_crypt[idx];
-						}
-					}
-				}
-				else
-				{
-					if(ieee->only_mesh){
-						if (i != -1)
-						{
-						}
-						else
-						{
-							printk("err find crypt\n");
-							goto rx_dropped;
-						}
-					}
-					else
-					{
-						if (i != -1)
-						{
-						}
-						else
-						{
-							find_crypt = true;
-							crypt = ieee->sta_crypt[idx];
-						}
-					}
-				}
-				if(find_crypt == false){
-					if(ieee->cryptlist[i] == NULL)
-						goto rx_dropped;
-					else
-						crypt = ieee->cryptlist[i]->crypt[idx];
-				}
-			}
-			}
-			else {
-			crypt = ieee->cryptlist[0]->crypt[idx];
-			if(crypt)
-			{
-				int i = rtllib_find_MP(ieee, hdr->addr2, 0);
-				if(ieee->only_mesh)
-				{
-					if (i == -1)
-					{
-						printk("error find entry in entry list\n");
-						goto rx_dropped;
-					}
-					if (ieee->cryptlist[i]&&ieee->cryptlist[i]->crypt[idx])
-						crypt = ieee->cryptlist[i]->crypt[idx];
-
-					else
-						crypt = NULL;
-				}
-				else
-				{
-					if(i != -1)
-					{
-						if (ieee->cryptlist[i]&&ieee->cryptlist[i]->crypt[idx])
-							crypt = ieee->cryptlist[i]->crypt[idx];
-						else
-							crypt = NULL;
-					}
-					else
-						crypt = ieee->sta_crypt[idx];
-
-				}
-			}
-			else
-			{
-				if(!ieee->ext_patch_rtllib_is_mesh(ieee,hdr->addr2))
-					crypt = ieee->sta_crypt[idx];
-			}
-		}
-		}
-		else
-			crypt = ieee->sta_crypt[idx];
-#ifdef NOT_YET
-		sta = NULL;
-
-		/* Use station specific key to override default keys if the
-		 * receiver address is a unicast address ("individual RA"). If
-		 * bcrx_sta_key parameter is set, station specific key is used
-		 * even with broad/multicast targets (this is against IEEE
-		 * 802.11, but makes it easier to use different keys with
-		 * stations that do not support WEP key mapping). */
-
-		if (!(hdr->addr1[0] & 0x01) || local->bcrx_sta_key)
-			(void) hostap_handle_sta_crypto(local, hdr, &crypt,
-							&sta);
-#endif
-
-		/* allow NULL decrypt to indicate an station specific override
-		 * for default encryption */
-		if (crypt && (crypt->ops == NULL ||
-			      crypt->ops->decrypt_mpdu == NULL))
-			crypt = NULL;
-
-		if (!crypt && (fc & RTLLIB_FCTL_WEP)) {
-			/* This seems to be triggered by some (multicast?)
-			 * frames from other than current BSS, so just drop the
-			 * frames silently instead of filling system log with
-			 * these reports. */
-			RTLLIB_DEBUG_DROP("Decryption failed (not set)"
-					     " (SA=" MAC_FMT ")\n",
-					     MAC_ARG(hdr->addr2));
-			ieee->ieee_stats.rx_discards_undecryptable++;
-			goto rx_dropped;
-		}
-	}
-	if((!rx_stats->Decrypted)){
-		ieee->need_sw_enc = 1;
-	}
-#endif
 	if (ieee->host_decrypt && (fc & RTLLIB_FCTL_WEP) &&
 	    (keyidx = rtllib_rx_frame_decrypt(ieee, skb, crypt)) < 0)
 	{
