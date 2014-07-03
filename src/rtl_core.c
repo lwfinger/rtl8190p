@@ -1931,12 +1931,7 @@ bool HalTxCheckStuck819xPci(struct net_device *dev)
 {
 	struct r8192_priv *priv = rtllib_priv(dev);
 	bool	bStuck = false;
-#if defined(RTL8192E) || defined(RTL8190P)
 	u16    RegTxCounter = read_nic_word(dev, 0x128);
-#else
-	u16	RegTxCounter = priv->TxCounter + 1;
-	WARN_ON(1);
-#endif
 
 	RT_TRACE(COMP_RESET, "%s():RegTxCounter is %d,TxCounter is %d\n",
 			__FUNCTION__,RegTxCounter,priv->TxCounter);
@@ -2036,7 +2031,6 @@ TxCheckStuck(struct net_device *dev)
 	return RESET_TYPE_NORESET;
 }
 
-#if defined(RTL8192E) || defined(RTL8190P)
 bool HalRxCheckStuck8190Pci(struct net_device *dev)
 {
 	struct r8192_priv *priv = rtllib_priv(dev);
@@ -2091,7 +2085,7 @@ bool HalRxCheckStuck8190Pci(struct net_device *dev)
 
 	return bStuck;
 }
-#endif
+
 RESET_TYPE RxCheckStuck(struct net_device *dev)
 {
 	if(HalRxCheckStuck8190Pci(dev)) {
@@ -4526,12 +4520,6 @@ int rtl8192_ioctl(struct net_device *dev, struct ifreq *rq, int cmd)
 							setKey(dev, ipw->u.crypt.idx, ipw->u.crypt.idx, ieee->pairwise_key_type, (u8*)ieee->ap_mac_addr, 0, key);
 						}
 					}
-#ifdef RTL8192E
-					if ((ieee->pairwise_key_type == KEY_TYPE_CCMP) && ieee->pHTInfo->bCurrentHTSupport){
-						write_nic_byte(dev, 0x173, 1); //fix aes bug
-					}
-#endif
-
 				}
 				else //if (ipw->u.crypt.idx) //group key use idx > 0
 				{
@@ -4807,7 +4795,6 @@ bool rtl8192_pci_findadapter(struct pci_dev *pdev, struct net_device *dev)
 		{
 			case HAL_HW_PCI_REVISION_ID_8192PCIE:
 				printk("Adapter(8192 PCI-E) is found - DeviceID=%x\n", DeviceID);
-				//priv->HardwareType = HARDWARE_TYPE_RTL8192E;
 				priv->ops->nic_type = priv->card_8192 = NIC_8192E;
 				break;
 			case HAL_HW_PCI_REVISION_ID_8192SE:

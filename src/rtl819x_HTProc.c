@@ -489,15 +489,8 @@ u8 HTIOTActIsMgntUseCCK6M(struct rtllib_device* ieee,struct rtllib_network *netw
 	u8	retValue = 0;
 
 
-#if (defined RTL8192U || defined RTL8192E || defined RTL8190P)
-	{
 	if(ieee->pHTInfo->IOTPeer == HT_IOT_PEER_BROADCOM)
-	{
 		retValue = 1;
-	}
-	}
-#endif
-
 	return retValue;
 }
 
@@ -1209,11 +1202,9 @@ void HTResetSelfAndSavePeerSetting(struct rtllib_device* ieee,	struct rtllib_net
 		if(bIOTAction)
 			pHTInfo->IOTAction |= HT_IOT_ACT_DISABLE_EDCA_TURBO;
 
-#if defined(RTL8190P) || defined(RTL8192E) || defined(RTL8192U)
 		bIOTAction = HTIOTActIsMgntUseCCK6M(ieee,pNetwork);
 		if(bIOTAction)
 			pHTInfo->IOTAction |= HT_IOT_ACT_MGNT_USE_CCK_6M;
-#endif
 		bIOTAction = HTIOTActIsCCDFsync(ieee);
 		if(bIOTAction)
 			pHTInfo->IOTAction |= HT_IOT_ACT_CDD_FSYNC;

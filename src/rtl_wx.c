@@ -1135,11 +1135,6 @@ static int r8192_wx_set_enc_ext(struct net_device *dev,
 		}
 		else //pairwise key
 		{
-			#ifdef RTL8192E
-			if ((ieee->pairwise_key_type == KEY_TYPE_CCMP) && ieee->pHTInfo->bCurrentHTSupport){
-							write_nic_byte(dev, 0x173, 1); //fix aes bug
-			}
-			#endif
 			setKey( dev,
 					4,//EntryNo
 					idx, //KeyIndex

@@ -16,8 +16,6 @@
  * Contact Information:
  * wlanfae <wlanfae@realtek.com>
 ******************************************************************************/
-#if (defined(RTL8192E) || defined(RTL8190P))
-
 
 #include "rtl_core.h"
 #include "r8192E_hw.h"
@@ -29,13 +27,7 @@
 #include "dot11d.h"
 #endif
 
-#ifdef RTL8190P
 #include "r8190P_hwimg.h"
-#endif
-
-#ifdef RTL8192E
-#include "r8192E_hwimg.h"
-#endif
 
 static u32 RF_CHANNEL_TABLE_ZEBRA[] = {
 	0,
@@ -73,7 +65,6 @@ u8 rtl8192_phy_CheckIsLegalRFPath(struct net_device* dev, u32 eRFPath)
 {
 	u8 ret = 1;
 	struct r8192_priv *priv = rtllib_priv(dev);
-#ifdef RTL8190P
 	if(priv->rf_type == RF_2T4R)
 	{
 		ret= 1;
@@ -85,19 +76,6 @@ u8 rtl8192_phy_CheckIsLegalRFPath(struct net_device* dev, u32 eRFPath)
 		else if(eRFPath == RF90_PATH_C || eRFPath == RF90_PATH_D)
 			ret =  1;
 	}
-#else
-	#ifdef RTL8192E
-	if (priv->rf_type == RF_2T4R)
-		ret = 0;
-	else if (priv->rf_type == RF_1T2R)
-	{
-		if (eRFPath == RF90_PATH_A || eRFPath == RF90_PATH_B)
-			ret = 1;
-		else if (eRFPath == RF90_PATH_C || eRFPath == RF90_PATH_D)
-			ret = 0;
-	}
-	#endif
-#endif
 	return ret;
 }
 void rtl8192_setBBreg(struct net_device* dev, u32 dwRegAddr, u32 dwBitMask, u32 dwData)
@@ -135,13 +113,7 @@ u32 rtl8192_phy_RFSerialRead(struct net_device* dev, RF90_RADIO_PATH_E eRFPath, 
 
 	if (priv->rf_chip == RF_8256)
 	{
-#ifdef RTL8190P
 		rtl8192_setBBreg(dev, rFPGA0_AnalogParameter4, 0xf00, 0x0);
-#else
-	#ifdef RTL8192E
-		rtl8192_setBBreg(dev, rFPGA0_AnalogParameter4, 0xf00, 0x0);
-	#endif
-#endif
 		if (Offset >= 31)
 		{
 			priv->RfReg0Value[eRFPath] |= 0x140;
@@ -184,7 +156,6 @@ u32 rtl8192_phy_RFSerialRead(struct net_device* dev, RF90_RADIO_PATH_E eRFPath, 
 			bMaskDWord,
 			(priv->RfReg0Value[eRFPath] << 16));
 
-#ifdef RTL8190P
 		if(priv->rf_type == RF_2T4R)
 		{
 			rtl8192_setBBreg(dev, rFPGA0_AnalogParameter4, 0xf00, 0xf);
@@ -193,11 +164,6 @@ u32 rtl8192_phy_RFSerialRead(struct net_device* dev, RF90_RADIO_PATH_E eRFPath, 
 		{
 			rtl8192_setBBreg(dev, rFPGA0_AnalogParameter4, 0xc00, 0x3);
 		}
-#else
-	#ifdef RTL8192E
-		rtl8192_setBBreg(dev, rFPGA0_AnalogParameter4, 0x300, 0x3);
-	#endif
-#endif
 	}
 
 
@@ -215,13 +181,7 @@ void rtl8192_phy_RFSerialWrite(struct net_device* dev, RF90_RADIO_PATH_E eRFPath
 	if (priv->rf_chip == RF_8256)
 	{
 
-#ifdef RTL8190P
 		rtl8192_setBBreg(dev, rFPGA0_AnalogParameter4, 0xf00, 0x0);
-#else
-	#ifdef RTL8192E
-		rtl8192_setBBreg(dev, rFPGA0_AnalogParameter4, 0xf00, 0x0);
-	#endif
-#endif
 
 		if (Offset >= 31)
 		{
@@ -264,7 +224,6 @@ void rtl8192_phy_RFSerialWrite(struct net_device* dev, RF90_RADIO_PATH_E eRFPath
 				bMaskDWord,
 				(priv->RfReg0Value[eRFPath] << 16));
 		}
-#ifdef RTL8190P
 		if(priv->rf_type == RF_2T4R)
 		{
 			rtl8192_setBBreg(dev, rFPGA0_AnalogParameter4, 0xf00, 0xf);
@@ -273,11 +232,6 @@ void rtl8192_phy_RFSerialWrite(struct net_device* dev, RF90_RADIO_PATH_E eRFPath
 		{
 			rtl8192_setBBreg(dev, rFPGA0_AnalogParameter4, 0xc00, 0x3);
 		}
-#else
-	#ifdef RTL8192E
-		rtl8192_setBBreg(dev, rFPGA0_AnalogParameter4, 0x300, 0x3);
-	#endif
-#endif
 	}
 
 	return;
@@ -290,10 +244,6 @@ void rtl8192_phy_SetRFReg(struct net_device* dev, RF90_RADIO_PATH_E eRFPath, u32
 
 	if (!rtl8192_phy_CheckIsLegalRFPath(dev, eRFPath))
 		return;
-#ifdef RTL8192E
-	if(priv->rtllib->eRFPowerState != eRfOn && !priv->being_init_adapter)
-		return;
-#endif
 
 	RT_TRACE(COMP_PHY, "FW RF CTRL is not ready now\n");
 	if (priv->Rf_Mode == RF_OP_By_FW)
@@ -331,10 +281,6 @@ u32 rtl8192_phy_QueryRFReg(struct net_device* dev, RF90_RADIO_PATH_E eRFPath, u3
 	struct r8192_priv *priv = rtllib_priv(dev);
 	if (!rtl8192_phy_CheckIsLegalRFPath(dev, eRFPath))
 		return 0;
-#ifdef RTL8192E
-	if(priv->rtllib->eRFPowerState != eRfOn && !priv->being_init_adapter)
-		return	0;
-#endif
 	down(&priv->rf_sem);
 	if (priv->Rf_Mode == RF_OP_By_FW)
 	{
@@ -705,17 +651,10 @@ bool rtl8192_BB_Config_ParaFile(struct net_device* dev)
 			(bXBTxAGC|bXCTxAGC|bXDTxAGC), dwRegValue);
 
 
-#ifdef RTL8190P
 	dwRegValue = priv->CrystalCap & 0x3;
 	rtl8192_setBBreg(dev, rFPGA0_AnalogParameter1, bXtalCap01, dwRegValue);
 	dwRegValue = ((priv->CrystalCap & 0xc)>>2);
 	rtl8192_setBBreg(dev, rFPGA0_AnalogParameter2, bXtalCap23, dwRegValue);
-#else
-	#ifdef RTL8192E
-		dwRegValue = priv->CrystalCap;
-		rtl8192_setBBreg(dev, rFPGA0_AnalogParameter1, bXtalCap92x, dwRegValue);
-	#endif
-#endif
 
 	}
 
@@ -732,29 +671,12 @@ bool rtl8192_BBConfig(struct net_device* dev)
 void rtl8192_phy_getTxPower(struct net_device* dev)
 {
 	struct r8192_priv *priv = rtllib_priv(dev);
-#ifdef RTL8190P
 	priv->MCSTxPowerLevelOriginalOffset[0] =
 		read_nic_dword(dev, MCS_TXAGC);
 	priv->MCSTxPowerLevelOriginalOffset[1] =
 		read_nic_dword(dev, (MCS_TXAGC+4));
 	priv->CCKTxPowerLevelOriginalOffset =
 		read_nic_dword(dev, CCK_TXAGC);
-#else
-	#ifdef RTL8192E
-	priv->MCSTxPowerLevelOriginalOffset[0] =
-		read_nic_dword(dev, rTxAGC_Rate18_06);
-	priv->MCSTxPowerLevelOriginalOffset[1] =
-		read_nic_dword(dev, rTxAGC_Rate54_24);
-	priv->MCSTxPowerLevelOriginalOffset[2] =
-		read_nic_dword(dev, rTxAGC_Mcs03_Mcs00);
-	priv->MCSTxPowerLevelOriginalOffset[3] =
-		read_nic_dword(dev, rTxAGC_Mcs07_Mcs04);
-	priv->MCSTxPowerLevelOriginalOffset[4] =
-		read_nic_dword(dev, rTxAGC_Mcs11_Mcs08);
-	priv->MCSTxPowerLevelOriginalOffset[5] =
-		read_nic_dword(dev, rTxAGC_Mcs15_Mcs12);
-	#endif
-#endif
 
 	priv->DefaultInitialGain[0] = read_nic_byte(dev, rOFDM0_XAAGCCore1);
 	priv->DefaultInitialGain[1] = read_nic_byte(dev, rOFDM0_XBAGCCore1);
@@ -1348,18 +1270,8 @@ static void CCK_Tx_Power_Track_BW_Switch_ThermalMeter(struct net_device *dev)
 
 static void CCK_Tx_Power_Track_BW_Switch(struct net_device *dev)
 {
-#ifdef RTL8192E
-	struct r8192_priv *priv = rtllib_priv(dev);
-#endif
 
-#ifdef RTL8190P
 	CCK_Tx_Power_Track_BW_Switch_TSSI(dev);
-#else
-	if(priv->IC_Cut >= IC_VersionCut_D)
-		CCK_Tx_Power_Track_BW_Switch_TSSI(dev);
-	else
-		CCK_Tx_Power_Track_BW_Switch_ThermalMeter(dev);
-#endif
 }
 
 void rtl8192_SetBWModeWorkItem(struct net_device *dev)
@@ -1415,15 +1327,8 @@ void rtl8192_SetBWModeWorkItem(struct net_device *dev)
 			else
 				CCK_Tx_Power_Track_BW_Switch(dev);
 
-#ifdef RTL8190P
 			rtl8192_setBBreg(dev, rFPGA0_AnalogParameter1, bADClkPhase, 1);
 			rtl8192_setBBreg(dev, rOFDM0_RxDetector1, bMaskByte0, 0x44);
-#else
-	#ifdef RTL8192E
-			rtl8192_setBBreg(dev, rFPGA0_AnalogParameter1, 0x00100000, 1);
-	#endif
-#endif
-
 			break;
 		case HT_CHANNEL_WIDTH_20_40:
 			rtl8192_setBBreg(dev, rFPGA0_RFMOD, bRFMOD, 0x1);
@@ -1441,8 +1346,6 @@ void rtl8192_SetBWModeWorkItem(struct net_device *dev)
 			rtl8192_setBBreg(dev, rCCK0_System, bCCKSideBand, (priv->nCur40MhzPrimeSC>>1));
 			rtl8192_setBBreg(dev, rOFDM1_LSTF, 0xC00, priv->nCur40MhzPrimeSC);
 
-
-#ifdef RTL8190P
 			rtl8192_setBBreg(dev, rFPGA0_AnalogParameter1, bADClkPhase, 0);
 			rtl8192_setBBreg(dev, rOFDM0_RxDetector1, bMaskByte0, 0x42);
 
@@ -1454,11 +1357,6 @@ void rtl8192_SetBWModeWorkItem(struct net_device *dev)
 				rtl8192_setBBreg(dev, rFPGA0_RFMOD, (BIT6|BIT5), 0x02);
 			}
 
-#else
-	#ifdef RTL8192E
-			rtl8192_setBBreg(dev, rFPGA0_AnalogParameter1, 0x00100000, 0);
-	#endif
-#endif
 			break;
 		default:
 			RT_TRACE(COMP_ERR, "SetChannelBandwidth819xUsb(): unknown Bandwidth: %#X\n" ,priv->CurrentChannelBW);
@@ -1818,12 +1716,7 @@ SetRFPowerState(
 	bool bResult = false;
 
 	RT_TRACE(COMP_PS,"---------> SetRFPowerState(): eRFPowerState(%d)\n", eRFPowerState);
-#ifdef RTL8192E
-	if(eRFPowerState == priv->rtllib->eRFPowerState && priv->bHwRfOffAction == 0)
-#else
-	if(eRFPowerState == priv->rtllib->eRFPowerState)
-#endif
-	{
+	if(eRFPowerState == priv->rtllib->eRFPowerState) {
 		RT_TRACE(COMP_PS, "<--------- SetRFPowerState(): discard the request for eRFPowerState(%d) is the same.\n", eRFPowerState);
 		return bResult;
 	}
@@ -1834,5 +1727,3 @@ SetRFPowerState(
 
 	return bResult;
 }
-
-#endif

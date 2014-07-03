@@ -231,12 +231,10 @@ u8 MgntQuery_MgntFrameTxRate(struct rtllib_device *ieee)
 	PRT_HIGH_THROUGHPUT      pHTInfo = ieee->pHTInfo;
 	u8 rate;
 
-#if defined RTL8190P || defined RTL8192E || defined RTL8192U
 	if(pHTInfo->IOTAction & HT_IOT_ACT_MGNT_USE_CCK_6M)
 		rate = 0x0c;
 	else
 		rate = ieee->basic_rate & 0x7f;
-#endif
 
 	if(rate == 0){
 		if(ieee->mode == IEEE_A||

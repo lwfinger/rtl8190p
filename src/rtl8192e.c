@@ -114,15 +114,10 @@ static void rtl8192_read_eeprom_info(struct net_device* dev)
 	struct r8192_priv *priv = rtllib_priv(dev);
 
 	u8			tempval;
-#ifdef RTL8192E
-	u8			ICVer8192, ICVer8256;
-#endif
 	u16			i,usValue, IC_Version;
 	u16			EEPROMId;
-#ifdef RTL8190P
 	u8			offset;//, tmpAFR;
 	u8			EepromTxPower[100];
-#endif
 	u8 bMac_Tmp_Addr[6] = {0x00, 0xe0, 0x4c, 0x00, 0x00, 0x01};
 	RT_TRACE(COMP_INIT, "====> rtl8192_read_eeprom_info\n");
 
@@ -157,21 +152,8 @@ static void rtl8192_read_eeprom_info(struct net_device* dev)
 		priv->eeprom_ChannelPlan = usValue&0xff;
 		IC_Version = ((usValue&0xff00)>>8);
 
-#ifdef RTL8190P
 		priv->card_8192_version = (VERSION_8190)(IC_Version);
-#elif defined  RTL8192E
-		ICVer8192 = (IC_Version&0xf);		//bit0~3; 1:A cut, 2:B cut, 3:C cut...
-		ICVer8256 = ((IC_Version&0xf0)>>4);//bit4~6, bit7 reserved for other RF chip; 1:A cut, 2:B cut, 3:C cut...
-		RT_TRACE(COMP_INIT, "\nICVer8192 = 0x%x\n", ICVer8192);
-		RT_TRACE(COMP_INIT, "\nICVer8256 = 0x%x\n", ICVer8256);
-		if(ICVer8192 == 0x2)	//B-cut
-		{
-			if(ICVer8256 == 0x5) //E-cut
-				priv->card_8192_version= VERSION_8190_BE;
-		}
-#endif
-		switch(priv->card_8192_version)
-		{
+		switch(priv->card_8192_version) {
 			case VERSION_8190_BD:
 			case VERSION_8190_BE:
 				break;
@@ -551,47 +533,31 @@ static void rtl8192_read_eeprom_info(struct net_device* dev)
 #endif
 
 #ifdef TO_DO_LIST
-	switch(priv->CustomerID)
-	{
-		case RT_CID_DEFAULT:
-#ifdef RTL8190P
-			priv->LedStrategy = HW_LED;
-#elif defined RTL8192E
-			priv->LedStrategy = SW_LED_MODE1;
-#endif
-			break;
-
-		case RT_CID_819x_CAMEO:
-			priv->LedStrategy = SW_LED_MODE2;
-			break;
-
-		case RT_CID_819x_RUNTOP:
-			priv->LedStrategy = SW_LED_MODE3;
-			break;
-
-		case RT_CID_819x_Netcore:
-			priv->LedStrategy = SW_LED_MODE4;
-			break;
-
-		case RT_CID_Nettronix:
-			priv->LedStrategy = SW_LED_MODE5;
-			break;
-
-		case RT_CID_PRONET:
-			priv->LedStrategy = SW_LED_MODE6;
-			break;
-
-		case RT_CID_TOSHIBA:   //Modify by Jacken 2008/01/31
-			// Do nothing.
-			//break;
-
-		default:
-#ifdef RTL8190P
-			priv->LedStrategy = HW_LED;
-#elif defined RTL8192E
-			priv->LedStrategy = SW_LED_MODE1;
-#endif
-			break;
+	switch(priv->CustomerID) {
+	case RT_CID_DEFAULT:
+		priv->LedStrategy = HW_LED;
+		break;
+	case RT_CID_819x_CAMEO:
+		priv->LedStrategy = SW_LED_MODE2;
+		break;
+	case RT_CID_819x_RUNTOP:
+		priv->LedStrategy = SW_LED_MODE3;
+		break;
+	case RT_CID_819x_Netcore:
+		priv->LedStrategy = SW_LED_MODE4;
+		break;
+	case RT_CID_Nettronix:
+		priv->LedStrategy = SW_LED_MODE5;
+		break;
+	case RT_CID_PRONET:
+		priv->LedStrategy = SW_LED_MODE6;
+		break;
+	case RT_CID_TOSHIBA:   //Modify by Jacken 2008/01/31
+		// Do nothing.
+		//break;
+	default:
+		priv->LedStrategy = HW_LED;
+		break;
 	}
 	RT_TRACE(COMP_INIT, "LedStrategy = %d \n", priv->LedStrategy);
 #endif
@@ -713,13 +679,8 @@ bool rtl8192_adapter_start(struct net_device *dev)
 //	static char szMACPHYRegPGFile[] = RTL819X_PHY_MACPHY_REG_PG;
 	//u8 eRFPath;
 	u8 tmpvalue;
-#ifdef RTL8192E
-	u8 ICVersion,SwitchingRegulatorOutput;
-#endif
 	bool bfirmwareok = true;
-#ifdef RTL8190P
 	u8 ucRegRead;
-#endif
 	u32 tmpRegA, tmpRegC, TempCCk;
 	int i = 0;
 	u32 retry_times = 0;
@@ -730,16 +691,6 @@ start:
         rtl8192_pci_resetdescring(dev);
 	// 2007/11/02 MH Before initalizing RF. We can not use FW to do RF-R/W.
 	priv->Rf_Mode = RF_OP_By_SW_3wire;
-#ifdef RTL8192E
-        //dPLL on
-        if(priv->ResetProgress == RESET_TYPE_NORESET)
-        {
-            write_nic_byte(dev, ANAPAR, 0x37);
-            // Accordign to designer's explain, LBUS active will never > 10ms. We delay 10ms
-            // Joseph increae the time to prevent firmware download fail
-            mdelay(500);
-        }
-#endif
 	//PlatformSleepUs(10000);
 	// For any kind of InitializeAdapter process, we shall use system now!!
 	priv->pFirmware->firmware_status = FW_STATUS_0_INIT;
@@ -769,27 +720,6 @@ start:
 	write_nic_dword(dev, CPU_GEN, ulRegRead);
 	//mdelay(100);
 
-#ifdef RTL8192E
-
-	//3//
-	//3 //Fix the issue of E-cut high temperature issue
-	//3//
-	// TODO: E cut only
-	ICVersion = read_nic_byte(dev, IC_VERRSION);
-	if(ICVersion >= 0x4) //E-cut only
-	{
-		// HW SD suggest that we should not wirte this register too often, so driver
-		// should readback this register. This register will be modified only when
-		// power on reset
-		SwitchingRegulatorOutput = read_nic_byte(dev, SWREGULATOR);
-		if(SwitchingRegulatorOutput  != 0xb8)
-		{
-			write_nic_byte(dev, SWREGULATOR, 0xa8);
-			mdelay(1);
-			write_nic_byte(dev, SWREGULATOR, 0xb8);
-		}
-	}
-#endif
 	//3//
 	//3// Initialize BB before MAC
 	//3//
@@ -845,14 +775,9 @@ start:
 	write_nic_byte(dev, CMDR, CR_RE|CR_TE);
 
 	//2Set Tx dma burst
-#ifdef RTL8190P
 	write_nic_byte(dev, PCIF, ((MXDMA2_NoLimit<<MXDMA2_RX_SHIFT) | \
 				(MXDMA2_NoLimit<<MXDMA2_TX_SHIFT) | \
 				(1<<MULRW_SHIFT)));
-#elif defined RTL8192E
-	write_nic_byte(dev, PCIF, ((MXDMA2_NoLimit<<MXDMA2_RX_SHIFT) |\
-				(MXDMA2_NoLimit<<MXDMA2_TX_SHIFT) ));
-#endif
 	//set IDR0 here
 	write_nic_dword(dev, MAC0, ((u32*)dev->dev_addr)[0]);
 	write_nic_word(dev, MAC4, ((u16*)(dev->dev_addr + 4))[0]);
@@ -988,11 +913,6 @@ start:
 	rtl8192_setBBreg(dev, rFPGA0_RFMOD, bCCKEn, 0x1);
 	rtl8192_setBBreg(dev, rFPGA0_RFMOD, bOFDMEn, 0x1);
 
-#ifdef RTL8192E
-	//Enable Led
-	write_nic_byte(dev, 0x87, 0x0);
-#endif
-#ifdef RTL8190P
 	//2008.06.03, for WOL
 	ucRegRead = read_nic_byte(dev, GPE);
 	ucRegRead |= BIT0;
@@ -1001,7 +921,6 @@ start:
 	ucRegRead = read_nic_byte(dev, GPO);
 	ucRegRead &= ~BIT0;
 	write_nic_byte(dev, GPO, ucRegRead);
-#endif
 
 	//2=======================================================
 	// RF Power Save
@@ -1047,17 +966,8 @@ start:
 	}
 #endif
 
-#ifdef RTL8192E
-	// We can force firmware to do RF-R/W
-	if(priv->rtllib->FwRWRF)
-		priv->Rf_Mode = RF_OP_By_FW;
-	else
-		priv->Rf_Mode = RF_OP_By_SW_3wire;
-#else
 	priv->Rf_Mode = RF_OP_By_SW_3wire;
-#endif
 
-#ifdef RTL8190P
 	if (priv->ResetProgress == RESET_TYPE_NORESET) {
 		dm_initialize_txpower_tracking(dev);
 
@@ -1101,47 +1011,6 @@ start:
 		RT_TRACE(COMP_POWER_TRACKING, "priv->CCKPresentAttentuation_difference_initial = %d\n", priv->CCKPresentAttentuation_difference);
 		RT_TRACE(COMP_POWER_TRACKING, "priv->CCKPresentAttentuation_initial = %d\n", priv->CCKPresentAttentuation);
 	}
-#elif defined RTL8192E
-	if(priv->ResetProgress == RESET_TYPE_NORESET)
-	{
-		dm_initialize_txpower_tracking(dev);
-
-		if(priv->IC_Cut>= IC_VersionCut_D)
-		{
-			tmpRegA= rtl8192_QueryBBReg(dev,rOFDM0_XATxIQImbalance,bMaskDWord);
-			tmpRegC= rtl8192_QueryBBReg(dev,rOFDM0_XCTxIQImbalance,bMaskDWord);
-			for(i = 0; i<TxBBGainTableLength; i++)
-			{
-				if(tmpRegA == priv->txbbgain_table[i].txbbgain_value)
-				{
-					priv->rfa_txpowertrackingindex= (u8)i;
-					priv->rfa_txpowertrackingindex_real= (u8)i;
-					priv->rfa_txpowertracking_default = priv->rfa_txpowertrackingindex;
-					break;
-				}
-			}
-
-			TempCCk = rtl8192_QueryBBReg(dev, rCCK0_TxFilter1, bMaskByte2);
-
-			for(i=0 ; i<CCKTxBBGainTableLength ; i++)
-			{
-				if(TempCCk == priv->cck_txbbgain_table[i].ccktxbb_valuearray[0])
-				{
-					priv->CCKPresentAttentuation_20Mdefault =(u8) i;
-					break;
-				}
-			}
-			priv->CCKPresentAttentuation_40Mdefault = 0;
-			priv->CCKPresentAttentuation_difference = 0;
-			priv->CCKPresentAttentuation = priv->CCKPresentAttentuation_20Mdefault;
-			RT_TRACE(COMP_POWER_TRACKING, "priv->rfa_txpowertrackingindex_initial = %d\n", priv->rfa_txpowertrackingindex);
-			RT_TRACE(COMP_POWER_TRACKING, "priv->rfa_txpowertrackingindex_real__initial = %d\n", priv->rfa_txpowertrackingindex_real);
-			RT_TRACE(COMP_POWER_TRACKING, "priv->CCKPresentAttentuation_difference_initial = %d\n", priv->CCKPresentAttentuation_difference);
-			RT_TRACE(COMP_POWER_TRACKING, "priv->CCKPresentAttentuation_initial = %d\n", priv->CCKPresentAttentuation);
-			priv->btxpower_tracking = false;//TEMPLY DISABLE
-		}
-	}
-#endif
 	rtl8192_irq_enable(dev);
 end:
 	priv->being_init_adapter = false;

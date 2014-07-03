@@ -241,7 +241,6 @@ void PHY_SetRF8256CCKTxPower(struct net_device*	dev, u8	powerlevel)
 void PHY_SetRF8256OFDMTxPower(struct net_device* dev, u8 powerlevel)
 {
 	struct r8192_priv *priv = rtllib_priv(dev);
-#ifdef RTL8190P
 	u32				TxAGC1=0, TxAGC2=0, TxAGC2_tmp = 0;
 	u8				i, byteVal1[4], byteVal2[4], byteVal3[4];
 
@@ -304,52 +303,5 @@ void PHY_SetRF8256OFDMTxPower(struct net_device* dev, u8 powerlevel)
 
 	write_nic_dword(dev, MCS_TXAGC, TxAGC1);
 	write_nic_dword(dev, MCS_TXAGC+4, TxAGC2);
-#else
-#ifdef RTL8192E
-	u32 writeVal, powerBase0, powerBase1, writeVal_tmp;
-	u8 index = 0;
-	u16 RegOffset[6] = {0xe00, 0xe04, 0xe10, 0xe14, 0xe18, 0xe1c};
-	u8 byte0, byte1, byte2, byte3;
-
-	powerBase0 = powerlevel + priv->LegacyHTTxPowerDiff;
-	powerBase0 = (powerBase0<<24) | (powerBase0<<16) |(powerBase0<<8) |powerBase0;
-	powerBase1 = powerlevel;
-	powerBase1 = (powerBase1<<24) | (powerBase1<<16) |(powerBase1<<8) |powerBase1;
-
-	for(index=0; index<6; index++)
-	{
-		writeVal = (u32)(priv->MCSTxPowerLevelOriginalOffset[index] + ((index<2)?powerBase0:powerBase1));
-		byte0 = (u8)(writeVal & 0x7f);
-		byte1 = (u8)((writeVal & 0x7f00)>>8);
-		byte2 = (u8)((writeVal & 0x7f0000)>>16);
-		byte3 = (u8)((writeVal & 0x7f000000)>>24);
-		if(byte0 > 0x24)
-			byte0 = 0x24;
-		if(byte1 > 0x24)
-			byte1 = 0x24;
-		if(byte2 > 0x24)
-			byte2 = 0x24;
-		if(byte3 > 0x24)
-			byte3 = 0x24;
-
-		if(index == 3)
-		{
-			writeVal_tmp = (byte3<<24) | (byte2<<16) |(byte1<<8) |byte0;
-			priv->Pwr_Track = writeVal_tmp;
-		}
-
-		if(priv->bDynamicTxHighPower == true)
-		{
-			writeVal = 0x03030303;
-		}
-		else
-		{
-			writeVal = (byte3<<24) | (byte2<<16) |(byte1<<8) |byte0;
-		}
-		rtl8192_setBBreg(dev, RegOffset[index], 0x7f7f7f7f, writeVal);
-	}
-
-#endif
-#endif
 	return;
 }

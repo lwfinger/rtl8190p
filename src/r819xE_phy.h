@@ -25,7 +25,6 @@
 #define MAX_RFDEPENDCMD_CNT 16
 #define MAX_POSTCMD_CNT 16
 
-#ifdef RTL8190P
 #define AGCTAB_ArrayLength				AGCTAB_ArrayLengthPci
 #define MACPHY_ArrayLength				MACPHY_ArrayLengthPci
 #define RadioA_ArrayLength				RadioA_ArrayLengthPci
@@ -45,31 +44,6 @@
 #define Rtl819XAGCTAB_Array				Rtl8190PciAGCTAB_Array
 #define Rtl819XPHY_REGArray				Rtl8190PciPHY_REGArray
 #define Rtl819XPHY_REG_1T2RArray		Rtl8190PciPHY_REG_1T2RArray
-#endif
-
-#ifdef RTL8192E
-#define AGCTAB_ArrayLength				AGCTAB_ArrayLengthPciE
-#define MACPHY_ArrayLength				MACPHY_ArrayLengthPciE
-#define RadioA_ArrayLength				RadioA_ArrayLengthPciE
-#define RadioB_ArrayLength				RadioB_ArrayLengthPciE
-#define MACPHY_Array_PGLength			MACPHY_Array_PGLengthPciE
-#define RadioC_ArrayLength				RadioC_ArrayLengthPciE
-#define RadioD_ArrayLength				RadioD_ArrayLengthPciE
-#define PHY_REGArrayLength				PHY_REGArrayLengthPciE
-#define PHY_REG_1T2RArrayLength				PHY_REG_1T2RArrayLengthPciE
-
-#define Rtl819XMACPHY_Array_PG			Rtl8192PciEMACPHY_Array_PG
-#define Rtl819XMACPHY_Array				Rtl8192PciEMACPHY_Array
-#define Rtl819XRadioA_Array				Rtl8192PciERadioA_Array
-#define Rtl819XRadioB_Array				Rtl8192PciERadioB_Array
-#define Rtl819XRadioC_Array				Rtl8192PciERadioC_Array
-#define Rtl819XRadioD_Array				Rtl8192PciERadioD_Array
-#define Rtl819XAGCTAB_Array				Rtl8192PciEAGCTAB_Array
-#define Rtl819XPHY_REGArray				Rtl8192PciEPHY_REGArray
-#define Rtl819XPHY_REG_1T2RArray			Rtl8192PciEPHY_REG_1T2RArray
-#endif
-
-
 
 typedef enum _SwChnlCmdID{
 	CmdID_End,

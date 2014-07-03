@@ -134,13 +134,11 @@ static	void	dm_check_txpower_tracking(struct net_device *dev);
 
 
 // DM --> BB init gain restore
-#if defined(RTL8192E)||defined(RTL8190P)
 static	void	dm_bb_initialgain_restore(struct net_device *dev);
 
 
 // DM --> BB init gain backup
 static	void	dm_bb_initialgain_backup(struct net_device *dev);
-#endif
 
 // DM --> Dynamic Init Gain by RSSI
 static	void	dm_dig_init(struct net_device *dev);
@@ -593,173 +591,6 @@ static void dm_bandwidth_autoswitch(struct net_device * dev)
 	}
 }	// dm_BandwidthAutoSwitch
 
-//OFDM default at 0db, index=6.
-#ifdef Rtl8192SE
-//OFDM default at 0db, index=6.
-u32	OFDMSwingTable[OFDM_Table_Length] = {
-	0x7f8001fe,	// 0, +6.0dB
-	0x788001e2,	// 1, +5.5dB
-	0x71c001c7,	// 2, +5.0dB
-	0x6b8001ae,	// 3, +4.5dB
-	0x65400195,	// 4, +4.0dB
-	0x5fc0017f,	// 5, +3.5dB
-	0x5a400169,	// 6, +3.0dB
-	0x55400155,	// 7, +2.5dB
-	0x50800142,	// 8, +2.0dB
-	0x4c000130,	// 9, +1.5dB
-	0x47c0011f,	// 10, +1.0dB
-	0x43c0010f,	// 11, +0.5dB
-	0x40000100,	// 12, +0dB
-	0x3c8000f2,	// 13, -0.5dB
-	0x390000e4,	// 14, -1.0dB
-	0x35c000d7,	// 15, -1.5dB
-	0x32c000cb,	// 16, -2.0dB
-	0x300000c0,	// 17, -2.5dB
-	0x2d4000b5,	// 18, -3.0dB
-	0x2ac000ab,	// 19, -3.5dB
-	0x288000a2,	// 20, -4.0dB
-	0x26000098,	// 21, -4.5dB
-	0x24000090,	// 22, -5.0dB
-	0x22000088,	// 23, -5.5dB
-	0x20000080,	// 24, -6.0dB
-	0x1e400079,	// 25, -6.5dB
-	0x1c800072,	// 26, -7.0dB
-	0x1b00006c,	// 27. -7.5dB
-	0x19800066,	// 28, -8.0dB
-	0x18000060,	// 29, -8.5dB
-	0x16c0005b,	// 30, -9.0dB
-	0x15800056,	// 31, -9.5dB
-	0x14400051,	// 32, -10.0dB
-	0x1300004c,	// 33, -10.5dB
-	0x12000048,	// 34, -11.0dB
-	0x11000044,	// 35, -11.5dB
-	0x10000040,	// 36, -12.0dB
-};
-
-u8	CCKSwingTable_Ch1_Ch13[CCK_Table_length][8] = {
-	{0x36, 0x35, 0x2e, 0x25, 0x1c, 0x12, 0x09, 0x04},	// 0, +0dB
-	{0x33, 0x32, 0x2b, 0x23, 0x1a, 0x11, 0x08, 0x04},	// 1, -0.5dB
-	{0x30, 0x2f, 0x29, 0x21, 0x19, 0x10, 0x08, 0x03},	// 2, -1.0dB
-	{0x2d, 0x2d, 0x27, 0x1f, 0x18, 0x0f, 0x08, 0x03},	// 3, -1.5dB
-	{0x2b, 0x2a, 0x25, 0x1e, 0x16, 0x0e, 0x07, 0x03},	// 4, -2.0dB
-	{0x28, 0x28, 0x22, 0x1c, 0x15, 0x0d, 0x07, 0x03},	// 5, -2.5dB
-	{0x26, 0x25, 0x21, 0x1b, 0x14, 0x0d, 0x06, 0x03},	// 6, -3.0dB
-	{0x24, 0x23, 0x1f, 0x19, 0x13, 0x0c, 0x06, 0x03},	// 7, -3.5dB
-	{0x22, 0x21, 0x1d, 0x18, 0x11, 0x0b, 0x06, 0x02},	// 8, -4.0dB
-	{0x20, 0x20, 0x1b, 0x16, 0x11, 0x08, 0x05, 0x02},	// 9, -4.5dB
-	{0x1f, 0x1e, 0x1a, 0x15, 0x10, 0x0a, 0x05, 0x02},	// 10, -5.0dB
-	{0x1d, 0x1c, 0x18, 0x14, 0x0f, 0x0a, 0x05, 0x02},	// 11, -5.5dB
-	{0x1b, 0x1a, 0x17, 0x13, 0x0e, 0x09, 0x04, 0x02},	// 12, -6.0dB <== default
-	{0x1a, 0x19, 0x16, 0x12, 0x0d, 0x09, 0x04, 0x02},	// 13, -6.5dB
-	{0x18, 0x17, 0x15, 0x11, 0x0c, 0x08, 0x04, 0x02},	// 14, -7.0dB
-	{0x17, 0x16, 0x13, 0x10, 0x0c, 0x08, 0x04, 0x02},	// 15, -7.5dB
-	{0x16, 0x15, 0x12, 0x0f, 0x0b, 0x07, 0x04, 0x01},	// 16, -8.0dB
-	{0x14, 0x14, 0x11, 0x0e, 0x0b, 0x07, 0x03, 0x02},	// 17, -8.5dB
-	{0x13, 0x13, 0x10, 0x0d, 0x0a, 0x06, 0x03, 0x01},	// 18, -9.0dB
-	{0x12, 0x12, 0x0f, 0x0c, 0x09, 0x06, 0x03, 0x01},	// 19, -9.5dB
-	{0x11, 0x11, 0x0f, 0x0c, 0x09, 0x06, 0x03, 0x01},	// 20, -10.0dB
-	{0x10, 0x10, 0x0e, 0x0b, 0x08, 0x05, 0x03, 0x01},	// 21, -10.5dB
-	{0x0f, 0x0f, 0x0d, 0x0b, 0x08, 0x05, 0x03, 0x01},	// 22, -11.0dB
-	{0x0e, 0x0e, 0x0c, 0x0a, 0x08, 0x05, 0x02, 0x01},	// 23, -11.5dB
-	{0x0d, 0x0d, 0x0c, 0x0a, 0x07, 0x05, 0x02, 0x01},	// 24, -12.0dB
-	{0x0d, 0x0c, 0x0b, 0x09, 0x07, 0x04, 0x02, 0x01},	// 25, -12.5dB
-	{0x0c, 0x0c, 0x0a, 0x09, 0x06, 0x04, 0x02, 0x01},	// 26, -13.0dB
-	{0x0b, 0x0b, 0x0a, 0x08, 0x06, 0x04, 0x02, 0x01},	// 27, -13.5dB
-	{0x0b, 0x0a, 0x09, 0x08, 0x06, 0x04, 0x02, 0x01},	// 28, -14.0dB
-	{0x0a, 0x0a, 0x09, 0x07, 0x05, 0x03, 0x02, 0x01},	// 29, -14.5dB
-	{0x0a, 0x09, 0x08, 0x07, 0x05, 0x03, 0x02, 0x01},	// 30, -15.0dB
-	{0x09, 0x09, 0x08, 0x06, 0x05, 0x03, 0x01, 0x01},	// 31, -15.5dB
-	{0x09, 0x08, 0x07, 0x06, 0x04, 0x03, 0x01, 0x01}	// 32, -16.0dB
-};
-
-
-u8	CCKSwingTable_Ch14[CCK_Table_length][8] = {
-	{0x36, 0x35, 0x2e, 0x1b, 0x00, 0x00, 0x00, 0x00},	// 0, +0dB
-	{0x33, 0x32, 0x2b, 0x19, 0x00, 0x00, 0x00, 0x00},	// 1, -0.5dB
-	{0x30, 0x2f, 0x29, 0x18, 0x00, 0x00, 0x00, 0x00},	// 2, -1.0dB
-	{0x2d, 0x2d, 0x17, 0x17, 0x00, 0x00, 0x00, 0x00},	// 3, -1.5dB
-	{0x2b, 0x2a, 0x25, 0x15, 0x00, 0x00, 0x00, 0x00},	// 4, -2.0dB
-	{0x28, 0x28, 0x24, 0x14, 0x00, 0x00, 0x00, 0x00},	// 5, -2.5dB
-	{0x26, 0x25, 0x21, 0x13, 0x00, 0x00, 0x00, 0x00},	// 6, -3.0dB
-	{0x24, 0x23, 0x1f, 0x12, 0x00, 0x00, 0x00, 0x00},	// 7, -3.5dB
-	{0x22, 0x21, 0x1d, 0x11, 0x00, 0x00, 0x00, 0x00},	// 8, -4.0dB
-	{0x20, 0x20, 0x1b, 0x10, 0x00, 0x00, 0x00, 0x00},	// 9, -4.5dB
-	{0x1f, 0x1e, 0x1a, 0x0f, 0x00, 0x00, 0x00, 0x00},	// 10, -5.0dB
-	{0x1d, 0x1c, 0x18, 0x0e, 0x00, 0x00, 0x00, 0x00},	// 11, -5.5dB
-	{0x1b, 0x1a, 0x17, 0x0e, 0x00, 0x00, 0x00, 0x00},	// 12, -6.0dB  <== default
-	{0x1a, 0x19, 0x16, 0x0d, 0x00, 0x00, 0x00, 0x00},	// 13, -6.5dB
-	{0x18, 0x17, 0x15, 0x0c, 0x00, 0x00, 0x00, 0x00},	// 14, -7.0dB
-	{0x17, 0x16, 0x13, 0x0b, 0x00, 0x00, 0x00, 0x00},	// 15, -7.5dB
-	{0x16, 0x15, 0x12, 0x0b, 0x00, 0x00, 0x00, 0x00},	// 16, -8.0dB
-	{0x14, 0x14, 0x11, 0x0a, 0x00, 0x00, 0x00, 0x00},	// 17, -8.5dB
-	{0x13, 0x13, 0x10, 0x0a, 0x00, 0x00, 0x00, 0x00},	// 18, -9.0dB
-	{0x12, 0x12, 0x0f, 0x09, 0x00, 0x00, 0x00, 0x00},	// 19, -9.5dB
-	{0x11, 0x11, 0x0f, 0x09, 0x00, 0x00, 0x00, 0x00},	// 20, -10.0dB
-	{0x10, 0x10, 0x0e, 0x08, 0x00, 0x00, 0x00, 0x00},	// 21, -10.5dB
-	{0x0f, 0x0f, 0x0d, 0x08, 0x00, 0x00, 0x00, 0x00},	// 22, -11.0dB
-	{0x0e, 0x0e, 0x0c, 0x07, 0x00, 0x00, 0x00, 0x00},	// 23, -11.5dB
-	{0x0d, 0x0d, 0x0c, 0x07, 0x00, 0x00, 0x00, 0x00},	// 24, -12.0dB
-	{0x0d, 0x0c, 0x0b, 0x06, 0x00, 0x00, 0x00, 0x00},	// 25, -12.5dB
-	{0x0c, 0x0c, 0x0a, 0x06, 0x00, 0x00, 0x00, 0x00},	// 26, -13.0dB
-	{0x0b, 0x0b, 0x0a, 0x06, 0x00, 0x00, 0x00, 0x00},	// 27, -13.5dB
-	{0x0b, 0x0a, 0x09, 0x05, 0x00, 0x00, 0x00, 0x00},	// 28, -14.0dB
-	{0x0a, 0x0a, 0x09, 0x05, 0x00, 0x00, 0x00, 0x00},	// 29, -14.5dB
-	{0x0a, 0x09, 0x08, 0x05, 0x00, 0x00, 0x00, 0x00},	// 30, -15.0dB
-	{0x09, 0x09, 0x08, 0x05, 0x00, 0x00, 0x00, 0x00},	// 31, -15.5dB
-	{0x09, 0x08, 0x07, 0x04, 0x00, 0x00, 0x00, 0x00}	// 32, -16.0dB
-};
-#elif defined RTL8192E
-static u32 OFDMSwingTable[OFDM_Table_Length] = {
-	0x7f8001fe,	// 0, +6db
-	0x71c001c7,	// 1, +5db
-	0x65400195,	// 2, +4db
-	0x5a400169,	// 3, +3db
-	0x50800142,	// 4, +2db
-	0x47c0011f,	// 5, +1db
-	0x40000100,	// 6, +0db ===> default, upper for higher temprature, lower for low temprature
-	0x390000e4,	// 7, -1db
-	0x32c000cb,	// 8, -2db
-	0x2d4000b5,	// 9, -3db
-	0x288000a2,	// 10, -4db
-	0x24000090,	// 11, -5db
-	0x20000080,	// 12, -6db
-	0x1c800072,	// 13, -7db
-	0x19800066,	// 14, -8db
-	0x26c0005b,	// 15, -9db
-	0x24400051,	// 16, -10db
-	0x12000048,	// 17, -11db
-	0x10000040	// 18, -12db
-};
-static u8	CCKSwingTable_Ch1_Ch13[CCK_Table_length][8] = {
-	{0x36, 0x35, 0x2e, 0x25, 0x1c, 0x12, 0x09, 0x04},	// 0, +0db ===> CCK40M default
-	{0x30, 0x2f, 0x29, 0x21, 0x19, 0x10, 0x08, 0x03},	// 1, -1db
-	{0x2b, 0x2a, 0x25, 0x1e, 0x16, 0x0e, 0x07, 0x03},	// 2, -2db
-	{0x26, 0x25, 0x21, 0x1b, 0x14, 0x0d, 0x06, 0x03},	// 3, -3db
-	{0x22, 0x21, 0x1d, 0x18, 0x11, 0x0b, 0x06, 0x02},	// 4, -4db
-	{0x1f, 0x1e, 0x1a, 0x15, 0x10, 0x0a, 0x05, 0x02},	// 5, -5db
-	{0x1b, 0x1a, 0x17, 0x13, 0x0e, 0x09, 0x04, 0x02},	// 6, -6db ===> CCK20M default
-	{0x18, 0x17, 0x15, 0x11, 0x0c, 0x08, 0x04, 0x02},	// 7, -7db
-	{0x16, 0x15, 0x12, 0x0f, 0x0b, 0x07, 0x04, 0x01},	// 8, -8db
-	{0x13, 0x13, 0x10, 0x0d, 0x0a, 0x06, 0x03, 0x01},	// 9, -9db
-	{0x11, 0x11, 0x0f, 0x0c, 0x09, 0x06, 0x03, 0x01},	// 10, -10db
-	{0x0f, 0x0f, 0x0d, 0x0b, 0x08, 0x05, 0x03, 0x01}	// 11, -11db
-};
-
-static u8	CCKSwingTable_Ch14[CCK_Table_length][8] = {
-	{0x36, 0x35, 0x2e, 0x1b, 0x00, 0x00, 0x00, 0x00},	// 0, +0db  ===> CCK40M default
-	{0x30, 0x2f, 0x29, 0x18, 0x00, 0x00, 0x00, 0x00},	// 1, -1db
-	{0x2b, 0x2a, 0x25, 0x15, 0x00, 0x00, 0x00, 0x00},	// 2, -2db
-	{0x26, 0x25, 0x21, 0x13, 0x00, 0x00, 0x00, 0x00},	// 3, -3db
-	{0x22, 0x21, 0x1d, 0x11, 0x00, 0x00, 0x00, 0x00},	// 4, -4db
-	{0x1f, 0x1e, 0x1a, 0x0f, 0x00, 0x00, 0x00, 0x00},	// 5, -5db
-	{0x1b, 0x1a, 0x17, 0x0e, 0x00, 0x00, 0x00, 0x00},	// 6, -6db  ===> CCK20M default
-	{0x18, 0x17, 0x15, 0x0c, 0x00, 0x00, 0x00, 0x00},	// 7, -7db
-	{0x16, 0x15, 0x12, 0x0b, 0x00, 0x00, 0x00, 0x00},	// 8, -8db
-	{0x13, 0x13, 0x10, 0x0a, 0x00, 0x00, 0x00, 0x00},	// 9, -9db
-	{0x11, 0x11, 0x0f, 0x09, 0x00, 0x00, 0x00, 0x00},	// 10, -10db
-	{0x0f, 0x0f, 0x0d, 0x08, 0x00, 0x00, 0x00, 0x00}	// 11, -11db
-};
-#endif
 #define		Pw_Track_Flag				0x11d
 #define		Tssi_Mea_Value				0x13c
 #define		Tssi_Report_Value1			0x134
@@ -1592,13 +1423,9 @@ static void dm_InitializeTXPowerTracking_ThermalMeter(struct net_device *dev)
 
 void dm_initialize_txpower_tracking(struct net_device *dev)
 {
-#ifdef RTL8192E
-	struct r8192_priv *priv = rtllib_priv(dev);
-#endif
 	dm_InitializeTXPowerTracking_TSSI(dev);
 }	// dm_InitializeTXPowerTracking
 
-#if (defined RTL8192E || defined RTL8190P)
 static void dm_CheckTXPowerTracking_TSSI(struct net_device *dev)
 {
 	struct r8192_priv *priv = rtllib_priv(dev);
@@ -1618,45 +1445,6 @@ static void dm_CheckTXPowerTracking_TSSI(struct net_device *dev)
 		}
 
 }
-#endif
-#ifndef RTL8190P
-static void dm_CheckTXPowerTracking_ThermalMeter(struct net_device *dev)
-{
-	struct r8192_priv *priv = rtllib_priv(dev);
-	static u8	TM_Trigger=0;
-	u8		TxPowerCheckCnt = 0;
-
-	if(IS_HARDWARE_TYPE_8192SE(dev))
-		TxPowerCheckCnt = 5;	//10 sec
-	else
-		TxPowerCheckCnt = 2;	// 4 sec
-        if(!priv->btxpower_tracking){
-            return;
-        } else {
-            if(priv->txpower_count  <= TxPowerCheckCnt) {
-			priv->txpower_count++;
-			return;
-		}
-	}
-
-	if(!TM_Trigger) {
-		//Attention!! You have to wirte all 12bits data to RF, or it may cause RF to crash
-		//actually write reg0x02 bit1=0, then bit1=1.
-		//DbgPrint("Trigger ThermalMeter, write RF reg0x2 = 0x4d to 0x4f\n");
-		rtl8192_phy_SetRFReg(dev, RF90_PATH_A, 0x02, bMask12Bits, 0x4d);
-		rtl8192_phy_SetRFReg(dev, RF90_PATH_A, 0x02, bMask12Bits, 0x4f);
-		rtl8192_phy_SetRFReg(dev, RF90_PATH_A, 0x02, bMask12Bits, 0x4d);
-		rtl8192_phy_SetRFReg(dev, RF90_PATH_A, 0x02, bMask12Bits, 0x4f);
-		TM_Trigger = 1;
-		return;
-	} else {
-            printk("===============>Schedule TxPowerTrackingWorkItem\n");
-		queue_delayed_work_rsl(priv->priv_wq,&priv->txpower_tracking_wq,0);
-		TM_Trigger = 0;
-	}
-}
-#endif
-
 //
 //	Description:
 //		- Dispatch TxPower Tracking direct call ONLY for 92s.
@@ -1723,91 +1511,15 @@ static void dm_CCKTxPowerAdjust_TSSI(struct net_device *dev, bool  bInCH14)
 
 
 }
-#ifdef RTL8192E
-static void dm_CCKTxPowerAdjust_ThermalMeter(struct net_device *dev,	bool  bInCH14)
-{
-	u32 TempVal;
-	struct r8192_priv *priv = rtllib_priv(dev);
-
-	TempVal = 0;
-	if(!bInCH14)
-	{
-		//Write 0xa22 0xa23
-		TempVal =	CCKSwingTable_Ch1_Ch13[priv->CCK_index][0] +
-					(CCKSwingTable_Ch1_Ch13[priv->CCK_index][1]<<8) ;
-		rtl8192_setBBreg(dev, rCCK0_TxFilter1, bMaskHWord, TempVal);
-		RT_TRACE(COMP_POWER_TRACKING, "CCK not chnl 14, reg 0x%x = 0x%x\n",
-			rCCK0_TxFilter1, TempVal);
-		//Write 0xa24 ~ 0xa27
-		TempVal = 0;
-		TempVal =	CCKSwingTable_Ch1_Ch13[priv->CCK_index][2] +
-					(CCKSwingTable_Ch1_Ch13[priv->CCK_index][3]<<8) +
-					(CCKSwingTable_Ch1_Ch13[priv->CCK_index][4]<<16 )+
-					(CCKSwingTable_Ch1_Ch13[priv->CCK_index][5]<<24);
-		rtl8192_setBBreg(dev, rCCK0_TxFilter2, bMaskDWord, TempVal);
-		RT_TRACE(COMP_POWER_TRACKING, "CCK not chnl 14, reg 0x%x = 0x%x\n",
-			rCCK0_TxFilter2, TempVal);
-		//Write 0xa28  0xa29
-		TempVal = 0;
-		TempVal =	CCKSwingTable_Ch1_Ch13[priv->CCK_index][6] +
-					(CCKSwingTable_Ch1_Ch13[priv->CCK_index][7]<<8) ;
-
-		rtl8192_setBBreg(dev, rCCK0_DebugPort, bMaskLWord, TempVal);
-		RT_TRACE(COMP_POWER_TRACKING, "CCK not chnl 14, reg 0x%x = 0x%x\n",
-			rCCK0_DebugPort, TempVal);
-	}
-	else
-	{
-//		priv->CCKTxPowerAdjustCntNotCh14++;	//cosa add for debug.
-		//Write 0xa22 0xa23
-		TempVal =	CCKSwingTable_Ch14[priv->CCK_index][0] +
-					(CCKSwingTable_Ch14[priv->CCK_index][1]<<8) ;
-
-		rtl8192_setBBreg(dev, rCCK0_TxFilter1, bMaskHWord, TempVal);
-		RT_TRACE(COMP_POWER_TRACKING, "CCK chnl 14, reg 0x%x = 0x%x\n",
-			rCCK0_TxFilter1, TempVal);
-		//Write 0xa24 ~ 0xa27
-		TempVal = 0;
-		TempVal =	CCKSwingTable_Ch14[priv->CCK_index][2] +
-					(CCKSwingTable_Ch14[priv->CCK_index][3]<<8) +
-					(CCKSwingTable_Ch14[priv->CCK_index][4]<<16 )+
-					(CCKSwingTable_Ch14[priv->CCK_index][5]<<24);
-		rtl8192_setBBreg(dev, rCCK0_TxFilter2, bMaskDWord, TempVal);
-		RT_TRACE(COMP_POWER_TRACKING, "CCK chnl 14, reg 0x%x = 0x%x\n",
-			rCCK0_TxFilter2, TempVal);
-		//Write 0xa28  0xa29
-		TempVal = 0;
-		TempVal =	CCKSwingTable_Ch14[priv->CCK_index][6] +
-					(CCKSwingTable_Ch14[priv->CCK_index][7]<<8) ;
-
-		rtl8192_setBBreg(dev, rCCK0_DebugPort, bMaskLWord, TempVal);
-		RT_TRACE(COMP_POWER_TRACKING,"CCK chnl 14, reg 0x%x = 0x%x\n",
-			rCCK0_DebugPort, TempVal);
-	}
-	}
-#endif
 
 extern void dm_cck_txpower_adjust(
 	struct net_device *dev,
 	bool  binch14
 )
 {	// dm_CCKTxPowerAdjust
-#ifndef RTL8190P
-	struct r8192_priv *priv = rtllib_priv(dev);
-#endif
-#ifdef RTL8190P
 	dm_CCKTxPowerAdjust_TSSI(dev, binch14);
-#else
-	//if(priv->bDcut == true)
-	if(priv->IC_Cut >= IC_VersionCut_D)
-		dm_CCKTxPowerAdjust_TSSI(dev, binch14);
-	else
-		dm_CCKTxPowerAdjust_ThermalMeter(dev, binch14);
-#endif
 }
 
-
-#if defined(RTL8192E)||defined(RTL8190P)
 static void dm_txpower_reset_recovery(
 	struct net_device *dev
 )
@@ -1861,14 +1573,6 @@ extern void dm_restore_dynamic_mechanism_state(struct net_device *dev)
 			//cosa PlatformEFIOWrite4Byte(dev, RATR0, ((pu4Byte)(val))[0]);
 			write_nic_dword(dev, RATR0, ratr_value);
 			write_nic_byte(dev, UFWP, 1);
-#if 0		// Disable old code.
-			u1Byte index;
-			u4Byte input_value;
-			index = (u1Byte)((((pu4Byte)(val))[0]) >> 28);
-			input_value = (((pu4Byte)(val))[0]) & 0x0fffffff;
-			// TODO: Correct it. Emily 2007.01.11
-			PlatformEFIOWrite4Byte(dev, RATR0+index*4, input_value);
-#endif
 	}
 	//Resore TX Power Tracking Index
 	if(priv->btxpower_trackingInit && priv->btxpower_tracking){
@@ -1950,7 +1654,6 @@ static void dm_bb_initialgain_backup(struct net_device *dev)
 
 }   // dm_BBInitialGainBakcup
 
-#endif
 //-----------------------------------------------------------------------------
 // Function:	dm_change_dynamic_initgain_thresh()
 //
@@ -2362,16 +2065,7 @@ static void dm_ctrl_initgain_byrssi_by_fwfalse_alarm(
 			#else
 				write_nic_byte(dev, (rOFDM0_XATxAFE+3), 0x00);
 				#endif
-			/*else if (priv->card_8192 == HARDWARE_TYPE_RTL8190P)
-				write_nic_byte(pAdapter, rOFDM0_RxDetector1, 0x40);
-			*/
-			//else if (pAdapter->HardwareType == HARDWARE_TYPE_RTL8192E)
-
-
-			//else
-				//write_nic_byte(pAdapter, rOFDM0_RxDetector1, 0x40);
-		}
-		else
+		} else
 			write_nic_byte(dev, rOFDM0_RxDetector1, 0x42);
 
 		// 1.4 Lower CS ratio for CCK.
@@ -2433,14 +2127,6 @@ static void dm_ctrl_initgain_byrssi_by_fwfalse_alarm(
 			#else
 				write_nic_byte(dev, (rOFDM0_XATxAFE+3), 0x20);
 				#endif
-			/*
-			else if (priv->card_8192 == HARDWARE_TYPE_RTL8190P)
-				write_nic_byte(dev, rOFDM0_RxDetector1, 0x42);
-			*/
-			//else if (pAdapter->HardwareType == HARDWARE_TYPE_RTL8192E)
-
-			//else
-				//write_nic_byte(pAdapter, rOFDM0_RxDetector1, 0x42);
 		}
 		else
 			write_nic_byte(dev, rOFDM0_RxDetector1, 0x44);
@@ -3641,20 +3327,12 @@ extern void dm_fsync_timer_callback(unsigned long data)
 			priv->bswitch_fsync = !priv->bswitch_fsync;
 			if(priv->bswitch_fsync)
 			{
-			#ifdef RTL8190P
 				write_nic_byte(dev,0xC36, 0x00);
-#elif defined RTL8192E
-				write_nic_byte(dev,0xC36, 0x1c);
-			#endif
 				write_nic_byte(dev, 0xC3e, 0x90);
 			}
 			else
 			{
-			#ifdef RTL8190P
 				write_nic_byte(dev, 0xC36, 0x40);
-			#else
-				write_nic_byte(dev, 0xC36, 0x5c);
-			#endif
 				write_nic_byte(dev, 0xC3e, 0x96);
 			}
 		}
@@ -3663,11 +3341,7 @@ extern void dm_fsync_timer_callback(unsigned long data)
 			if(priv->bswitch_fsync)
 			{
 				priv->bswitch_fsync  = false;
-			#ifdef RTL8190P
 				write_nic_byte(dev, 0xC36, 0x40);
-#elif defined RTL8192E
-				write_nic_byte(dev, 0xC36, 0x5c);
-			#endif
 				write_nic_byte(dev, 0xC3e, 0x96);
 			}
 		}
@@ -3690,19 +3364,11 @@ extern void dm_fsync_timer_callback(unsigned long data)
 		if(priv->bswitch_fsync)
 		{
 			priv->bswitch_fsync  = false;
-		#ifdef RTL8190P
 			write_nic_byte(dev, 0xC36, 0x40);
-#elif defined RTL8192E
-			write_nic_byte(dev, 0xC36, 0x5c);
-		#endif
 			write_nic_byte(dev, 0xC3e, 0x96);
 		}
 		priv->ContiuneDiffCount = 0;
-	#ifdef RTL8190P
 		write_nic_dword(dev, rOFDM0_RxDetector2, 0x164052cd);
-#elif defined RTL8192E
-		write_nic_dword(dev, rOFDM0_RxDetector2, 0x465c52cd);
-	#endif
 	}
 	RT_TRACE(COMP_HALDM, "ContiuneDiffCount %d\n", priv->ContiuneDiffCount);
 	RT_TRACE(COMP_HALDM, "rateRecord %d rateCount %d, rateCountdiff %d bSwitchFsync %d\n", priv->rate_record, rate_count, rate_count_diff , priv->bswitch_fsync);
@@ -3732,18 +3398,12 @@ static void dm_EndSWFsync(struct net_device *dev)
 
 		#ifdef RTL8190P
 			write_nic_byte(dev, 0xC36, 0x40);
-#elif defined RTL8192E
-		write_nic_byte(dev, 0xC36, 0x5c);
 #endif
 
 		write_nic_byte(dev, 0xC3e, 0x96);
 	}
 
 	priv->ContiuneDiffCount = 0;
-#ifdef RTL8192E
-	write_nic_dword(dev, rOFDM0_RxDetector2, 0x465c52cd);
-#endif
-
 }
 
 static void dm_StartSWFsync(struct net_device *dev)
@@ -3780,11 +3440,6 @@ static void dm_StartSWFsync(struct net_device *dev)
 		del_timer_sync(&priv->fsync_timer);
 	priv->fsync_timer.expires = jiffies + MSECS(priv->rtllib->fsync_time_interval);
 	add_timer(&priv->fsync_timer);
-
-#ifdef RTL8192E
-	write_nic_dword(dev, rOFDM0_RxDetector2, 0x465c12cd);
-#endif
-
 }
 
 void dm_check_fsync(struct net_device *dev)
