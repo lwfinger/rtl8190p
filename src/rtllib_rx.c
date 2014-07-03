@@ -1848,7 +1848,6 @@ int rtllib_parse_info_param(struct rtllib_device *ieee,
 				       network->wpa_ie_len);
 				break;
 			}
-#ifdef THOMAS_TURBO
                         if (info_element->len == 7 &&
                             info_element->data[0] == 0x00 &&
                             info_element->data[1] == 0xe0 &&
@@ -1857,7 +1856,6 @@ int rtllib_parse_info_param(struct rtllib_device *ieee,
                             info_element->data[4] == 0x02) {
                                 network->Turbo_Enable = 1;
                         }
-#endif
 
 			if(tmp_htcap_len == 0){
 				if(info_element->len >= 4 &&
@@ -2241,9 +2239,7 @@ static inline int rtllib_network_init(
 	network->unknown_cap_exist = false;
 	network->realtek_cap_exit = false;
 	network->marvell_cap_exist = false;
-#ifdef THOMAS_TURBO
 	network->Turbo_Enable = 0;
-#endif
 	network->SignalStrength = stats->SignalStrength;
 	network->RSSI = stats->SignalStrength;
 	network->CountryIeLen = 0;
@@ -2447,7 +2443,6 @@ static inline void update_network(struct rtllib_network *dst,
 	dst->qos_data.old_param_count = old_param;
 
 	/* dst->last_associate is not overwritten */
-#if 1
 	dst->wmm_info = src->wmm_info;
 	if(src->wmm_param[0].ac_aci_acm_aifsn|| \
 	   src->wmm_param[1].ac_aci_acm_aifsn|| \
@@ -2455,14 +2450,9 @@ static inline void update_network(struct rtllib_network *dst,
 	   src->wmm_param[1].ac_aci_acm_aifsn) {
 	  memcpy(dst->wmm_param, src->wmm_param, WME_AC_PRAM_LEN);
 	}
-#else
-	dst->QoS_Enable = 1;
-#endif
 	dst->SignalStrength = src->SignalStrength;
 	dst->RSSI = src->RSSI;
-#ifdef THOMAS_TURBO
 	dst->Turbo_Enable = src->Turbo_Enable;
-#endif
 
 	dst->CountryIeLen = src->CountryIeLen;
 	memcpy(dst->CountryIeBuf, src->CountryIeBuf, src->CountryIeLen);

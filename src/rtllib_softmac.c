@@ -132,7 +132,6 @@ void rtllib_WMM_Info(struct rtllib_device *ieee, u8 **tag_p) {
 	*tag_p = tag;
 }
 
-#ifdef THOMAS_TURBO
 void rtllib_TURBO_Info(struct rtllib_device *ieee, u8 **tag_p) {
 	u8 *tag = *tag_p;
 
@@ -149,7 +148,6 @@ void rtllib_TURBO_Info(struct rtllib_device *ieee, u8 **tag_p) {
 	*tag_p = tag;
 	printk(KERN_ALERT "This is enable turbo mode IE process\n");
 }
-#endif
 
 void enqueue_mgmt(struct rtllib_device *ieee, struct sk_buff *skb)
 {
@@ -1213,9 +1211,7 @@ inline struct sk_buff *rtllib_association_req(struct rtllib_network *beacon,stru
 	unsigned int rate_len = (beacon->rates_len?(beacon->rates_len+2):0) + (beacon->rates_ex_len?(beacon->rates_ex_len)+2:0);
 
 	unsigned int wmm_info_len = beacon->qos_data.supported?9:0;
-#ifdef THOMAS_TURBO
 	unsigned int turbo_info_len = beacon->Turbo_Enable?9:0;
-#endif
 
 	int len = 0;
 
@@ -1273,7 +1269,6 @@ inline struct sk_buff *rtllib_association_req(struct rtllib_network *beacon,stru
 		printk("[PMK cache]: WPA2 IE length: %x\n", wpa_ie_len);
 	}
 
-#ifdef THOMAS_TURBO
 	len = sizeof(struct rtllib_assoc_request_frame)+ 2
 		+ beacon->ssid_len
 		+ rate_len
@@ -1286,19 +1281,6 @@ inline struct sk_buff *rtllib_association_req(struct rtllib_network *beacon,stru
 		+ ccxrm_ie_len
 		+ cxvernum_ie_len
 		+ ieee->tx_headroom;
-#else
-	len = sizeof(struct rtllib_assoc_request_frame)+ 2
-		+ beacon->ssid_len
-		+ rate_len
-		+ wpa_ie_len + wps_ie_len
-		+ wmm_info_len
-                + ht_cap_len
-		+ realtek_ie_len
-		+ ckip_ie_len
-		+ ccxrm_ie_len
-		+ cxvernum_ie_len
-		+ ieee->tx_headroom;
-#endif
 
 #ifdef USB_USE_ALIGNMENT
 	u32 Tmpaddr=0;
@@ -1450,12 +1432,10 @@ inline struct sk_buff *rtllib_association_req(struct rtllib_network *beacon,stru
 		memcpy(tag, ieee->wps_ie, wps_ie_len);
 	}
 
-#ifdef THOMAS_TURBO
 	tag = skb_put(skb,turbo_info_len);
         if(turbo_info_len) {
                 rtllib_TURBO_Info(ieee, &tag);
         }
-#endif
 
 	if(ieee->pHTInfo->bCurrentHTSupport&&ieee->pHTInfo->bEnableHT){
 		if(ieee->pHTInfo->ePeerHTSpecVer == HT_SPEC_VER_EWC)

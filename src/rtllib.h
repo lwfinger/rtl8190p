@@ -1867,9 +1867,7 @@ struct rtllib_network {
         u8 wmm_info;
         struct rtllib_wmm_ac_param wmm_param[4];
         u8 QoS_Enable;
-#ifdef THOMAS_TURBO
 	u8 Turbo_Enable;
-#endif
 	u16 CountryIeLen;
 	u8 CountryIeBuf[MAX_IE_LEN];
 	BSS_HT	bssht;
@@ -3145,9 +3143,7 @@ u8 HTFilterMCSRate( struct rtllib_device* ieee, u8* pSupportMCS, u8* pOperateMCS
 void HTUseDefaultSetting(struct rtllib_device* ieee);
 #define RT_ASOC_RETRY_LIMIT	5
 u8 MgntQuery_TxRateExcludeCCKRates(struct rtllib_device *ieee);
-#ifdef THOMAS_TURBO
 void rtllib_TURBO_Info(struct rtllib_device *ieee, u8 **tag_p);
-#endif
 #ifndef ENABLE_LOCK_DEBUG
 #define SPIN_LOCK_IEEE(plock) spin_lock_irqsave((plock), flags)
 #define SPIN_UNLOCK_IEEE(plock) spin_unlock_irqrestore((plock), flags)

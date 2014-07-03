@@ -15,7 +15,6 @@ EXTRA_CFLAGS += -I$(TOPDIR)/drivers/net/wireless
 EXTRA_CFLAGS += -std=gnu89
 EXTRA_CFLAGS += -O2
 EXTRA_CFLAGS += -mhard-float -DCONFIG_FORCE_HARD_FLOAT=y
-EXTRA_CFLAGS += -DTHOMAS_TURBO
 #flag for single module compile
 EXTRA_CFLAGS += -DBUILT_IN_RTLLIB
 
