@@ -716,17 +716,9 @@ MgntDisconnect(
 			// e.g. OID_802_11_DISASSOCIATE in Windows while as MgntDisconnectAP() is
 			// used to handle disassociation related things to AP, e.g. send Disassoc
 			// frame to AP.  2005.01.27, by rcnjko.
-#ifdef TO_DO_LIST
-			SecClearAllKeys(Adapter);
-#endif
-			//RTLLIB_DEBUG(RTLLIB_DL_TRACE,"MgntDisconnect() ===> MgntDisconnectAP\n");
 			MgntDisconnectAP(dev, asRsn);
 		}
-
-		// Inidicate Disconnect, 2005.02.23, by rcnjko.
-		//MgntIndicateMediaStatus( dev, RT_MEDIA_DISCONNECT, GENERAL_INDICATE);
 	}
-
 	return true;
 }
 //
@@ -2220,24 +2212,7 @@ RESET_START:
 				ieee->data_hard_resume(ieee->dev);
 			netif_carrier_on(ieee->dev);
 		}
-#ifdef TO_DO_LIST
-		else if(Adapter->MgntInfo.mActingAsAp)
-		{
-		//	AP_Reset(Adapter);
-		//	ULONG i = 0;
-		//	PMGNT_INFO pMgntInfo = &Adapter->MgntInfo;
-		//	PRT_WLAN_STA	AsocEntry = pMgntInfo->AsocEntry;
-		//	PRT_WLAN_STA pEntry = NULL;
-			AP_StartApRequest((PVOID)Adapter);
-			Adapter->HalFunc.ResetHalRATRTableHandler(Adapter);
-		}
-#endif
 
-#ifdef TO_DO_LIST
-		if(Adapter->MgntInfo.mActingAsAp)
-			AP_CamRestoreAllEntry(Adapter);
-		else
-#endif
 		CamRestoreAllEntry(dev);
 		// Restore the previous setting for all dynamic mechanism
 		dm_restore_dynamic_mechanism_state(dev);
