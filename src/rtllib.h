@@ -1750,9 +1750,6 @@ enum {WMM_all_frame, WMM_two_frame, WMM_four_frame, WMM_six_frame};
 #define MAX_SP_Len  (WMM_all_frame << 4)
 #define RTLLIB_QOS_TID 0x0f
 #define QOS_CTL_NOTCONTAIN_ACK (0x01 << 5)
-#ifdef ENABLE_AMSDU
-#define QOS_CTL_AMSDU_PRESENT (0x01 << 7)
-#endif
 
 #define RTLLIB_DTIM_MBCAST 4
 #define RTLLIB_DTIM_UCAST 2
@@ -2887,13 +2884,6 @@ int rtllib_encrypt_fragment(
 
 int rtllib_xmit(struct sk_buff *skb,  struct net_device *dev);
 void rtllib_txb_free(struct rtllib_txb *);
-
-#ifdef ENABLE_AMSDU
-struct sk_buff *AMSDU_Aggregation(struct rtllib_device *ieee, struct sk_buff_head *pSendList);
-u8 AMSDU_GetAggregatibleList(struct rtllib_device *ieee, struct sk_buff *pCurSkb, struct sk_buff_head	*pSendList, u8 queue_index);
-struct sk_buff *msh_AMSDU_Aggregation(struct rtllib_device *ieee, struct sk_buff_head *pSendList);
-u8 msh_AMSDU_GetAggregatibleList(struct rtllib_device *ieee, struct sk_buff *pCurSkb, struct sk_buff_head *pSendList, u8 queue_index);
-#endif
 
 /* rtllib_rx.c */
 int rtllib_rx(struct rtllib_device *ieee, struct sk_buff *skb,

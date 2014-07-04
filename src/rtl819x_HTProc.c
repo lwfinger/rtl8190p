@@ -1232,28 +1232,10 @@ void HTUseDefaultSetting(struct rtllib_device* ieee)
 
 		pHTInfo->bCurShortGI40MHz= pHTInfo->bRegShortGI40MHz;
 
-#ifdef ENABLE_AMSDU
-		if(ieee->iw_mode == IW_MODE_ADHOC)
-		{
-			ieee->current_network.qos_data.supported = 1;
-			ieee->current_network.qos_data.active = ieee->current_network.qos_data.supported;
-			pHTInfo->bCurrent_AMSDU_Support = 1;
-		}
-		else
-			pHTInfo->bCurrent_AMSDU_Support = pHTInfo->bAMSDU_Support;
-#else
 		pHTInfo->bCurrent_AMSDU_Support = pHTInfo->bAMSDU_Support;
-#endif
 		pHTInfo->nCurrent_AMSDU_MaxSize = pHTInfo->nAMSDU_MaxSize;
 
-#ifdef ENABLE_AMSDU
-		if(ieee->iw_mode == IW_MODE_ADHOC)
-			pHTInfo->bCurrentAMPDUEnable = 0;
-		else
-			pHTInfo->bCurrentAMPDUEnable = pHTInfo->bAMPDUEnable;
-#else
 		pHTInfo->bCurrentAMPDUEnable = pHTInfo->bAMPDUEnable;
-#endif
 		pHTInfo->CurrentAMPDUFactor = pHTInfo->AMPDU_Factor;
 
 		pHTInfo->CurrentMPDUDensity = pHTInfo->CurrentMPDUDensity;

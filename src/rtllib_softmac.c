@@ -1822,10 +1822,6 @@ inline void rtllib_softmac_new_net(struct rtllib_device *ieee, struct rtllib_net
 					   ieee->current_network.bssht.bdSupportHT)
 /*WB, 2008.09.09:bCurrentHTSupport and bEnableHT two flags are going to put together to check whether we are in HT now, so needn't to check bEnableHT flags here. That's is to say we will set to HT support whenever joined AP has the ability to support HT. And whether we are in HT or not, please check bCurrentHTSupport&&bEnableHT now please.*/
 					{
-#ifdef ENABLE_AMSDU
-						if((ieee->mode == IEEE_N_24G) && (ieee->mode == IEEE_N_5G))
-							HTUseDefaultSetting(ieee);
-#endif
 						HTResetSelfAndSavePeerSetting(ieee, &(ieee->current_network));
 					}
 					else

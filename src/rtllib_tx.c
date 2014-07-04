@@ -301,18 +301,11 @@ rtllib_classify(struct sk_buff *skb, u8 bIsAmsdu)
 	if (eth->h_proto != htons(ETH_P_IP))
 		return 0;
 
-#ifdef ENABLE_AMSDU
-	if(bIsAmsdu)
-		ip = (struct iphdr*)(skb->data + sizeof(struct ether_header) + AMSDU_SUBHEADER_LEN + SNAP_SIZE + sizeof(u16));
-	else
-		ip = (struct iphdr*)(skb->data + sizeof(struct ether_header));
-#else
 	RTLLIB_DEBUG_DATA(RTLLIB_DL_DATA, skb->data, skb->len);
 #if (LINUX_VERSION_CODE >= KERNEL_VERSION(2,6,22))
 	ip = ip_hdr(skb);
 #else
 	ip = (struct iphdr*)(skb->data + sizeof(struct ether_header));
-#endif
 #endif
 	switch (ip->tos & 0xfc) {
 		case 0x20:
@@ -577,228 +570,6 @@ u16 rtllib_query_seqnum(struct rtllib_device*ieee, struct sk_buff* skb, u8* dst)
 	return 0;
 }
 
-
-
-#ifdef ENABLE_AMSDU
-#if 0
-static void CB_DESC_DUMP(pcb_desc tcb, char* func)
-{
-	printk("\n%s",func);
-	printk("\n-------------------CB DESC DUMP ><------------------------");
-	printk("\npkt_size:\t %d", tcb->pkt_size);
-	printk("\nqueue_index:\t %d", tcb->queue_index);
-	printk("\nbMulticast:\t %d", tcb->bMulticast);
-	printk("\nbBroadcast:\t %d", tcb->bBroadcast);
-	printk("\nbPacketBw:\t %d", tcb->bPacketBW);
-	printk("\nbRTSEnable:\t %d", tcb->bRTSEnable);
-	printk("\nrts_rate:\t %d", tcb->rts_rate);
-	printk("\nbUseShortGI:\t %d", tcb->bUseShortGI);
-	printk("\nbAMSDU:\t %d", tcb->bAMSDU);
-	printk("\nFromAggrQ:\t %d", tcb->bFromAggrQ);
-	printk("\nRATRIndex:\t %d", tcb->RATRIndex);
-	printk("\ndata_rate:\t %d", tcb->data_rate);
-	printk("\n-------------------CB DESC DUMP <>------------------------\n");
-}
-#endif
-struct sk_buff *AMSDU_Aggregation(
-	struct rtllib_device	*ieee,
-	struct sk_buff_head		*pSendList
-	)
-{
-	struct sk_buff *	pSkb;
-	struct sk_buff *	pAggrSkb;
-	u8		i;
-	u32		total_length = 0;
-	u32		skb_len, num_skb;
-	pcb_desc	pcb;
-	u8		amsdu_shdr[AMSDU_SUBHEADER_LEN];
-	u8		padding = 0;
-	u8		*p = NULL, *q=NULL;
-	u16		ether_type;
-
-	num_skb = skb_queue_len(pSendList);
-	if(num_skb == 0)
-		return NULL;
-	if(num_skb == 1)
-	{
-		pSkb = (struct sk_buff *)skb_dequeue(pSendList);
-		memset(pSkb->cb, 0, sizeof(pSkb->cb));
-		pcb = (pcb_desc)(pSkb->cb + MAX_DEV_ADDR_SIZE);
-		pcb->bFromAggrQ = true;
-		return pSkb;
-	}
-
-	total_length += sizeof(struct ethhdr);
-	for(i=0; i<num_skb; i++)
-	{
-		pSkb= (struct sk_buff *)skb_dequeue(pSendList);
-		if(pSkb->len <= (ETH_ALEN*2))
-		{
-			dev_kfree_skb_any(pSkb);
-			continue;
-		}
-		skb_len = pSkb->len - ETH_ALEN*2 + SNAP_SIZE + AMSDU_SUBHEADER_LEN;
-		if(i < (num_skb-1))
-		{
-			skb_len += ((4-skb_len%4)==4)?0:(4-skb_len%4);
-		}
-		total_length += skb_len;
-		skb_queue_tail(pSendList, pSkb);
-	}
-
-	pAggrSkb = dev_alloc_skb(total_length);
-	if(NULL == pAggrSkb)
-	{
-		skb_queue_purge(pSendList);
-		printk("%s: Can not alloc skb!\n", __FUNCTION__);
-		return NULL;
-	}
-	skb_put(pAggrSkb,total_length);
-	pAggrSkb->priority = pSkb->priority;
-
-	memset(pAggrSkb->cb, 0, sizeof(pAggrSkb->cb));
-	pcb = (pcb_desc)(pAggrSkb->cb + MAX_DEV_ADDR_SIZE);
-	pcb->bFromAggrQ = true;
-	pcb->bAMSDU = true;
-
-	memset(amsdu_shdr, 0, AMSDU_SUBHEADER_LEN);
-	p = pAggrSkb->data;
-	for(i=0; i<num_skb; i++)
-	{
-		q = p;
-		pSkb= (struct sk_buff *)skb_dequeue(pSendList);
-		ether_type = ntohs(((struct ethhdr *)pSkb->data)->h_proto);
-
-		skb_len = pSkb->len - sizeof(struct ethhdr) + AMSDU_SUBHEADER_LEN + SNAP_SIZE + sizeof(u16);
-		if(i < (num_skb-1))
-		{
-			padding = ((4-skb_len%4)==4)?0:(4-skb_len%4);
-			skb_len += padding;
-		}
-		if(i == 0)
-		{
-			memcpy(p, pSkb->data, sizeof(struct ethhdr));
-			p += sizeof(struct ethhdr);
-		}
-		memcpy(amsdu_shdr, pSkb->data, (ETH_ALEN*2));
-		skb_pull(pSkb, sizeof(struct ethhdr));
-		*(u16*)(amsdu_shdr+ETH_ALEN*2) = ntohs(pSkb->len + SNAP_SIZE + sizeof(u16));
-		memcpy(p, amsdu_shdr, AMSDU_SUBHEADER_LEN);
-		p += AMSDU_SUBHEADER_LEN;
-
-		rtllib_put_snap(p, ether_type);
-		p += SNAP_SIZE + sizeof(u16);
-
-		memcpy(p, pSkb->data, pSkb->len);
-		p += pSkb->len;
-		if(padding > 0)
-		{
-			memset(p, 0, padding);
-			p += padding;
-			padding = 0;
-		}
-		dev_kfree_skb_any(pSkb);
-	}
-
-	return pAggrSkb;
-}
-
-
-/* NOTE:
-	This function return a list of SKB which is proper to be aggregated.
-	If no proper SKB is found to do aggregation, SendList will only contain the input SKB.
-*/
-u8 AMSDU_GetAggregatibleList(
-	struct rtllib_device *	ieee,
-	struct sk_buff *		pCurSkb,
-	struct sk_buff_head		*pSendList,
-	u8				queue_index
-	)
-{
-	struct sk_buff			*pSkb = NULL;
-	u16				nMaxAMSDUSize = 0;
-	u32				AggrSize = 0;
-	u32				nAggrSkbNum = 0;
-	u8				padding = 0;
-	struct sta_info			*psta = NULL;
-	u8				*addr = (u8*)(pCurSkb->data);
-	struct sk_buff_head *header;
-	struct sk_buff	  *punlinkskb = NULL;
-
-	padding = ((4-pCurSkb->len%4)==4)?0:(4-pCurSkb->len%4);
-	AggrSize = AMSDU_SUBHEADER_LEN + pCurSkb->len + padding;
-	skb_queue_tail(pSendList, pCurSkb);
-	nAggrSkbNum++;
-
-	if(ieee->iw_mode == IW_MODE_MASTER){
-		psta = GetStaInfo(ieee, addr);
-		if(NULL != psta)
-			nMaxAMSDUSize = psta->htinfo.AMSDU_MaxSize;
-		else
-			return 1;
-	}else if(ieee->iw_mode == IW_MODE_ADHOC){
-		psta = GetStaInfo(ieee, addr);
-		if(NULL != psta)
-			nMaxAMSDUSize = psta->htinfo.AMSDU_MaxSize;
-		else
-			return 1;
-	}else{
-		nMaxAMSDUSize = ieee->pHTInfo->nCurrent_AMSDU_MaxSize;
-	}
-	nMaxAMSDUSize = ((nMaxAMSDUSize)==0)?HT_AMSDU_SIZE_4K:HT_AMSDU_SIZE_8K;
-
-	if(ieee->pHTInfo->ForcedAMSDUMode == HT_AGG_FORCE_ENABLE)
-	{
-		nMaxAMSDUSize = ieee->pHTInfo->ForcedAMSDUMaxSize;
-	}
-
-	header = (&ieee->skb_aggQ[queue_index]);
-	pSkb = header->next;
-	while(pSkb != (struct sk_buff*)header)
-	{
-		if((ieee->iw_mode == IW_MODE_MASTER) ||(ieee->iw_mode == IW_MODE_ADHOC))
-		{
-			if(memcmp(pCurSkb->data, pSkb->data, ETH_ALEN) != 0)
-			{
-				pSkb = pSkb->next;
-				continue;
-			}
-		}
-		if((AMSDU_SUBHEADER_LEN + pSkb->len + AggrSize < nMaxAMSDUSize) )
-		{
-			punlinkskb = pSkb;
-			pSkb = pSkb->next;
-#if LINUX_VERSION_CODE >= KERNEL_VERSION(2,6,14)
-			skb_unlink(punlinkskb, header);
-#else
-			/*
-			 * __skb_unlink before linux2.6.14 does not use spinlock to protect list head.
-			 * add spinlock function manually. john,2008/12/03
-			 */
-			{
-				unsigned long flags;
-				spin_lock_irqsave(&ieee->lock, flags);
-				__skb_unlink(punlinkskb,header);
-				spin_unlock_irqrestore(&ieee->lock, flags);
-			}
-#endif
-
-			padding = ((4-punlinkskb->len%4)==4)?0:(4-punlinkskb->len%4);
-			AggrSize += AMSDU_SUBHEADER_LEN + punlinkskb->len + padding;
-			skb_queue_tail(pSendList, punlinkskb);
-			nAggrSkbNum++;
-		}
-		else
-		{
-			if(!(AMSDU_SUBHEADER_LEN + pSkb->len + AggrSize < nMaxAMSDUSize))
-				;
-
-			break;
-		}
-	}
-	return nAggrSkbNum;
-}
-#endif
 static int wme_downgrade_ac(struct sk_buff *skb)
 {
 	switch (skb->priority) {
@@ -841,11 +612,6 @@ int rtllib_xmit_inter(struct sk_buff *skb, struct net_device *dev)
 	cb_desc *tcb_desc;
 	u8 bIsMulticast = false;
 	u8 IsAmsdu = false;
-#ifdef ENABLE_AMSDU
-	u8 queue_index = WME_AC_BE;
-	cb_desc *tcb_desc_skb;
-	u8 bIsSptAmsdu = false;
-#endif
 	bool	bdhcp =false;
 	spin_lock_irqsave(&ieee->lock, flags);
 
@@ -869,51 +635,6 @@ int rtllib_xmit_inter(struct sk_buff *skb, struct net_device *dev)
 		memcpy(dest, skb->data, ETH_ALEN);
 		memcpy(src, skb->data+ETH_ALEN, ETH_ALEN);
 
-#ifdef ENABLE_AMSDU
-		if(ieee->iw_mode == IW_MODE_ADHOC)
-		{
-			p_sta = GetStaInfo(ieee, dest);
-			if(p_sta)	{
-				if(p_sta->htinfo.bEnableHT)
-					bIsSptAmsdu = true;
-			}
-		}else if(ieee->iw_mode == IW_MODE_INFRA) {
-			bIsSptAmsdu = true;
-		}else
-			bIsSptAmsdu = true;
-		bIsSptAmsdu = (bIsSptAmsdu && ieee->pHTInfo->bCurrent_AMSDU_Support && qos_actived);
-
-		tcb_desc_skb = (pcb_desc)(skb->cb + MAX_DEV_ADDR_SIZE);
-		if(bIsSptAmsdu) {
-			if(!tcb_desc_skb->bFromAggrQ)
-			{
-				if(qos_actived)
-				{
-					queue_index = UP2AC(skb->priority);
-				} else {
-					queue_index = WME_AC_BE;
-				}
-
-				if ((skb_queue_len(&ieee->skb_aggQ[queue_index]) != 0)||
-				   (!ieee->check_nic_enough_desc(ieee->dev,queue_index))||
-				   (ieee->queue_stop) ||
-				   (ieee->amsdu_in_process))
-				{
-					/* insert the skb packet to the Aggregation queue */
-					skb_queue_tail(&ieee->skb_aggQ[queue_index], skb);
-					spin_unlock_irqrestore(&ieee->lock, flags);
-					return 0;
-				}
-			}
-			else
-			{
-				if(tcb_desc_skb->bAMSDU)
-					IsAmsdu = true;
-
-				ieee->amsdu_in_process = false;
-			}
-		}
-#endif
 		memset(skb->cb, 0, sizeof(skb->cb));
 		ether_type = ntohs(((struct ethhdr *)skb->data)->h_proto);
 
@@ -963,14 +684,7 @@ int rtllib_xmit_inter(struct sk_buff *skb, struct net_device *dev)
 		skb_pull(skb, sizeof(struct ethhdr));
 
                 /* Determine total amount of storage required for TXB packets */
-#ifdef ENABLE_AMSDU
-		if(!IsAmsdu)
-			bytes = skb->len + SNAP_SIZE + sizeof(u16);
-		else
-			bytes = skb->len;
-#else
 		bytes = skb->len + SNAP_SIZE + sizeof(u16);
-#endif
 
 		if (encrypt)
 			fc = RTLLIB_FTYPE_DATA | RTLLIB_FCTL_WEP;
@@ -1009,26 +723,9 @@ int rtllib_xmit_inter(struct sk_buff *skb, struct net_device *dev)
 		if (bIsMulticast) {
 			frag_size = MAX_FRAG_THRESHOLD;
 			qos_ctl |= QOS_CTL_NOTCONTAIN_ACK;
-		}
-		else {
-#ifdef ENABLE_AMSDU
-			if(bIsSptAmsdu) {
-				if(ieee->iw_mode == IW_MODE_ADHOC) {
-					if(p_sta)
-						frag_size = p_sta->htinfo.AMSDU_MaxSize;
-					else
-						frag_size = ieee->pHTInfo->nAMSDU_MaxSize;
-				}
-				else
-					frag_size = ieee->pHTInfo->nAMSDU_MaxSize;
-				qos_ctl = 0;
-			}
-			else
-#endif
-			{
-				frag_size = ieee->fts;
-				qos_ctl = 0;
-			}
+		} else {
+			frag_size = ieee->fts;
+			qos_ctl = 0;
 		}
 
 		if(qos_actived)
@@ -1044,15 +741,7 @@ int rtllib_xmit_inter(struct sk_buff *skb, struct net_device *dev)
                         printk("converted skb->priority = %x\n", skb->priority);
                     }
                     qos_ctl |= skb->priority;
-#ifdef ENABLE_AMSDU
-			if(IsAmsdu)
-			{
-				qos_ctl |= QOS_CTL_AMSDU_PRESENT;
-			}
-                    header.qos_ctl = cpu_to_le16(qos_ctl);
-#else
                     header.qos_ctl = cpu_to_le16(qos_ctl & RTLLIB_QOS_TID);
-#endif
 		} else {
 			hdr_len = RTLLIB_3ADDR_LEN;
 		}
@@ -1143,12 +832,7 @@ int rtllib_xmit_inter(struct sk_buff *skb, struct net_device *dev)
 				frag_hdr->seq_ctl = cpu_to_le16(ieee->seq_ctrl[0]<<4 | i);
 			}
 			/* Put a SNAP header on the first fragment */
-#ifdef ENABLE_AMSDU
-			if ((i == 0) && (!IsAmsdu))
-#else
-			if (i == 0)
-#endif
-			{
+			if (i == 0) {
 				rtllib_put_snap(
 					skb_put(skb_frag, SNAP_SIZE + sizeof(u16)),
 					ether_type);
@@ -1282,8 +966,4 @@ int rtllib_xmit(struct sk_buff *skb, struct net_device *dev)
 
 #ifndef BUILT_IN_RTLLIB
 EXPORT_SYMBOL_RSL(rtllib_txb_free);
-#ifdef ENABLE_AMSDU
-EXPORT_SYMBOL_RSL(AMSDU_Aggregation);
-EXPORT_SYMBOL_RSL(AMSDU_GetAggregatibleList);
-#endif
 #endif
