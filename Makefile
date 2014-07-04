@@ -13,7 +13,7 @@ all:
 install: all
 	install -p -m 644 src/r8190_pci.ko $(MODDESTDIR)
 	depmod -a
-	@cp -p firmware/*.img /lib/firmware/rtlwifi/.
+	cp -p firmware/*.img /lib/firmware/rtlwifi/.
 uninstall:
 	$(shell [ -d $(MODDESTDIR) ] && rm -f $(MODDESTDIR)/r8190_pci.ko)
 	depmod -a
