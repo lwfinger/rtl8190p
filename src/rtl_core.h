@@ -119,7 +119,7 @@ do { if (rt_global_debug_component & component) \
                         int _i;                                  \
                         u8* _pdata = (u8*) data;                 \
                         printk(KERN_DEBUG DRV_NAME ": %s()\n", __FUNCTION__);   \
-                        for(_i=0; _i<(int)(datalen); _i++)                 \
+                        for (_i=0; _i<(int)(datalen); _i++)                 \
                         {                                               \
                                 printk("%2x ", _pdata[_i]);               \
                                 if ((_i+1)%16 == 0) printk("\n");        \

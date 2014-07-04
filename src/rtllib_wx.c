@@ -87,7 +87,7 @@ static inline char *rtl819x_translate_scan(struct rtllib_device *ieee,
 	}
 	/* Add the protocol name */
 	iwe.cmd = SIOCGIWNAME;
-	for(i=0; i<(sizeof(rtllib_modes)/sizeof(rtllib_modes[0])); i++) {
+	for (i=0; i<(sizeof(rtllib_modes)/sizeof(rtllib_modes[0])); i++) {
 		if (network->mode&(1<<i)) {
 			sprintf(pname,rtllib_modes[i].mode_string,rtllib_modes[i].mode_size);
 			pname +=rtllib_modes[i].mode_size;

@@ -830,7 +830,7 @@ do { if (rtllib_debug_level & (level)) \
 			int i;					\
 			u8* pdata = (u8*) data;			\
 			printk(KERN_DEBUG "rtllib: %s()\n", __FUNCTION__);	\
-			for(i=0; i<(int)(datalen); i++)			\
+			for (i=0; i<(int)(datalen); i++)			\
 			{						\
 				printk("%2x ", pdata[i]);		\
 				if ((i+1)%16 == 0) printk("\n");	\
@@ -924,7 +924,7 @@ do { if (rtllib_debug_level & (level)) \
                                 int length = (_Len<MAX_STR_LEN)? _Len : (MAX_STR_LEN-1) ;	\
                                 memset(buffer, 0, MAX_STR_LEN);					\
                                 memcpy(buffer, (u8 *)_Ptr, length );				\
-                                for( __i=0; __i<MAX_STR_LEN; __i++ )                            \
+                                for ( __i=0; __i<MAX_STR_LEN; __i++ )                            \
                                 {                                                               \
                                      if ( !PRINTABLE(buffer[__i]) )   buffer[__i] = '?';		\
                                 }                                                               \
@@ -3134,7 +3134,7 @@ static inline void dump_buf(u8 *buf, u32 len)
 {
 	u32 i;
 	printk("-----------------Len %d----------------\n", len);
-	for(i=0; i<len; i++)
+	for (i=0; i<len; i++)
 		printk("%2.2x-", *(buf+i));
 	printk("\n");
 }

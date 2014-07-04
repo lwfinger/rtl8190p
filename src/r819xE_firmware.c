@@ -68,7 +68,7 @@ bool fw_download_code(struct net_device *dev, u8 *code_virtual_address, u32 buff
 		tcb_desc->bLastIniPkt = bLastIniPkt;
 
 		seg_ptr = skb->data;
-		for(i=0 ; i < frag_length; i+=4) {
+		for (i=0 ; i < frag_length; i+=4) {
 			*seg_ptr++ = ((i+0)<frag_length)?code_virtual_address[i+3]:0;
 			*seg_ptr++ = ((i+1)<frag_length)?code_virtual_address[i+2]:0;
 			*seg_ptr++ = ((i+2)<frag_length)?code_virtual_address[i+1]:0;
@@ -292,7 +292,7 @@ bool init_firmware(struct net_device *dev)
 #else
 	priv->firmware_source = FW_SOURCE_HEADER_FILE;
 #endif
-	for(init_step = starting_state; init_step <= FW_INIT_STEP2_DATA; init_step++) {
+	for (init_step = starting_state; init_step <= FW_INIT_STEP2_DATA; init_step++) {
 		if (rst_opt == OPT_SYSTEM_RESET) {
 			switch(priv->firmware_source) {
 			case FW_SOURCE_IMG_FILE: {

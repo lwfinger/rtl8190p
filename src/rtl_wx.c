@@ -791,7 +791,7 @@ static int r8192_wx_set_enc(struct net_device *dev,
 	}
 	if (wrqu->encoding.length!=0){
 
-		for(i=0 ; i<4 ; i++){
+		for (i=0 ; i<4 ; i++){
 			hwkey[i] |=  key[4*i+0]&mask;
 			if (i==1&&(4*i+1)==wrqu->encoding.length) mask=0x00;
 			if (i==3&&(4*i+1)==wrqu->encoding.length) mask=0x00;

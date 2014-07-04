@@ -723,7 +723,7 @@ void HTConstructCapabilityElement(struct rtllib_device* ieee, u8* posHTCap, u8* 
 	if (ieee->GetHalfNmodeSupportByAPsHandler(ieee->dev))
 	{
 		int i;
-		for(i = 1; i< 16; i++)
+		for (i = 1; i< 16; i++)
 			pCapELE->MCS[i] = 0;
 	}
 
@@ -843,7 +843,7 @@ u8 HT_PickMCSRate(struct rtllib_device* ieee, u8* pOperateMCS)
 	case IEEE_B:
 	case IEEE_G:
 
-			for(i=0;i<=15;i++){
+			for (i=0;i<=15;i++){
 				pOperateMCS[i] = 0;
 			}
 			break;
@@ -876,10 +876,10 @@ u8 HTGetHighestMCSRate(struct rtllib_device* ieee, u8* pMCSRateSet, u8* pMCSFilt
 		RTLLIB_DEBUG(RTLLIB_DL_ERR, "pMCSRateSet or pMCSFilter can't be null in HTGetHighestMCSRate()\n");
 		return false;
 	}
-	for(i=0; i<16; i++)
+	for (i=0; i<16; i++)
 		availableMcsRate[i] = pMCSRateSet[i] & pMCSFilter[i];
 
-	for(i = 0; i < 16; i++)
+	for (i = 0; i < 16; i++)
 	{
 		if (availableMcsRate[i] != 0)
 			break;
@@ -887,12 +887,12 @@ u8 HTGetHighestMCSRate(struct rtllib_device* ieee, u8* pMCSRateSet, u8* pMCSFilt
 	if (i == 16)
 		return false;
 
-	for(i = 0; i < 16; i++)
+	for (i = 0; i < 16; i++)
 	{
 		if (availableMcsRate[i] != 0)
 		{
 			bitMap = availableMcsRate[i];
-			for(j = 0; j < 8; j++)
+			for (j = 0; j < 8; j++)
 			{
 				if ((bitMap%2) != 0)
 				{
@@ -911,7 +911,7 @@ u8 HTFilterMCSRate( struct rtllib_device* ieee, u8* pSupportMCS, u8* pOperateMCS
 
 	u8 i=0;
 
-	for(i=0;i<=15;i++){
+	for (i=0;i<=15;i++){
 		pOperateMCS[i] = ieee->Regdot11TxHTOperationalRateSet[i]&pSupportMCS[i];
 	}
 
@@ -922,7 +922,7 @@ u8 HTFilterMCSRate( struct rtllib_device* ieee, u8* pSupportMCS, u8* pOperateMCS
 	if (ieee->GetHalfNmodeSupportByAPsHandler(ieee->dev))
 		pOperateMCS[1] = 0;
 
-	for(i=2; i<=15; i++)
+	for (i=2; i<=15; i++)
 		pOperateMCS[i] = 0;
 
 	return true;

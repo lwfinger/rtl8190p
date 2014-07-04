@@ -27,7 +27,7 @@ void PHY_SetRF8256Bandwidth(struct net_device* dev , HT_CHANNEL_WIDTH Bandwidth)
 	u8	eRFPath;
 	struct r8192_priv *priv = rtllib_priv(dev);
 
-	for(eRFPath = 0; eRFPath <priv->NumTotalRFPath; eRFPath++)
+	for (eRFPath = 0; eRFPath <priv->NumTotalRFPath; eRFPath++)
 	{
 		if (!rtl8192_phy_CheckIsLegalRFPath(dev, eRFPath))
 				continue;
@@ -88,7 +88,7 @@ bool phy_RF8256_Config_ParaFile(struct net_device* dev)
 	u32	RF3_Final_Value = 0;
 	u8	ConstRetryTimes = 5, RetryTimes = 5;
 	u8 ret = 0;
-	for(eRFPath = (RF90_RADIO_PATH_E)RF90_PATH_A; eRFPath <priv->NumTotalRFPath; eRFPath++)
+	for (eRFPath = (RF90_RADIO_PATH_E)RF90_PATH_A; eRFPath <priv->NumTotalRFPath; eRFPath++)
 	{
 		if (!rtl8192_phy_CheckIsLegalRFPath(dev, eRFPath))
 				continue;
@@ -255,7 +255,7 @@ void PHY_SetRF8256OFDMTxPower(struct net_device* dev, u8 powerlevel)
 		TxAGC2_tmp = TxAGC2;
 
 	}
-	for(i=0; i<4; i++)
+	for (i=0; i<4; i++)
 	{
 		byteVal1[i] = (u8)(  (TxAGC1 & (0xff<<(i*8))) >>(i*8) );
 		if (byteVal1[i] > 0x24)
@@ -273,7 +273,7 @@ void PHY_SetRF8256OFDMTxPower(struct net_device* dev, u8 powerlevel)
 	{
 		if (priv->RF_C_TxPwDiff > 0)
 		{
-			for(i=0; i<4; i++)
+			for (i=0; i<4; i++)
 			{
 				if ( (byteVal1[i] + (u8)priv->RF_C_TxPwDiff) > 0x24)
 					byteVal1[i] = 0x24 - priv->RF_C_TxPwDiff;

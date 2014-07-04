@@ -130,7 +130,7 @@ void Dot11d_UpdateCountryIe(struct rtllib_device *dev, u8 *pTaddr,
 	MaxChnlNum = 0;
 	NumTriples = (CoutryIeLen - 3) / 3;
 	pTriple = (PCHNL_TXPOWER_TRIPLE)(pCoutryIe + 3);
-	for(i = 0; i < NumTriples; i++)
+	for (i = 0; i < NumTriples; i++)
 	{
 		if (MaxChnlNum >= pTriple->FirstChnl)
 		{
@@ -143,7 +143,7 @@ void Dot11d_UpdateCountryIe(struct rtllib_device *dev, u8 *pTaddr,
 			return;
 		}
 
-		for(j = 0 ; j < pTriple->NumChnls; j++)
+		for (j = 0 ; j < pTriple->NumChnls; j++)
 		{
 			pDot11dInfo->channel_map[pTriple->FirstChnl + j] = 1;
 			pDot11dInfo->MaxTxPwrDbmList[pTriple->FirstChnl + j] = pTriple->MaxTxPowerInDbm;
@@ -153,7 +153,7 @@ void Dot11d_UpdateCountryIe(struct rtllib_device *dev, u8 *pTaddr,
 		pTriple = (PCHNL_TXPOWER_TRIPLE)((u8*)pTriple + 3);
 	}
 	printk("Channel List:");
-	for(i=1; i<= MAX_CHANNEL_NUMBER; i++)
+	for (i=1; i<= MAX_CHANNEL_NUMBER; i++)
 		if (pDot11dInfo->channel_map[i] > 0)
 			printk(" %d", i);
 	printk("\n");

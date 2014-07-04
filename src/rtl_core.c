@@ -456,7 +456,7 @@ MgntDisconnectIBSS(
 	priv->rtllib->state = RTLLIB_NOLINK;
 
 //	PlatformZeroMemory( pMgntInfo->Bssid, 6 );
-	for(i=0;i<6;i++)  priv->rtllib->current_network.bssid[i]= 0x55;
+	for (i=0;i<6;i++)  priv->rtllib->current_network.bssid[i]= 0x55;
 	priv->OpMode = RT_OP_MODE_NO_LINK;
 	//write_nic_word(dev, BSSIDR, ((u16*)priv->rtllib->current_network.bssid)[0]);
 	//write_nic_dword(dev, BSSIDR+2, ((u32*)(priv->rtllib->current_network.bssid+2))[0]);
@@ -495,7 +495,7 @@ MlmeDisassociateRequest(
 		priv->rtllib->state = RTLLIB_NOLINK;
 
 		//pMgntInfo->AsocTimestamp = 0;
-		for(i=0;i<6;i++)  priv->rtllib->current_network.bssid[i] = 0x22;
+		for (i=0;i<6;i++)  priv->rtllib->current_network.bssid[i] = 0x22;
 //		pMgntInfo->mBrates.Length = 0;
 		OpMode = RT_OP_MODE_NO_LINK;
 		priv->OpMode = RT_OP_MODE_NO_LINK;
@@ -1540,10 +1540,10 @@ static void rtl8192_init_priv_variable(struct net_device* dev)
 	skb_queue_head_init(&priv->skb_queue);
 
 	// Tx related queue */
-	for(i = 0; i < MAX_QUEUE_SIZE; i++) {
+	for (i = 0; i < MAX_QUEUE_SIZE; i++) {
 		skb_queue_head_init(&priv->rtllib->skb_waitQ [i]);
 	}
-	for(i = 0; i < MAX_QUEUE_SIZE; i++) {
+	for (i = 0; i < MAX_QUEUE_SIZE; i++) {
 		skb_queue_head_init(&priv->rtllib->skb_aggQ [i]);
 	}
 }
@@ -1800,7 +1800,7 @@ TxCheckStuck(struct net_device *dev)
 	// Check whether specific tcb has been queued for a specific time
 	//
 	spin_lock_irqsave(&priv->irq_th_lock,flags);
-	for(QueueID = 0; QueueID < MAX_TX_QUEUE; QueueID++)
+	for (QueueID = 0; QueueID < MAX_TX_QUEUE; QueueID++)
 	{
 
 
@@ -2825,13 +2825,13 @@ rtl8190_process_cck_rxpathsel(
 				if (priv->stats.cck_adc_pwdb.TotalNum++ >= PHY_RSSI_SLID_WIN_MAX)
 				{
 					priv->stats.cck_adc_pwdb.TotalNum = PHY_RSSI_SLID_WIN_MAX;
-					for(i=RF90_PATH_A; i<RF90_PATH_MAX; i++)
+					for (i=RF90_PATH_A; i<RF90_PATH_MAX; i++)
 					{
 						last_cck_adc_pwdb[i] = priv->stats.cck_adc_pwdb.elements[i][priv->stats.cck_adc_pwdb.index];
 						priv->stats.cck_adc_pwdb.TotalVal[i] -= last_cck_adc_pwdb[i];
 					}
 				}
-				for(i=RF90_PATH_A; i<RF90_PATH_MAX; i++)
+				for (i=RF90_PATH_A; i<RF90_PATH_MAX; i++)
 				{
 					priv->stats.cck_adc_pwdb.TotalVal[i] += pprevious_stats->cck_adc_pwdb[i];
 					priv->stats.cck_adc_pwdb.elements[i][priv->stats.cck_adc_pwdb.index] = pprevious_stats->cck_adc_pwdb[i];
@@ -2840,12 +2840,12 @@ rtl8190_process_cck_rxpathsel(
 				if (priv->stats.cck_adc_pwdb.index >= PHY_RSSI_SLID_WIN_MAX)
 					priv->stats.cck_adc_pwdb.index = 0;
 
-				for(i=RF90_PATH_A; i<RF90_PATH_MAX; i++)
+				for (i=RF90_PATH_A; i<RF90_PATH_MAX; i++)
 				{
 					DM_RxPathSelTable.cck_pwdb_sta[i] = priv->stats.cck_adc_pwdb.TotalVal[i]/priv->stats.cck_adc_pwdb.TotalNum;
 				}
 
-				for(i=RF90_PATH_A; i<RF90_PATH_MAX; i++)
+				for (i=RF90_PATH_A; i<RF90_PATH_MAX; i++)
 				{
 					if (pprevious_stats->cck_adc_pwdb[i]  > (char)priv->undecorated_smoothed_cck_adc_pwdb[i])
 					{
@@ -3051,7 +3051,7 @@ void rtl8192_process_phyinfo(struct r8192_priv * priv, u8* buffer,struct rtllib_
 		// <2> Showed on UI for engineering
 		if (pprevious_stats->bPacketToSelf || pprevious_stats->bPacketBeacon || pprevious_stats->bToSelfBA)
 		{
-			for(nspatial_stream = 0; nspatial_stream<2 ; nspatial_stream++) // 2 spatial stream
+			for (nspatial_stream = 0; nspatial_stream<2 ; nspatial_stream++) // 2 spatial stream
 			{
 				if (pprevious_stats->RxMIMOSignalQuality[nspatial_stream] != -1)
 				{
@@ -3244,7 +3244,7 @@ void rtl8192_query_rxphystatus(
 
 		if (priv->rf_type == RF_2T4R && DM_RxPathSelTable.Enable && bpacket_match_bssid)
 		{
-			for(i=RF90_PATH_A; i<RF90_PATH_MAX; i++)
+			for (i=RF90_PATH_A; i<RF90_PATH_MAX; i++)
 			{
 				tmp_pwdb = pcck_buf->adc_pwdb_X[i];
 				cck_adc_pwdb[i] = (char)tmp_pwdb;
@@ -3334,7 +3334,7 @@ void rtl8192_query_rxphystatus(
 		//
 		// (1)Get RSSI for HT rate
 		//
-		for(i=RF90_PATH_A; i<RF90_PATH_MAX; i++)
+		for (i=RF90_PATH_A; i<RF90_PATH_MAX; i++)
 		{
 			// 2008/01/30 MH we will judge RF RX path now.
 			if (priv->brfpath_rxenable[i])
@@ -3386,7 +3386,7 @@ void rtl8192_query_rxphystatus(
 		else
 			max_spatial_stream = 1; //only spatial stream 1 makes sense
 
-		for(i=0; i<max_spatial_stream; i++)
+		for (i=0; i<max_spatial_stream; i++)
 		{
 			tmp_rxevm = pofdm_buf->rxevm_X[i];
 			rx_evmX = (char)(tmp_rxevm);
@@ -3700,7 +3700,7 @@ void rtl8192_tx_resume(struct net_device *dev)
 	struct sk_buff *skb;
 	int queue_index;
 
-	for(queue_index = BK_QUEUE; queue_index < TXCMD_QUEUE;queue_index++) {
+	for (queue_index = BK_QUEUE; queue_index < TXCMD_QUEUE;queue_index++) {
 		//printk("===>queue:%d, %d, %d\n", queue_index, skb_queue_empty(&ieee->skb_aggQ[queue_index]),  priv->rtllib->check_nic_enough_desc(dev,queue_index));
 		while((!skb_queue_empty(&ieee->skb_waitQ[queue_index]))&&
 				(priv->rtllib->check_nic_enough_desc(dev,queue_index) > 0)) {
@@ -4156,7 +4156,7 @@ int rtl8192_ioctl(struct net_device *dev, struct ifreq *rq, int cmd)
 			{
 				int i;
 				printk("@@ wrq->u pointer = ");
-				for(i=0;i<wrq->u.data.length;i++){
+				for (i=0;i<wrq->u.data.length;i++){
 					if (i%10==0) printk("\n");
 					printk( "%8x|", ((u32*)wrq->u.data.pointer)[i] );
 				}

@@ -378,7 +378,7 @@ void rtl8192_phy_configmac(struct net_device* dev)
 		dwArrayLen = MACPHY_ArrayLength;
 		pdwArray = Rtl819XMACPHY_Array;
 	}
-	for(i = 0; i<dwArrayLen; i=i+3){
+	for (i = 0; i<dwArrayLen; i=i+3){
 		RT_TRACE(COMP_DBG, "The Rtl8190MACPHY_Array[0] is %x Rtl8190MACPHY_Array[1] is %x Rtl8190MACPHY_Array[2] is %x\n",
 				pdwArray[i], pdwArray[i+1], pdwArray[i+2]);
 		if (pdwArray[i] == 0x318)
@@ -533,7 +533,7 @@ bool rtl8192_phy_checkBBAndRF(struct net_device* dev, HW90_BLOCK_E CheckBlock, R
 	WriteAddr[HW90_BLOCK_PHY1] = 0x800;
 	WriteAddr[HW90_BLOCK_RF] = 0x3;
 	RT_TRACE(COMP_PHY, "=======>%s(), CheckBlock:%d\n", __FUNCTION__, CheckBlock);
-	for(i=0 ; i < CheckTimes ; i++)
+	for (i=0 ; i < CheckTimes ; i++)
 	{
 
 		switch(CheckBlock)
@@ -588,7 +588,7 @@ bool rtl8192_BB_Config_ParaFile(struct net_device* dev)
 	dwRegValue = read_nic_dword(dev, CPU_GEN);
 	write_nic_dword(dev, CPU_GEN, (dwRegValue&(~CPU_GEN_BB_RST)));
 
-	for(eCheckItem=(HW90_BLOCK_E)HW90_BLOCK_PHY0; eCheckItem<=HW90_BLOCK_PHY1; eCheckItem++)
+	for (eCheckItem=(HW90_BLOCK_E)HW90_BLOCK_PHY0; eCheckItem<=HW90_BLOCK_PHY1; eCheckItem++)
 	{
 		rtStatus  = rtl8192_phy_checkBBAndRF(dev, (HW90_BLOCK_E)eCheckItem, (RF90_RADIO_PATH_E)0);
 		if (rtStatus != true)
@@ -834,7 +834,7 @@ u8 rtl8192_phy_ConfigRFWithHeaderFile(struct net_device* dev, RF90_RADIO_PATH_E	
 
 	switch(eRFPath){
 		case RF90_PATH_A:
-			for(i = 0;i<RadioA_ArrayLength; i=i+2){
+			for (i = 0;i<RadioA_ArrayLength; i=i+2){
 
 				if (Rtl819XRadioA_Array[i] == 0xfe){
 						msleep(100);
@@ -845,7 +845,7 @@ u8 rtl8192_phy_ConfigRFWithHeaderFile(struct net_device* dev, RF90_RADIO_PATH_E	
 			}
 			break;
 		case RF90_PATH_B:
-			for(i = 0;i<RadioB_ArrayLength; i=i+2){
+			for (i = 0;i<RadioB_ArrayLength; i=i+2){
 
 				if (Rtl819XRadioB_Array[i] == 0xfe){
 						msleep(100);
@@ -856,7 +856,7 @@ u8 rtl8192_phy_ConfigRFWithHeaderFile(struct net_device* dev, RF90_RADIO_PATH_E	
 			}
 			break;
 		case RF90_PATH_C:
-			for(i = 0;i<RadioC_ArrayLength; i=i+2){
+			for (i = 0;i<RadioC_ArrayLength; i=i+2){
 
 				if (Rtl819XRadioC_Array[i] == 0xfe){
 						msleep(100);
@@ -867,7 +867,7 @@ u8 rtl8192_phy_ConfigRFWithHeaderFile(struct net_device* dev, RF90_RADIO_PATH_E	
 			}
 			break;
 		case RF90_PATH_D:
-			for(i = 0;i<RadioD_ArrayLength; i=i+2){
+			for (i = 0;i<RadioD_ArrayLength; i=i+2){
 
 				if (Rtl819XRadioD_Array[i] == 0xfe){
 						msleep(100);
@@ -1049,7 +1049,7 @@ u8 rtl8192_phy_SwChnlStepByStep(struct net_device *dev, u8 channel, u8* stage, u
 				write_nic_byte(dev, CurrentCmd->Para1, (u8)CurrentCmd->Para2);
 				break;
 			case CmdID_RF_WriteReg:
-				for(eRFPath = 0; eRFPath <priv->NumTotalRFPath; eRFPath++)
+				for (eRFPath = 0; eRFPath <priv->NumTotalRFPath; eRFPath++)
 					rtl8192_phy_SetRFReg(dev, (RF90_RADIO_PATH_E)eRFPath, CurrentCmd->Para1, bMask12Bits, CurrentCmd->Para2<<7);
 				break;
 			default:
@@ -1058,7 +1058,7 @@ u8 rtl8192_phy_SwChnlStepByStep(struct net_device *dev, u8 channel, u8* stage, u
 
 			break;
 		}while(true);
-	}/*for(Number of RF paths)*/
+	}/*for (Number of RF paths)*/
 
 	(*delay)=CurrentCmd->msDelay;
 	(*step)++;
@@ -1463,7 +1463,7 @@ SetRFPowerState8190(
 				RT_TRACE(COMP_PS, "SetRFPowerState8190() eRfOff/Sleep !\n");
 				if (pPSC->bLeisurePs)
 				{
-					for(QueueID = 0, i = 0; QueueID < MAX_TX_QUEUE; )
+					for (QueueID = 0, i = 0; QueueID < MAX_TX_QUEUE; )
 					{
 						switch(QueueID) {
 							case MGNT_QUEUE:

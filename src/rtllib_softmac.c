@@ -195,7 +195,7 @@ MgntQuery_TxRateExcludeCCKRates(struct rtllib_device *ieee)
 	u8	BasicRate;
 
 
-	for( i = 0; i < ieee->current_network.rates_len; i++)
+	for ( i = 0; i < ieee->current_network.rates_len; i++)
 	{
 		BasicRate = ieee->current_network.rates[i]&0x7F;
 		if (!rtllib_is_cck_rate(BasicRate))
@@ -1337,7 +1337,7 @@ inline struct sk_buff *rtllib_association_req(struct rtllib_network *beacon,stru
 	if (beacon->rates_len){
 		*tag++ = MFIE_TYPE_RATES;
 		*tag++ = beacon->rates_len;
-		for(i=0;i<beacon->rates_len;i++){
+		for (i=0;i<beacon->rates_len;i++){
 			*tag++ = beacon->rates[i];
 		}
 	}
@@ -1345,7 +1345,7 @@ inline struct sk_buff *rtllib_association_req(struct rtllib_network *beacon,stru
 	if (beacon->rates_ex_len){
 		*tag++ = MFIE_TYPE_RATES_EX;
 		*tag++ = beacon->rates_ex_len;
-		for(i=0;i<beacon->rates_ex_len;i++){
+		for (i=0;i<beacon->rates_ex_len;i++){
 			*tag++ = beacon->rates_ex[i];
 		}
 	}
@@ -2540,7 +2540,7 @@ void rtllib_softmac_xmit(struct rtllib_txb *txb, struct rtllib_device *ieee)
 		ieee->stats.multicast++;
 	}
 	/* if xmit available, just xmit it immediately, else just insert it to the wait queue */
-	for(i = 0; i < txb->nr_frags; i++) {
+	for (i = 0; i < txb->nr_frags; i++) {
 #ifdef USB_TX_DRIVER_AGGREGATION_ENABLE
 		queue_len = skb_queue_len(&ieee->skb_drv_aggQ[queue_index]);
 #else
@@ -2583,7 +2583,7 @@ void rtllib_softmac_xmit(struct rtllib_txb *txb, struct rtllib_device *ieee)
 void rtllib_resume_tx(struct rtllib_device *ieee)
 {
 	int i;
-	for(i = ieee->tx_pending.frag; i < ieee->tx_pending.txb->nr_frags; i++) {
+	for (i = ieee->tx_pending.frag; i < ieee->tx_pending.txb->nr_frags; i++) {
 
 		if (ieee->queue_stop){
 			ieee->tx_pending.frag = i;
@@ -3079,7 +3079,7 @@ void rtllib_start_protocol(struct rtllib_device *ieee)
 	if (ieee->current_network.beacon_interval == 0)
 		ieee->current_network.beacon_interval = 100;
 
-	for(i = 0; i < 17; i++) {
+	for (i = 0; i < 17; i++) {
 	  ieee->last_rxseq_num[i] = -1;
 	  ieee->last_rxfrag_num[i] = -1;
 	  ieee->last_packet_time[i] = 0;
@@ -3112,7 +3112,7 @@ void rtllib_softmac_init(struct rtllib_device *ieee)
 
 	ieee->state = RTLLIB_NOLINK;
 	ieee->sync_scan_hurryup = 0;
-	for(i = 0; i < 5; i++) {
+	for (i = 0; i < 5; i++) {
 	  ieee->seq_ctrl[i] = 0;
 	}
 	ieee->pDot11dInfo = kmalloc(sizeof(RT_DOT11D_INFO), GFP_ATOMIC);

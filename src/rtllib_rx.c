@@ -493,10 +493,10 @@ void rtllib_indicate_packets(struct rtllib_device *ieee, struct rtllib_rxb** prx
 	struct net_device_stats *stats = &ieee->stats;
 	u8 i = 0 , j=0;
 	u16 ethertype;
-	for(j = 0; j<index; j++)
+	for (j = 0; j<index; j++)
 	{
 		struct rtllib_rxb* prxb = prxbIndicateArray[j];
-		for(i = 0; i<prxb->nr_subframes; i++) {
+		for (i = 0; i<prxb->nr_subframes; i++) {
 			struct sk_buff *sub_skb = prxb->subframes[i];
 
 		/* convert hdr + possible LLC headers into Ethernet header */
@@ -571,7 +571,7 @@ void RxReorderIndicatePacket( struct rtllib_device *ieee,
 		pHTInfo->RxReorderDropCounter++;
 		{
 			int i;
-			for(i =0; i < prxb->nr_subframes; i++) {
+			for (i =0; i < prxb->nr_subframes; i++) {
 				dev_kfree_skb(prxb->subframes[i]);
 			}
 			kfree(prxb);
@@ -628,7 +628,7 @@ void RxReorderIndicatePacket( struct rtllib_device *ieee,
 				list_add_tail(&pReorderEntry->List,&ieee->RxReorder_Unused_List);
 				{
 					int i;
-					for(i =0; i < prxb->nr_subframes; i++) {
+					for (i =0; i < prxb->nr_subframes; i++) {
 						dev_kfree_skb(prxb->subframes[i]);
 					}
 					kfree(prxb);
@@ -647,7 +647,7 @@ void RxReorderIndicatePacket( struct rtllib_device *ieee,
 			RTLLIB_DEBUG(RTLLIB_DL_ERR, "RxReorderIndicatePacket(): There is no reorder entry!! Packet is dropped!!\n");
 			{
 				int i;
-				for(i =0; i < prxb->nr_subframes; i++) {
+				for (i =0; i < prxb->nr_subframes; i++) {
 					dev_kfree_skb(prxb->subframes[i]);
 				}
 				kfree(prxb);
@@ -1255,7 +1255,7 @@ int rtllib_rx(struct rtllib_device *ieee, struct sk_buff *skb,
 	/* qos data packets & reserved bit is 1 */
 	if (parse_subframe(ieee,skb,rx_stats,rxb,src,dst) == 0) {
 		/* only to free rxb, and not submit the packets to upper layer */
-		for(i =0; i < rxb->nr_subframes; i++) {
+		for (i =0; i < rxb->nr_subframes; i++) {
 			dev_kfree_skb(rxb->subframes[i]);
 		}
 		kfree(rxb);
@@ -1289,7 +1289,7 @@ int rtllib_rx(struct rtllib_device *ieee, struct sk_buff *skb,
 #endif
 	ieee->last_rx_ps_time = jiffies;
 	if (ieee->pHTInfo->bCurRxReorderEnable == false ||pTS == NULL){
-		for(i = 0; i<rxb->nr_subframes; i++) {
+		for (i = 0; i<rxb->nr_subframes; i++) {
 			struct sk_buff *sub_skb = rxb->subframes[i];
 
 			if (sub_skb) {

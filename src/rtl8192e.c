@@ -180,7 +180,7 @@ static void rtl8192_read_eeprom_info(struct net_device* dev)
 	//2 Read Permanent MAC address
 	if (!priv->AutoloadFailFlag)
 	{
-		for(i = 0; i < 6; i += 2)
+		for (i = 0; i < 6; i += 2)
 		{
 			usValue = eprom_read(dev, (u16) ((EEPROM_NODE_ADDRESS_BYTE_0+i)>>1));
 			*(u16*)(&dev->dev_addr[i]) = usValue;
@@ -259,7 +259,7 @@ static void rtl8192_read_eeprom_info(struct net_device* dev)
 		//
 		// Get per-channel Tx Power Level
 		//
-		for(i=0; i<14; i+=2)
+		for (i=0; i<14; i+=2)
 		{
 			if (!priv->AutoloadFailFlag)
 			{
@@ -273,7 +273,7 @@ static void rtl8192_read_eeprom_info(struct net_device* dev)
 			RT_TRACE(COMP_INIT,"CCK Tx Power Level, Index %d = 0x%02x\n", i, priv->EEPROMTxPowerLevelCCK[i]);
 			RT_TRACE(COMP_INIT, "CCK Tx Power Level, Index %d = 0x%02x\n", i+1, priv->EEPROMTxPowerLevelCCK[i+1]);
 		}
-		for(i=0; i<14; i+=2)
+		for (i=0; i<14; i+=2)
 		{
 			if (!priv->AutoloadFailFlag)
 			{
@@ -308,7 +308,7 @@ static void rtl8192_read_eeprom_info(struct net_device* dev)
 			if (!priv->AutoloadFailFlag)
 			{
 				// Read Tx power of Channel 1 ~ 14 from EEPROM.
-				for(i = 0; i < 12; i+=2)
+				for (i = 0; i < 12; i+=2)
 				{
 					if (i <6)
 						offset = EEPROM_C56_RfA_CCK_Chnl1_TxPwIndex + i;
@@ -318,7 +318,7 @@ static void rtl8192_read_eeprom_info(struct net_device* dev)
 					*((u16*)(&EepromTxPower[i])) = usValue;
 				}
 
-				for(i = 0; i < 12; i++)
+				for (i = 0; i < 12; i++)
 				{
 					if (i <= 2)
 						priv->EEPROMRfACCKChnl1TxPwLevel[i] = EepromTxPower[i];
@@ -367,7 +367,7 @@ static void rtl8192_read_eeprom_info(struct net_device* dev)
 		//
 		if (priv->epromtype == EEPROM_93C46)
 		{
-			for(i=0; i<14; i++)
+			for (i=0; i<14; i++)
 			{
 				priv->TxPowerLevelCCK[i] = priv->EEPROMTxPowerLevelCCK[i];
 				priv->TxPowerLevelOFDM24G[i] = priv->EEPROMTxPowerLevelOFDM24G[i];
@@ -391,34 +391,34 @@ static void rtl8192_read_eeprom_info(struct net_device* dev)
 
 			//cck_pwr_diff_a = pHalData->EEPROMRfACCKChnl7TxPwLevel - pHalData->EEPROMRfAOfdmChnlTxPwLevel[1];
 			//cck_pwr_diff_c = pHalData->EEPROMRfCCCKChnl7TxPwLevel - pHalData->EEPROMRfCOfdmChnlTxPwLevel[1];
-			for(i=0; i<3; i++)	// channel 1~3 use the same Tx Power Level.
+			for (i=0; i<3; i++)	// channel 1~3 use the same Tx Power Level.
 			{
 				priv->TxPowerLevelCCK_A[i]  = priv->EEPROMRfACCKChnl1TxPwLevel[0];
 				priv->TxPowerLevelOFDM24G_A[i] = priv->EEPROMRfAOfdmChnlTxPwLevel[0];
 				priv->TxPowerLevelCCK_C[i] =  priv->EEPROMRfCCCKChnl1TxPwLevel[0];
 				priv->TxPowerLevelOFDM24G_C[i] = priv->EEPROMRfCOfdmChnlTxPwLevel[0];
 			}
-			for(i=3; i<9; i++)	// channel 4~9 use the same Tx Power Level
+			for (i=3; i<9; i++)	// channel 4~9 use the same Tx Power Level
 			{
 				priv->TxPowerLevelCCK_A[i]  = priv->EEPROMRfACCKChnl1TxPwLevel[1];
 				priv->TxPowerLevelOFDM24G_A[i] = priv->EEPROMRfAOfdmChnlTxPwLevel[1];
 				priv->TxPowerLevelCCK_C[i] =  priv->EEPROMRfCCCKChnl1TxPwLevel[1];
 				priv->TxPowerLevelOFDM24G_C[i] = priv->EEPROMRfCOfdmChnlTxPwLevel[1];
 			}
-			for(i=9; i<14; i++)	// channel 10~14 use the same Tx Power Level
+			for (i=9; i<14; i++)	// channel 10~14 use the same Tx Power Level
 			{
 				priv->TxPowerLevelCCK_A[i]  = priv->EEPROMRfACCKChnl1TxPwLevel[2];
 				priv->TxPowerLevelOFDM24G_A[i] = priv->EEPROMRfAOfdmChnlTxPwLevel[2];
 				priv->TxPowerLevelCCK_C[i] =  priv->EEPROMRfCCCKChnl1TxPwLevel[2];
 				priv->TxPowerLevelOFDM24G_C[i] = priv->EEPROMRfCOfdmChnlTxPwLevel[2];
 			}
-			for(i=0; i<14; i++)
+			for (i=0; i<14; i++)
 				RT_TRACE(COMP_INIT, "priv->TxPowerLevelCCK_A[%d] = 0x%x\n", i, priv->TxPowerLevelCCK_A[i]);
-			for(i=0; i<14; i++)
+			for (i=0; i<14; i++)
 				RT_TRACE(COMP_INIT,"priv->TxPowerLevelOFDM24G_A[%d] = 0x%x\n", i, priv->TxPowerLevelOFDM24G_A[i]);
-			for(i=0; i<14; i++)
+			for (i=0; i<14; i++)
 				RT_TRACE(COMP_INIT, "priv->TxPowerLevelCCK_C[%d] = 0x%x\n", i, priv->TxPowerLevelCCK_C[i]);
-			for(i=0; i<14; i++)
+			for (i=0; i<14; i++)
 				RT_TRACE(COMP_INIT, "priv->TxPowerLevelOFDM24G_C[%d] = 0x%x\n", i, priv->TxPowerLevelOFDM24G_C[i]);
 			priv->LegacyHTTxPowerDiff = priv->EEPROMLegacyHTTxPowerDiff;
 			priv->AntennaTxPwDiff[0] = 0;
@@ -1343,10 +1343,10 @@ void rtl8192_halt_adapter(struct net_device *dev, bool reset)
 			(CR_TE|CR_RE));
 	mdelay(30);
 
-	for(i = 0; i < MAX_QUEUE_SIZE; i++) {
+	for (i = 0; i < MAX_QUEUE_SIZE; i++) {
 		skb_queue_purge(&priv->rtllib->skb_waitQ [i]);
 	}
-	for(i = 0; i < MAX_QUEUE_SIZE; i++) {
+	for (i = 0; i < MAX_QUEUE_SIZE; i++) {
 		skb_queue_purge(&priv->rtllib->skb_aggQ [i]);
 	}
 	skb_queue_purge(&priv->skb_queue);

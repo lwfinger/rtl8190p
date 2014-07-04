@@ -80,7 +80,7 @@ void eprom_send_bits_string(struct net_device *dev, short b[], int len)
 {
 	int i;
 
-	for(i=0; i<len; i++){
+	for (i=0; i<len; i++){
 		eprom_w(dev, b[i]);
 		eprom_ck_cycle(dev);
 	}
@@ -130,7 +130,7 @@ u32 eprom_read(struct net_device *dev, u32 addr)
 	//I'm unsure if it is necessary, but anyway shouldn't hurt
 	eprom_w(dev, 0);
 
-	for(i=0;i<16;i++){
+	for (i=0;i<16;i++){
 		//eeprom needs a clk cycle between writing opcode&adr
 		//and reading data. (eeprom outs a dummy 0)
 		eprom_ck_cycle(dev);

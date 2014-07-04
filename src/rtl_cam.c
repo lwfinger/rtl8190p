@@ -147,7 +147,7 @@ void setKey(struct net_device *dev,
 	//	usConfig |= BIT15 | (KeyType<<2) | (DefaultKey<<5) | KeyIndex;
 
 
-	for(i=0 ; i<CAM_CONTENT_COUNT; i++){
+	for (i=0 ; i<CAM_CONTENT_COUNT; i++){
 		TargetCommand  = i+CAM_CONTENT_COUNT*EntryNo;
 		TargetCommand |= BIT31|BIT16;
 
@@ -188,7 +188,7 @@ void CAM_read_entry(struct net_device *dev, u32 iIndex)
 	u32 ulStatus;
 	s32 i=100;
 	//	printk("=======>start read CAM\n");
-	for(entry_i=0;entry_i<CAM_CONTENT_COUNT;entry_i++)
+	for (entry_i=0;entry_i<CAM_CONTENT_COUNT;entry_i++)
 	{
 		// polling bit, and No Write enable, and address
 		target_command= entry_i+CAM_CONTENT_COUNT*iIndex;
@@ -237,7 +237,7 @@ void CamRestoreAllEntry(	struct net_device *dev)
 			(priv->rtllib->pairwise_key_type == KEY_TYPE_WEP104))
 	{
 
-		for(EntryId=0; EntryId<4; EntryId++)
+		for (EntryId=0; EntryId<4; EntryId++)
 		{
 			{
 				MacAddr = CAM_CONST_ADDR[EntryId];
@@ -319,7 +319,7 @@ void CamRestoreAllEntry(	struct net_device *dev)
 	if (priv->rtllib->group_key_type == KEY_TYPE_TKIP)
 	{
 		MacAddr = CAM_CONST_BROAD;
-		for(EntryId=1 ; EntryId<4 ; EntryId++)
+		for (EntryId=1 ; EntryId<4 ; EntryId++)
 		{
 			if (priv->rtllib->swcamtable[EntryId].bused )
 			{
@@ -353,7 +353,7 @@ void CamRestoreAllEntry(	struct net_device *dev)
 		}
 	} else if (priv->rtllib->group_key_type == KEY_TYPE_CCMP) {
 		MacAddr = CAM_CONST_BROAD;
-		for(EntryId=1; EntryId<4 ; EntryId++)
+		for (EntryId=1; EntryId<4 ; EntryId++)
 		{
 			if (priv->rtllib->swcamtable[EntryId].bused )
 			{

@@ -614,14 +614,14 @@ static void dm_TXPowerTrackingCallback_TSSI(struct net_device * dev)
 	//priv->bTxPwrTrack = true;
 
 	// Tx command only send once to prevent fimware stop!!
-	for(j = 0; j<1; j++) {	//fill tx_cmd
+	for (j = 0; j<1; j++) {	//fill tx_cmd
 	tx_cmd.Op		= TXCMD_SET_TX_PWR_TRACKING;
 	tx_cmd.Length	= 4;
 	tx_cmd.Value		= Value;
 	cmpk_message_handle_tx(dev, (u8*)&tx_cmd, DESC_PACKET_TYPE_INIT, sizeof(DCMD_TXCMD_T));
 	mdelay(1);
 	//DbgPrint("hi, vivi, strange\n");
-	for(i = 0;i <= 30; i++)
+	for (i = 0;i <= 30; i++)
 	{
 		Pwr_Flag = read_nic_byte(dev, Pw_Track_Flag);
 
@@ -650,7 +650,7 @@ static void dm_TXPowerTrackingCallback_TSSI(struct net_device * dev)
 			return;
 		}
 
-		for(k = 0;k < 5; k++)
+		for (k = 0;k < 5; k++)
 		{
 			if (k !=4)
 				tmp_report[k] = read_nic_byte(dev, Tssi_Report_Value1+k);
@@ -674,12 +674,12 @@ static void dm_TXPowerTrackingCallback_TSSI(struct net_device * dev)
 			write_nic_byte(dev, Pw_Track_Flag, 0);
 			viviflag = false;
 			RT_TRACE(COMP_POWER_TRACKING, "we filted this data\n");
-			for(k = 0;k < 5; k++)
+			for (k = 0;k < 5; k++)
 				tmp_report[k] = 0;
 			break;
 		}
 
-		for(k = 0;k < 5; k++)
+		for (k = 0;k < 5; k++)
 		{
 			Avg_TSSI_Meas_from_driver += tmp_report[k];
 		}
@@ -861,7 +861,7 @@ static void dm_TXPowerTrackingCallback_TSSI(struct net_device * dev)
 	}
 		write_nic_byte(dev, Pw_Track_Flag, 0);
 		Avg_TSSI_Meas_from_driver = 0;
-		for(k = 0;k < 5; k++)
+		for (k = 0;k < 5; k++)
 			tmp_report[k] = 0;
 		break;
 	}
@@ -1912,7 +1912,7 @@ static void dm_ctrl_initgain_byrssi_by_driverrssi(
 		fw_dig = 0;
 	if (fw_dig <= 3)	// execute several times to make sure the FW Dig is disabled
 	{// FW DIG Off
-		for(i=0; i<3; i++)
+		for (i=0; i<3; i++)
 			rtl8192_setBBreg(dev, UFWP, bMaskByte1, 0x8);	// Only clear byte 1 and rewrite.
 		fw_dig++;
 		dm_digtable.dig_state = DM_STA_DIG_OFF;	//fw dig off.
@@ -1952,7 +1952,7 @@ static void dm_ctrl_initgain_byrssi_by_fwfalse_alarm(
 	{
 		dm_digtable.dig_state = DM_STA_DIG_MAX;
 		// Fw DIG On.
-		for(i=0; i<3; i++)
+		for (i=0; i<3; i++)
 			rtl8192_setBBreg(dev, UFWP, bMaskByte1, 0x1);	// Only clear byte 1 and rewrite.
 		dm_digtable.dig_algorithm_switch = 0;
 	}
@@ -2823,7 +2823,7 @@ static void dm_init_rxpath_selection(struct net_device * dev)
 		DM_RxPathSelTable.cck_method = CCK_Rx_Version_1;
 	DM_RxPathSelTable.DbgMode = DM_DBG_OFF;
 	DM_RxPathSelTable.disabledRF = 0;
-	for(i=0; i<4; i++)
+	for (i=0; i<4; i++)
 	{
 		DM_RxPathSelTable.rf_rssi[i] = 50;
 		DM_RxPathSelTable.cck_pwdb_sta[i] = -64;
@@ -3075,7 +3075,7 @@ static void dm_rxpath_sel_byrssi(struct net_device * dev)
 
 	if (DM_RxPathSelTable.disabledRF)
 	{
-		for(i=0; i<4; i++)
+		for (i=0; i<4; i++)
 		{
 			if ((DM_RxPathSelTable.disabledRF>>i) & 0x1)	//disabled rf
 			{
@@ -3153,7 +3153,7 @@ extern void dm_fsync_timer_callback(unsigned long data)
 	{
 		 // Count rate 54, MCS [7], [12, 13, 14, 15]
 		u32 rate_bitmap;
-		for(rate_index = 0; rate_index <= 27; rate_index++)
+		for (rate_index = 0; rate_index <= 27; rate_index++)
 		{
 			rate_bitmap  = 1 << rate_index;
 			if (priv->rtllib->fsync_rate_bitmap &  rate_bitmap)
@@ -3303,7 +3303,7 @@ static void dm_StartSWFsync(struct net_device *dev)
 		priv->rtllib->fsync_firstdiff_ratethreshold= 200;
 		priv->rtllib->fsync_seconddiff_ratethreshold = 200;
 	}
-	for(rateIndex = 0; rateIndex <= 27; rateIndex++)
+	for (rateIndex = 0; rateIndex <= 27; rateIndex++)
 	{
 		rateBitmap  = 1 << rateIndex;
 		if (priv->rtllib->fsync_rate_bitmap &  rateBitmap)

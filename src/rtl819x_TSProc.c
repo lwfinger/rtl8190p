@@ -155,7 +155,7 @@ void TSInitialize(struct rtllib_device *ieee)
 	INIT_LIST_HEAD(&ieee->Tx_TS_Pending_List);
 	INIT_LIST_HEAD(&ieee->Tx_TS_Unused_List);
 
-	for(count = 0; count < TOTAL_TS_NUM; count++)
+	for (count = 0; count < TOTAL_TS_NUM; count++)
 	{
 		pTxTS->num = count;
 		_setup_timer(&pTxTS->TsCommonInfo.SetupTimer,
@@ -186,7 +186,7 @@ void TSInitialize(struct rtllib_device *ieee)
 	INIT_LIST_HEAD(&ieee->Rx_TS_Admit_List);
 	INIT_LIST_HEAD(&ieee->Rx_TS_Pending_List);
 	INIT_LIST_HEAD(&ieee->Rx_TS_Unused_List);
-	for(count = 0; count < TOTAL_TS_NUM; count++)
+	for (count = 0; count < TOTAL_TS_NUM; count++)
 	{
 		pRxTS->num = count;
 		INIT_LIST_HEAD(&pRxTS->RxPendingPktList);
@@ -212,7 +212,7 @@ void TSInitialize(struct rtllib_device *ieee)
 		pRxTS++;
 	}
 	INIT_LIST_HEAD(&ieee->RxReorder_Unused_List);
-	for(count = 0; count < REORDER_ENTRY_NUM; count++)
+	for (count = 0; count < REORDER_ENTRY_NUM; count++)
 	{
 		list_add_tail( &pRxReorderEntry->List,&ieee->RxReorder_Unused_List);
 		if (count == (REORDER_ENTRY_NUM-1))
@@ -279,7 +279,7 @@ PTS_COMMON_INFO SearchAdmitTRStream(struct rtllib_device *ieee, u8*	Addr, u8 TID
 	else
 		psearch_list = &ieee->Rx_TS_Admit_List;
 
-	for(dir = 0; dir <= DIR_BI_DIR; dir++)
+	for (dir = 0; dir <= DIR_BI_DIR; dir++)
 	{
 		if (search_dir[dir] ==false )
 			continue;
@@ -322,7 +322,7 @@ void MakeTSEntry(
 	if (pTSPEC != NULL)
 		memcpy((u8*)(&(pTsCommonInfo->TSpec)), (u8*)pTSPEC, sizeof(TSPEC_BODY));
 
-	for(count = 0; count < TCLAS_Num; count++)
+	for (count = 0; count < TCLAS_Num; count++)
 		memcpy((u8*)(&(pTsCommonInfo->TClass[count])), (u8*)pTCLAS, sizeof(QOS_TCLAS));
 
 	pTsCommonInfo->TClasProc = TCLAS_Proc;
@@ -483,7 +483,7 @@ void RemoveTsEntry(
 					spin_unlock_irqrestore(&(ieee->reorder_spinlock), flags);
 					return;
 				}
-                                for(i =0; i < prxb->nr_subframes; i++) {
+                                for (i =0; i < prxb->nr_subframes; i++) {
                                         dev_kfree_skb(prxb->subframes[i]);
                                 }
                                 kfree(prxb);
