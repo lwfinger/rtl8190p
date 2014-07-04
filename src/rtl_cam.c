@@ -127,7 +127,7 @@ void setKey(struct net_device *dev,
 				RT_TRACE(COMP_ERR, "%s(): RF is OFF.\n",__FUNCTION__);
 				return ;
 			}
-			else{
+			else {
 				down(&priv->rtllib->ips_sem);
 				IPSLeave(dev);
 				up(&priv->rtllib->ips_sem);			}
@@ -202,7 +202,7 @@ void CAM_read_entry(struct net_device *dev, u32 iIndex)
 			if (ulStatus & BIT31){
 				continue;
 			}
-			else{
+			else {
 				break;
 			}
 		}

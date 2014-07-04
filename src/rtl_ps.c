@@ -155,7 +155,7 @@ void rtllib_ips_leave_wq(struct net_device *dev)
 				RT_TRACE(COMP_ERR, "%s(): RF is OFF.\n",__FUNCTION__);
 				return;
 			}
-			else{
+			else {
 				printk("=========>%s(): IPSLeave\n",__FUNCTION__);
 				queue_work_rsl(priv->rtllib->wq,&priv->rtllib->ips_leave_wq);
 			}

@@ -86,7 +86,7 @@ void rtl8192_setBBreg(struct net_device* dev, u32 dwRegAddr, u32 dwBitMask, u32 
 		BitShift = rtl8192_CalculateBitShift(dwBitMask);
 		NewValue = (((OriginalValue) & (~dwBitMask)) | (dwData << BitShift));
 		write_nic_dword(dev, dwRegAddr, NewValue);
-	}else
+	} else
 		write_nic_dword(dev, dwRegAddr, dwData);
 	return;
 }
@@ -252,7 +252,7 @@ void rtl8192_phy_SetRFReg(struct net_device* dev, RF90_RADIO_PATH_E eRFPath, u32
 			New_Value = (((Original_Value) & (~BitMask)) | (Data<< BitShift));
 
 			phy_FwRFSerialWrite(dev, eRFPath, RegAddr, New_Value);
-		}else
+		} else
 			phy_FwRFSerialWrite(dev, eRFPath, RegAddr, Data);
 		udelay(200);
 
@@ -266,7 +266,7 @@ void rtl8192_phy_SetRFReg(struct net_device* dev, RF90_RADIO_PATH_E eRFPath, u32
 			New_Value = (((Original_Value) & (~BitMask)) | (Data<< BitShift));
 
 			rtl8192_phy_RFSerialWrite(dev, eRFPath, RegAddr, New_Value);
-	        }else
+	        } else
 			rtl8192_phy_RFSerialWrite(dev, eRFPath, RegAddr, Data);
 	}
 	return;
@@ -1282,7 +1282,7 @@ void rtl8192_SetBWModeWorkItem(struct net_device *dev)
 			if (priv->nCur40MhzPrimeSC == HAL_PRIME_CHNL_OFFSET_UPPER)
 			{
 				rtl8192_setBBreg(dev, rFPGA0_RFMOD, (BIT6|BIT5), 0x01);
-			}else if (priv->nCur40MhzPrimeSC == HAL_PRIME_CHNL_OFFSET_LOWER)
+			} else if (priv->nCur40MhzPrimeSC == HAL_PRIME_CHNL_OFFSET_LOWER)
 			{
 				rtl8192_setBBreg(dev, rFPGA0_RFMOD, (BIT6|BIT5), 0x02);
 			}

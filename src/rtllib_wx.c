@@ -78,10 +78,10 @@ static inline char *rtl819x_translate_scan(struct rtllib_device *ieee,
 	if (network->ssid_len > 0){
 		iwe.u.data.length = min(network->ssid_len, (u8)32);
 		start = iwe_stream_add_point_rsl(info, start, stop, &iwe, network->ssid);
-        }else if (network->hidden_ssid_len == 0){
+        } else if (network->hidden_ssid_len == 0){
 		iwe.u.data.length = sizeof("<hidden>");
 		start = iwe_stream_add_point_rsl(info, start, stop, &iwe, "<hidden>");
-        }else {
+        } else {
 		iwe.u.data.length = min(network->hidden_ssid_len, (u8)32);
 		start = iwe_stream_add_point_rsl(info, start, stop, &iwe, network->hidden_ssid);
 	}
@@ -567,7 +567,7 @@ int rtllib_wx_set_encode_ext(struct rtllib_device *ieee,
                 if (idx < 1 || idx > WEP_KEYS)
                         return -EINVAL;
                 idx--;
-	} else{
+	} else {
 		idx = ieee->tx_keyidx;
 	}
 	if (ext->ext_flags & IW_ENCODE_EXT_GROUP_KEY) {
@@ -735,7 +735,7 @@ int rtllib_wx_get_encode_ext(struct rtllib_device *ieee,
 		if (idx < 1 || idx > WEP_KEYS)
 			return -EINVAL;
 		idx--;
-	} else{
+	} else {
 		idx = ieee->tx_keyidx;
 	}
 	if (!(ext->ext_flags & IW_ENCODE_EXT_GROUP_KEY) &&

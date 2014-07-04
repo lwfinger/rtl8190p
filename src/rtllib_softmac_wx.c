@@ -60,7 +60,7 @@ int rtllib_wx_set_freq(struct rtllib_device *ieee, struct iw_request_info *a,
 		ret = -EOPNOTSUPP;
 		goto out;
 
-	}else { /* Set the channel */
+	} else { /* Set the channel */
 
 		if (!(GET_DOT11D_INFO(ieee)->channel_map)[fwrq->m]) {
 			ret = -EINVAL;
@@ -458,7 +458,7 @@ int rtllib_wx_set_essid(struct rtllib_device *ieee,
 		strncpy(ieee->current_network.ssid, extra, len);
 		ieee->current_network.ssid_len = len;
 		ieee->ssid_set = 1;
-	} else{
+	} else {
 		ieee->ssid_set = 0;
 		ieee->current_network.ssid[0] = '\0';
 		ieee->current_network.ssid_len = 0;

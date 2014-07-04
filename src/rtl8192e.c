@@ -667,7 +667,7 @@ start:
 	if (priv->pFirmware->firmware_status == FW_STATUS_0_INIT)
 	{	//called from MPInitialized. do nothing
 		ulRegRead |= CPU_GEN_SYSTEM_RESET;
-	}else if (priv->pFirmware->firmware_status == FW_STATUS_5_READY)
+	} else if (priv->pFirmware->firmware_status == FW_STATUS_5_READY)
 		ulRegRead |= CPU_GEN_FIRMWARE_RESET;	// Called from MPReset
 	else
 		RT_TRACE(COMP_ERR, "ERROR in %s(): undefined firmware state(%d)\n", __FUNCTION__,   priv->pFirmware->firmware_status);
@@ -1380,7 +1380,7 @@ void rtl8192_update_ratr_table(struct net_device* dev)
 		case IEEE_N_5G:
 			if (ieee->pHTInfo->PeerMimoPs == 0) //MIMO_PS_STATIC
 				ratr_value &= 0x0007F007;
-			else{
+			else {
 				if (priv->rf_type == RF_1T2R)
 					ratr_value &= 0x000FF007;
 				else
@@ -1393,7 +1393,7 @@ void rtl8192_update_ratr_table(struct net_device* dev)
 	ratr_value &= 0x0FFFFFFF;
 	if (ieee->pHTInfo->bCurTxBW40MHz && ieee->pHTInfo->bCurShortGI40MHz){
 		ratr_value |= 0x80000000;
-	}else if (!ieee->pHTInfo->bCurTxBW40MHz && ieee->pHTInfo->bCurShortGI20MHz){
+	} else if (!ieee->pHTInfo->bCurTxBW40MHz && ieee->pHTInfo->bCurShortGI20MHz){
 		ratr_value |= 0x80000000;
 	}
 	write_nic_dword(dev, RATR0+rate_index*4, ratr_value);

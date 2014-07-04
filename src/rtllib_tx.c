@@ -644,7 +644,7 @@ int rtllib_xmit_inter(struct sk_buff *skb, struct net_device *dev)
 						ieee->LPSDelayCnt = 100;
 					}
 				}
-			}else if (ETH_P_ARP == ether_type){
+			} else if (ETH_P_ARP == ether_type){
 				printk("=================>DHCP Protocol start tx ARP pkt!!\n");
 				bdhcp = true;
 				ieee->LPSDelayCnt = ieee->current_network.tim.tim_count;
@@ -858,7 +858,7 @@ int rtllib_xmit_inter(struct sk_buff *skb, struct net_device *dev)
 		  else
 			ieee->seq_ctrl[0]++;
 		}
-	}else{
+	} else {
 		if (unlikely(skb->len < sizeof(struct rtllib_hdr_3addr))) {
 			printk(KERN_WARNING "%s: skb too small (%d).\n",
 			ieee->dev->name, skb->len);
@@ -887,7 +887,7 @@ int rtllib_xmit_inter(struct sk_buff *skb, struct net_device *dev)
 			if (ieee->pHTInfo->IOTAction & HT_IOT_ACT_WA_IOT_Broadcom) {
 				tcb_desc->data_rate = MgntQuery_TxRateExcludeCCKRates(ieee);
 				tcb_desc->bTxDisableRateFallBack = false;
-			}else{
+			} else {
 	                        tcb_desc->data_rate = ieee->basic_rate;
         	                tcb_desc->bTxDisableRateFallBack = 1;
 			}
@@ -911,7 +911,7 @@ int rtllib_xmit_inter(struct sk_buff *skb, struct net_device *dev)
 				if (ieee->pHTInfo->IOTAction & HT_IOT_ACT_WA_IOT_Broadcom) {
 					tcb_desc->data_rate = MgntQuery_TxRateExcludeCCKRates(ieee);
 					tcb_desc->bTxDisableRateFallBack = false;
-				}else{
+				} else {
 					tcb_desc->data_rate = MGN_1M;
 					tcb_desc->bTxDisableRateFallBack = 1;
 				}
@@ -933,7 +933,7 @@ int rtllib_xmit_inter(struct sk_buff *skb, struct net_device *dev)
 	if (txb) {
 		if (ieee->softmac_features & IEEE_SOFTMAC_TX_QUEUE){
 			rtllib_softmac_xmit(txb, ieee);
-		}else{
+		} else {
 			if ((*ieee->hard_start_xmit)(txb, dev) == 0) {
 				stats->tx_packets++;
 				stats->tx_bytes += txb->payload_size;

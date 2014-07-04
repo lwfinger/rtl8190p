@@ -295,7 +295,7 @@ static int proc_get_stats_ap(char *page, char **start,
 	                len += snprintf(page + len, count - len,
 		        "WPA\n");
 		}
-		else{
+		else {
                         len += snprintf(page + len, count - len,
                         "non_WPA\n");
                 }
@@ -848,7 +848,7 @@ static int proc_get_cam_register(char *page, char **start,
 				if (ulStatus & BIT31){
 					continue;
 				}
-				else{
+				else {
 					break;
 				}
 			}

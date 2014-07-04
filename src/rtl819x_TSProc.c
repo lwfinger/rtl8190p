@@ -421,7 +421,7 @@ bool GetTs(
 					PTX_TS_RECORD tmp = container_of(*ppTS, TX_TS_RECORD, TsCommonInfo);
 					ResetTxTsEntry(tmp);
 				}
-				else{
+				else {
 					PRX_TS_RECORD tmp = container_of(*ppTS, RX_TS_RECORD, TsCommonInfo);
 					ResetRxTsEntry(tmp);
 				}

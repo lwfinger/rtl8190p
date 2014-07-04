@@ -682,7 +682,7 @@ MgntActSet_RF_State(
 				bConnectBySSID = true;
 			}
 		}
-		else{
+		else {
 			RT_TRACE((COMP_PS | COMP_RF), "MgntActSet_RF_State - eRfon reject pMgntInfo->RfOffReason= 0x%x, ChangeSource=0x%X\n", priv->rtllib->RfOffReason, ChangeSource);
                 }
 
@@ -1336,7 +1336,7 @@ void rtl8192_SetWirelessMode(struct net_device* dev, u8 wireless_mode)
 	if ((wireless_mode == WIRELESS_MODE_N_24G) ||  (wireless_mode == WIRELESS_MODE_N_5G)){
 		priv->rtllib->pHTInfo->bEnableHT = 1;
                 printk("<===%s(), wireless_mode:%x, bEnableHT = 1\n", __FUNCTION__,wireless_mode);
-        }else{
+        } else {
 		priv->rtllib->pHTInfo->bEnableHT = 0;
                 printk("<===%s(), wireless_mode:%x, bEnableHT = 0\n", __FUNCTION__,wireless_mode);
         }
@@ -2002,7 +2002,7 @@ RESET_START:
 			netif_carrier_off(dev);
 			SEM_UP_IEEE_WX(&ieee->wx_sem);
 		}
-		else{
+		else {
 			printk("ieee->state is NOT LINKED\n");
 			rtllib_softmac_stop_protocol(priv->rtllib,true);
 		}
@@ -3312,7 +3312,7 @@ void rtl8192_query_rxphystatus(
 			if (pstats->RxPWDBAll > 40)
 			{
 				sq = 100;
-			}else
+			} else
 			{
 				sq = pcck_buf->sq_rpt;
 
@@ -3643,9 +3643,9 @@ void rtl8192_rx(struct net_device *dev)
 			rtllib_hdr = (struct rtllib_hdr_1addr *)skb->data;
 			if (is_broadcast_ether_addr(rtllib_hdr->addr1)) {
 				//TODO
-			}else if (is_multicast_ether_addr(rtllib_hdr->addr1)){
+			} else if (is_multicast_ether_addr(rtllib_hdr->addr1)){
 				//TODO
-			}else {
+			} else {
 				/* unicast packet */
 				unicast_packet = true;
 			}
@@ -4689,7 +4689,7 @@ static void rtl8192_pci_disconnect(struct pci_dev *pdev)
 #endif /*end #ifdef RTL_IO_MAP*/
 		free_rtllib(dev);
 
-	} else{
+	} else {
 		priv=rtllib_priv(dev);
         }
 

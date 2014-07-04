@@ -1833,7 +1833,7 @@ int rtllib_parse_info_param(struct rtllib_device *ieee,
 				if (tmp_htcap_len != 0){
 					network->bssht.bdSupportHT = true;
 					network->bssht.bdHT1R = ((((PHT_CAPABILITY_ELE)(network->bssht.bdHTCapBuf))->MCS[1]) == 0);
-				}else{
+				} else {
 					network->bssht.bdSupportHT = false;
 					network->bssht.bdHT1R = false;
 				}
@@ -2032,7 +2032,7 @@ int rtllib_parse_info_param(struct rtllib_device *ieee,
 
 				network->bssht.bdBandWidth = (HT_CHANNEL_WIDTH)(((PHT_CAPABILITY_ELE)(network->bssht.bdHTCapBuf))->ChlWidth);
 			}
-			else{
+			else {
 				network->bssht.bdSupportHT = false;
 				network->bssht.bdHT1R = false;
 				network->bssht.bdBandWidth = HT_CHANNEL_WIDTH_20 ;
@@ -2308,7 +2308,7 @@ static inline void update_network(struct rtllib_network *dst,
 			memset(dst->hidden_ssid, 0, sizeof(dst->hidden_ssid));
 			dst->hidden_ssid_len = src->ssid_len;
 			memcpy(dst->hidden_ssid, src->ssid, src->ssid_len);
-		}else{
+		} else {
 			memset(dst->ssid, 0, dst->ssid_len);
 			dst->ssid_len = src->ssid_len;
 			memcpy(dst->ssid, src->ssid, src->ssid_len);
@@ -2474,20 +2474,20 @@ static inline void rtllib_process_probe_response(
 					goto free_network;
 				}
 			}
-			else{
+			else {
 				if (network->channel > 11){
 					printk("GetScanInfo(): For Global Domain, filter probe response at channel(%d).\n", network->channel);
 					goto free_network;
 				}
 			}
-		}else{
+		} else {
 			if (IS_COUNTRY_IE_VALID(ieee) ){
 				if ( !IsLegalChannel(ieee, network->channel) ){
 					printk("GetScanInfo(): For Country code, filter beacon at channel(%d).\n",network->channel);
 					goto free_network;
 				}
 			}
-			else{
+			else {
 				if (network->channel > 14){
 					printk("GetScanInfo(): For Global Domain, filter beacon at channel(%d).\n",network->channel);
 					goto free_network;

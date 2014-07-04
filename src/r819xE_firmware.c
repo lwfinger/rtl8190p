@@ -280,10 +280,10 @@ bool init_firmware(struct net_device *dev)
 		rst_opt = OPT_SYSTEM_RESET;
 		starting_state = FW_INIT_STEP0_BOOT;
 
-	}else if (pfirmware->firmware_status == FW_STATUS_5_READY) {
+	} else if (pfirmware->firmware_status == FW_STATUS_5_READY) {
 		rst_opt = OPT_FIRMWARE_RESET;
 		starting_state = FW_INIT_STEP2_DATA;
-	}else {
+	} else {
 		 RT_TRACE(COMP_FIRMWARE, "PlatformInitFirmware: undefined firmware state\n");
 	}
 
@@ -349,7 +349,7 @@ bool init_firmware(struct net_device *dev)
 			}
 
 
-		}else if (rst_opt == OPT_FIRMWARE_RESET ) {
+		} else if (rst_opt == OPT_FIRMWARE_RESET ) {
 			mapped_file = pfirmware->firmware_buf[init_step];
 			file_length = pfirmware->firmware_buf_size[init_step];
 		}

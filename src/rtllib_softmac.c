@@ -268,7 +268,7 @@ inline void softmac_mgmt_xmit(struct sk_buff *skb, struct rtllib_device *ieee)
 	if (single){
 		if (ieee->queue_stop){
 			enqueue_mgmt(ieee,skb);
-		}else{
+		} else {
 			header->seq_ctl = cpu_to_le16(ieee->seq_ctrl[0]<<4);
 
 			if (ieee->seq_ctrl[0] == 0xFFF)
@@ -281,7 +281,7 @@ inline void softmac_mgmt_xmit(struct sk_buff *skb, struct rtllib_device *ieee)
 		}
 
 		spin_unlock_irqrestore(&ieee->lock, flags);
-	}else{
+	} else {
 		spin_unlock_irqrestore(&ieee->lock, flags);
 		spin_lock_irqsave(&ieee->mgmt_tx_lock, flags);
 
@@ -520,7 +520,7 @@ out:
 		up(&ieee->scan_sem);
 		ieee->be_scan_inprogress = false;
 	}
-	else{
+	else {
 		ieee->actscanning = false;
 		ieee->sync_scan_hurryup = 0;
 		if (IS_DOT11D_ENABLE(ieee))
@@ -684,7 +684,7 @@ void rtllib_start_scan(struct rtllib_device *ieee)
 			ieee->scanning = 1;
 			queue_delayed_work_rsl(ieee->wq, &ieee->softmac_scan_wq, 0);
 		}
-	}else
+	} else
 		ieee->start_scan(ieee->dev);
 
 }
@@ -1464,7 +1464,7 @@ inline struct sk_buff *rtllib_association_req(struct rtllib_network *beacon,stru
 	ieee->assocreq_ies = kmalloc(ieee->assocreq_ies_len, GFP_ATOMIC);
 	if (ieee->assocreq_ies)
 		memcpy(ieee->assocreq_ies, ies, ieee->assocreq_ies_len);
-	else{
+	else {
 		printk("%s()Warning: can't alloc memory for assocreq_ies\n", __func__);
 		ieee->assocreq_ies_len = 0;
 	}
@@ -1489,7 +1489,7 @@ void rtllib_associate_abort(struct rtllib_device *ieee)
 	if (ieee->state == RTLLIB_ASSOCIATING_AUTHENTICATING){
 		RTLLIB_DEBUG_MGMT("Authentication failed\n");
 		ieee->softmac_stats.no_auth_rs++;
-	}else{
+	} else {
 		RTLLIB_DEBUG_MGMT("Association failed\n");
 		ieee->softmac_stats.no_ass_rs++;
 	}
@@ -1518,7 +1518,7 @@ void rtllib_associate_step1(struct rtllib_device *ieee)
 	skb=rtllib_authentication_req(beacon, ieee, 0);
 	if (!skb)
 		rtllib_associate_abort(ieee);
-	else{
+	else {
 		ieee->state = RTLLIB_ASSOCIATING_AUTHENTICATING ;
 		RTLLIB_DEBUG_MGMT("Sending authentication request\n");
 		softmac_mgmt_xmit(skb, ieee);
@@ -1541,7 +1541,7 @@ void rtllib_auth_challenge(struct rtllib_device *ieee, u8 *challenge, int chlen)
 	skb = rtllib_authentication_req(beacon, ieee, chlen+2);
 	if (!skb)
 		rtllib_associate_abort(ieee);
-	else{
+	else {
 		c = skb_put(skb, chlen+2);
 		*(c++) = MFIE_TYPE_CHALLENGE;
 		*(c++) = chlen;
@@ -1570,7 +1570,7 @@ void rtllib_associate_step2(struct rtllib_device *ieee)
 	skb=rtllib_association_req(beacon, ieee);
 	if (!skb)
 		rtllib_associate_abort(ieee);
-	else{
+	else {
 		softmac_mgmt_xmit(skb, ieee);
 		mod_timer(&ieee->associate_timer, jiffies + (HZ/2));
 	}
@@ -1594,7 +1594,7 @@ void rtllib_associate_complete_wq(void *data)
 
 		ieee->rate = 108;
 		printk(KERN_INFO"Using G rates:%d\n", ieee->rate);
-	}else{
+	} else {
 		ieee->rate = 22;
 		printk(KERN_INFO"Using B rates:%d\n", ieee->rate);
 	}
@@ -1810,13 +1810,13 @@ inline void rtllib_softmac_new_net(struct rtllib_device *ieee, struct rtllib_net
 					if (ieee->LedControlHandler != NULL)
 					        ieee->LedControlHandler(ieee->dev, LED_CTL_START_TO_LINK);
 					queue_delayed_work_rsl(ieee->wq, &ieee->associate_procedure_wq, 0);
-				}else{
+				} else {
 					if (rtllib_is_54g(&ieee->current_network) &&
 						(ieee->modulation & RTLLIB_OFDM_MODULATION)){
 						ieee->rate = 108;
 						ieee->SetWirelessMode(ieee->dev, IEEE_G);
 						printk(KERN_INFO"Using G rates\n");
-					}else{
+					} else {
 						ieee->rate = 22;
 						ieee->SetWirelessMode(ieee->dev, IEEE_B);
 						printk(KERN_INFO"Using B rates\n");
@@ -1982,7 +1982,7 @@ static inline u16 assoc_parse(struct rtllib_device *ieee, struct sk_buff *skb, i
 	    (ieee->current_network.mode == IEEE_N_24G) &&
             (ieee->AsocRetryCount++ < (RT_ASOC_RETRY_LIMIT-1)))) {
                  ieee->pHTInfo->IOTAction |= HT_IOT_ACT_PURE_N_MODE;
-	}else {
+	} else {
 		 ieee->AsocRetryCount = 0;
 	}
 
@@ -2180,7 +2180,7 @@ inline void rtllib_sta_ps(struct rtllib_device *ieee)
 
 		ieee->bAwakePktSent = false;
 
-	}else if (sleep == 2){
+	} else if (sleep == 2){
 		spin_lock_irqsave(&ieee->mgmt_tx_lock, flags2);
 
 		rtllib_sta_wakeup(ieee,1);
@@ -2374,7 +2374,7 @@ rtllib_rx_frame_softmac(struct rtllib_device *ieee, struct sk_buff *skb,
 					ieee->assocresp_ies = kmalloc(ieee->assocresp_ies_len, GFP_ATOMIC);
 					if (ieee->assocresp_ies)
 						memcpy(ieee->assocresp_ies, ies, ieee->assocresp_ies_len);
-					else{
+					else {
 						printk("%s()Warning: can't alloc memory for assocresp_ies\n", __func__);
 						ieee->assocresp_ies_len = 0;
 					}
@@ -2438,7 +2438,7 @@ rtllib_rx_frame_softmac(struct rtllib_device *ieee, struct sk_buff *skb,
 								if (bSupportNmode) {
 									ieee->SetWirelessMode(ieee->dev, \
 											ieee->current_network.mode);
-								}else{
+								} else {
 									/*TODO*/
 									ieee->SetWirelessMode(ieee->dev, IEEE_G);
 								}
@@ -2452,10 +2452,10 @@ rtllib_rx_frame_softmac(struct rtllib_device *ieee, struct sk_buff *skb,
 									ieee->bHalfWirelessN24GMode = false;
 
 								rtllib_associate_step2(ieee);
-							}else{
+							} else {
 								rtllib_auth_challenge(ieee, challenge, chlen);
 							}
-						}else{
+						} else {
 							ieee->softmac_stats.rx_auth_rs_err++;
 							RTLLIB_DEBUG_MGMT("Authentication respose status code 0x%x",errcode);
 
@@ -2463,7 +2463,7 @@ rtllib_rx_frame_softmac(struct rtllib_device *ieee, struct sk_buff *skb,
 							rtllib_associate_abort(ieee);
 						}
 
-					}else if (ieee->iw_mode == IW_MODE_MASTER){
+					} else if (ieee->iw_mode == IW_MODE_MASTER){
 						rtllib_rx_auth_rq(ieee, skb);
 					}
 				}
@@ -2564,10 +2564,10 @@ void rtllib_softmac_xmit(struct rtllib_txb *txb, struct rtllib_device *ieee)
 #else
 				skb_queue_tail(&ieee->skb_waitQ[queue_index], txb->fragments[i]);
 #endif
-			}else{
+			} else {
 				kfree_skb(txb->fragments[i]);
 			}
-		}else{
+		} else {
 			ieee->softmac_data_hard_start_xmit(
 					txb->fragments[i],
 					ieee->dev,ieee->rate);
@@ -2588,7 +2588,7 @@ void rtllib_resume_tx(struct rtllib_device *ieee)
 		if (ieee->queue_stop){
 			ieee->tx_pending.frag = i;
 			return;
-		}else{
+		} else {
 
 			ieee->softmac_data_hard_start_xmit(
 				ieee->tx_pending.txb->fragments[i],
@@ -2779,7 +2779,7 @@ void rtllib_start_ibss_wq(void *data)
 			ieee->current_network.rates[2] = RTLLIB_BASIC_RATE_MASK | RTLLIB_CCK_RATE_5MB;
 			ieee->current_network.rates[3] = RTLLIB_BASIC_RATE_MASK | RTLLIB_CCK_RATE_11MB;
 
-		}else
+		} else
 			ieee->current_network.rates_len = 0;
 
 		if (ieee->modulation & RTLLIB_OFDM_MODULATION){
@@ -2804,7 +2804,7 @@ void rtllib_start_ibss_wq(void *data)
 			ieee->current_network.rates_ex[7] = RTLLIB_OFDM_RATE_54MB;
 
 			ieee->rate = 108;
-		}else{
+		} else {
 			ieee->current_network.rates_ex_len = 0;
 			ieee->rate = 22;
 		}
@@ -3741,7 +3741,7 @@ void notify_wx_assoc_event(struct rtllib_device *ieee)
 	wrqu.ap_addr.sa_family = ARPHRD_ETHER;
 	if (ieee->state == RTLLIB_LINKED)
 		memcpy(wrqu.ap_addr.sa_data, ieee->current_network.bssid, ETH_ALEN);
-	else{
+	else {
 		printk("################>%s(): Tell user space disconnected\n",__func__);
 		memset(wrqu.ap_addr.sa_data, 0, ETH_ALEN);
 	}

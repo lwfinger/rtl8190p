@@ -251,7 +251,7 @@ void dm_CheckRxAggregation(struct net_device *dev) {
 			write_nic_dword(dev, 0x1a8, 0);
 			priv->bCurrentRxAggrEnable = false;
 		}
-	}else{
+	} else {
 		if (!priv->bCurrentRxAggrEnable && !pHTInfo->bCurrentRT2RTAggregation) {
 			u32 ulValue;
 			ulValue = (pHTInfo->UsbRxFwAggrEn<<24) | (pHTInfo->UsbRxFwAggrPageNum<<16) |
@@ -482,12 +482,12 @@ static void dm_check_rate_adaptive(struct net_device * dev)
 			//DbgPrint("[DM] RSSI=%d STA=HIGH\n\r", pHalData->UndecoratedSmoothedPWDB);
 			pra->ratr_state = DM_RATR_STA_HIGH;
 			targetRATR = pra->upper_rssi_threshold_ratr;
-		}else if (priv->undecorated_smoothed_pwdb >= (long)LowRSSIThreshForRA)
+		} else if (priv->undecorated_smoothed_pwdb >= (long)LowRSSIThreshForRA)
 		{
 			//DbgPrint("[DM] RSSI=%d STA=Middle\n\r", pHalData->UndecoratedSmoothedPWDB);
 			pra->ratr_state = DM_RATR_STA_MIDDLE;
 			targetRATR = pra->middle_rssi_threshold_ratr;
-		}else
+		} else
 		{
 			//DbgPrint("[DM] RSSI=%d STA=LOW\n\r", pHalData->UndecoratedSmoothedPWDB);
 			pra->ratr_state = DM_RATR_STA_LOW;
@@ -568,11 +568,11 @@ static void dm_bandwidth_autoswitch(struct net_device * dev)
 
 	if (priv->CurrentChannelBW == HT_CHANNEL_WIDTH_20 ||!priv->rtllib->bandwidth_auto_switch.bautoswitch_enable){
 		return;
-	}else{
+	} else {
 		if (priv->rtllib->bandwidth_auto_switch.bforced_tx20Mhz == false){//If send packets in 40 Mhz in 20/40
 			if (priv->undecorated_smoothed_pwdb <= priv->rtllib->bandwidth_auto_switch.threshold_40Mhzto20Mhz)
 				priv->rtllib->bandwidth_auto_switch.bforced_tx20Mhz = true;
-		}else{//in force send packets in 20 Mhz in 20/40
+		} else {//in force send packets in 20 Mhz in 20/40
 			if (priv->undecorated_smoothed_pwdb >= priv->rtllib->bandwidth_auto_switch.threshold_20Mhzto40Mhz)
 				priv->rtllib->bandwidth_auto_switch.bforced_tx20Mhz = false;
 
@@ -801,7 +801,7 @@ static void dm_TXPowerTrackingCallback_TSSI(struct net_device * dev)
 			if (RF_Type == RF_2T4R){
 			priv->CCKPresentAttentuation_difference
 				= priv->rfa_txpowertrackingindex - priv->rfa_txpowertracking_default;
-			}else{
+			} else {
 				//switch(Adapter->HardwareType)
 				{
 				priv->CCKPresentAttentuation_difference
@@ -3227,7 +3227,7 @@ extern void dm_fsync_timer_callback(unsigned long data)
 			priv->fsync_timer.expires = jiffies + MSECS(priv->rtllib->fsync_time_interval*priv->rtllib->fsync_multiple_timeinterval);
 			add_timer(&priv->fsync_timer);
 		}
-		else{
+		else {
 			if (timer_pending(&priv->fsync_timer))
 				del_timer_sync(&priv->fsync_timer);
 			priv->fsync_timer.expires = jiffies + MSECS(priv->rtllib->fsync_time_interval);

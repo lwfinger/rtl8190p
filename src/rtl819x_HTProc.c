@@ -126,7 +126,7 @@ void HTDebugHTCapability(u8* CapIE, u8* TitleString )
 	{
 		RTLLIB_DEBUG(RTLLIB_DL_HT, "EWC IE in %s()\n", __FUNCTION__);
 		pCapELE = (PHT_CAPABILITY_ELE)(&CapIE[4]);
-	}else
+	} else
 		pCapELE = (PHT_CAPABILITY_ELE)(&CapIE[0]);
 
 	RTLLIB_DEBUG(RTLLIB_DL_HT, "<Log HT Capability>. Called by %s\n", TitleString );
@@ -154,7 +154,7 @@ void HTDebugHTInfo(u8*	InfoIE, u8* TitleString)
 	{
 		RTLLIB_DEBUG(RTLLIB_DL_HT, "EWC IE in %s()\n", __FUNCTION__);
 		pHTInfoEle = (PHT_INFORMATION_ELE)(&InfoIE[4]);
-	}else
+	} else
 		pHTInfoEle = (PHT_INFORMATION_ELE)(&InfoIE[0]);
 
 
@@ -489,7 +489,7 @@ HTIOTActWAIOTBroadcom(struct rtllib_device* ieee)
 					if ( ieee->current_network.RSSI >= boundary)
 						retValue = true;
 				}
-			}else{
+			} else {
 				printk("===============>IOT Broadcom STA 40MHz.\n");
 			}
 		}
@@ -671,7 +671,7 @@ void HTConstructCapabilityElement(struct rtllib_device* ieee, u8* posHTCap, u8* 
 		u8	EWC11NHTCap[] = {0x00, 0x90, 0x4c, 0x33};
 		memcpy(posHTCap, EWC11NHTCap, sizeof(EWC11NHTCap));
 		pCapELE = (PHT_CAPABILITY_ELE)&(posHTCap[4]);
-	}else {
+	} else {
 		pCapELE = (PHT_CAPABILITY_ELE)posHTCap;
 	}
 
@@ -811,7 +811,7 @@ void HTConstructRT2RTAggElement(struct rtllib_device* ieee, u8* posRT2RTAgg, u8*
 	if (IS_UNDER_11N_AES_MODE(Adapter))
 	{
 		posRT2RTAgg->Octet[5] |=RT_HT_CAP_USE_AMPDU;
-	}else
+	} else
 	{
 		posRT2RTAgg->Octet[5] &= 0xfb;
 	}
@@ -999,7 +999,7 @@ void HTOnAssocRsp(struct rtllib_device *ieee)
 				pHTInfo->CurrentAMPDUFactor = pPeerHTCap->MaxRxAMPDUFactor;
 			else
 				pHTInfo->CurrentAMPDUFactor = HT_AGG_SIZE_64K;
-		}else {
+		} else {
 			if (pPeerHTCap->MaxRxAMPDUFactor < HT_AGG_SIZE_32K)
 				pHTInfo->CurrentAMPDUFactor = pPeerHTCap->MaxRxAMPDUFactor;
 			else

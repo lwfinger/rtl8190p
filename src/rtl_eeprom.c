@@ -112,7 +112,7 @@ u32 eprom_read(struct net_device *dev, u32 addr)
 		addr_str[1]=addr & (1<<6);
 		addr_str[0]=addr & (1<<7);
 		addr_len=8;
-	}else{
+	} else {
 		addr_str[5]=addr & 1;
 		addr_str[4]=addr & (1<<1);
 		addr_str[3]=addr & (1<<2);

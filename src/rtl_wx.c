@@ -508,7 +508,7 @@ static int r8192_wx_set_scan(struct net_device *dev, struct iw_request_info *a,
 					up(&priv->wx_sem);
 					return -1;
 				}
-				else{
+				else {
 					printk("=========>%s(): IPSLeave\n",__FUNCTION__);
 					down(&priv->rtllib->ips_sem);
 					IPSLeave(dev);
@@ -906,7 +906,7 @@ static int r8192_wx_set_retry(struct net_device *dev,
 		priv->retry_rts = wrqu->retry.value;
 		DMESG("Setting retry for RTS/CTS data to %d", wrqu->retry.value);
 
-	}else {
+	} else {
 		priv->retry_data = wrqu->retry.value;
 		DMESG("Setting retry for non RTS/CTS data to %d", wrqu->retry.value);
 	}
