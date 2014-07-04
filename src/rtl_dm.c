@@ -105,9 +105,6 @@ extern	void	dm_init_edca_turbo(struct net_device *dev);
 extern	void	dm_rf_operation_test_callback(unsigned long data);
 extern	void	dm_rf_pathcheck_workitemcallback(void *data);
 extern	void dm_fsync_timer_callback(unsigned long data);
-#if 0
-extern	bool	dm_check_lbus_status(struct net_device *dev);
-#endif
 extern	void dm_check_fsync(struct net_device *dev);
 extern	void	dm_shadow_init(struct net_device *dev);
 extern	void dm_initialize_txpower_tracking(struct net_device *dev);
@@ -522,11 +519,9 @@ static void dm_check_rate_adaptive(struct net_device * dev)
 		}
 
 		// 2008.04.01
-#if 1
 		// For RTL819X, if pairwisekey = wep/tkip, we support only MCS0~7.
 		if(priv->rtllib->GetHalfNmodeSupportByAPsHandler(dev))
 			targetRATR &=  0xf00fffff;
-#endif
 
 		//
 		// Check whether updating of RATR0 is required
@@ -1784,29 +1779,6 @@ dm_change_rxpath_selection_setting(
 	}
 }
 
-#if 0
-extern void dm_force_tx_fw_info(struct net_device *dev,
-										u32		force_type,
-										u32		force_value)
-{
-	struct r8192_priv *priv = rtllib_priv(dev);
-
-	if (force_type == 0)	// don't force TxSC
-	{
-		//DbgPrint("Set Force SubCarrier Off\n");
-		priv->tx_fwinfo_force_subcarriermode = 0;
-	}
-	else if(force_type == 1) //force
-	{
-		//DbgPrint("Set Force SubCarrier On\n");
-		priv->tx_fwinfo_force_subcarriermode = 1;
-		if(force_value > 3)
-			force_value = 3;
-		priv->tx_fwinfo_force_subcarrierval = (u8)force_value;
-	}
-}
-#endif
-
 //-----------------------------------------------------------------------------
 // Function:	dm_dig_init()
 //
@@ -2513,7 +2485,6 @@ extern void dm_init_edca_turbo(struct net_device * dev)
 	priv->bis_cur_rdlstate = false;
 }	// dm_init_edca_turbo
 
-#if 1
 static void dm_check_edca_turbo(
 	struct net_device * dev)
 {
@@ -2671,7 +2642,6 @@ dm_CheckEdcaTurbo_EXIT:
 	lastTxOkCnt = priv->stats.txbytesunicast;
 	lastRxOkCnt = priv->stats.rxbytesunicast;
 }	// dm_CheckEdcaTurbo
-#endif
 
 extern void DM_CTSToSelfSetting(struct net_device * dev,u32 DM_Type, u32 DM_Value)
 {
@@ -2731,20 +2701,7 @@ static void dm_ctstoself(struct net_device *dev)
 		}
 		else	//uplink
 		{
-		#if 1
 			pHTInfo->IOTAction |= HT_IOT_ACT_FORCED_CTS2SELF;
-		#else
-			if(priv->undecorated_smoothed_pwdb < priv->rtllib->CTSToSelfTH)	// disable CTS to self
-			{
-				pHTInfo->IOTAction &= ~HT_IOT_ACT_FORCED_CTS2SELF;
-				//DbgPrint("dm_CTSToSelf() ==> CTS to self disabled\n");
-			}
-			else if(priv->undecorated_smoothed_pwdb >= (priv->rtllib->CTSToSelfTH+5))	// enable CTS to self
-			{
-				pHTInfo->IOTAction |= HT_IOT_ACT_FORCED_CTS2SELF;
-				//DbgPrint("dm_CTSToSelf() ==> CTS to self enabled\n");
-			}
-		#endif
 		}
 
 		lastTxOkCnt = priv->stats.txbytesunicast;
@@ -3491,51 +3448,6 @@ void dm_check_fsync(struct net_device *dev)
 		}
 	}
 }
-
-#if 0
-//-----------------------------------------------------------------------------
-// Function:	DM_CheckLBusStatus()
-//
-// Overview:	For 9x series, we must make sure LBUS is active for IO.
-//
-// Input:		NONE
-//
-// Output:		NONE
-//
-// Return:		NONE
-//
-// Revised History:
-//	When		Who		Remark
-//	02/22/2008	MHC		Create Version 0.
-//
-//---------------------------------------------------------------------------*/
-extern	s1Byte	DM_CheckLBusStatus(IN	PADAPTER	dev)
-{
-	PMGNT_INFO	pMgntInfo=&dev->MgntInfo;
-
-#if (HAL_CODE_BASE & RTL819X)
-
-#if (HAL_CODE_BASE == RTL8192)
-
-#if( DEV_BUS_TYPE==PCI_INTERFACE)
-	//return (pMgntInfo->bLbusEnable);	// For debug only
-	return true;
-#endif
-
-#if( DEV_BUS_TYPE==USB_INTERFACE)
-	return true;
-#endif
-
-#endif	// #if (HAL_CODE_BASE == RTL8192)
-
-#if (HAL_CODE_BASE == RTL8190)
-	return true;
-#endif	// #if (HAL_CODE_BASE == RTL8190)
-
-#endif	// #if (HAL_CODE_BASE & RTL819X)
-}	// DM_CheckLBusStatus */
-
-#endif
 
 //-----------------------------------------------------------------------------
 // Function:	dm_shadow_init()

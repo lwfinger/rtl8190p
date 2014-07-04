@@ -559,10 +559,6 @@ void RxReorderIndicatePacket( struct rtllib_device *ieee,
 	u8			index = 0;
 	bool			bMatchWinStart = false, bPktInBuf = false;
 	RTLLIB_DEBUG(RTLLIB_DL_REORDER,"%s(): Seq is %d,pTS->RxIndicateSeq is %d, WinSize is %d\n",__FUNCTION__,SeqNum,pTS->RxIndicateSeq,WinSize);
-#if 0
-	if(!list_empty(&ieee->RxReorder_Unused_List))
-		RTLLIB_DEBUG(RTLLIB_DL_REORDER,"%s(): ieee->RxReorder_Unused_List is nut NULL\n");
-#endif
 	/* Rx Reorder initialize condition.*/
 	if(pTS->RxIndicateSeq == 0xffff) {
 		pTS->RxIndicateSeq = SeqNum;
@@ -626,7 +622,6 @@ void RxReorderIndicatePacket( struct rtllib_device *ieee,
 			pReorderEntry->SeqNum = SeqNum;
 			pReorderEntry->prxb = prxb;
 
-#if 1
 			if(!AddReorderEntry(pTS, pReorderEntry)) {
 				RTLLIB_DEBUG(RTLLIB_DL_REORDER, "%s(): Duplicate packet is dropped!! IndicateSeq: %d, NewSeq: %d\n",
 					__FUNCTION__, pTS->RxIndicateSeq, SeqNum);
@@ -643,9 +638,7 @@ void RxReorderIndicatePacket( struct rtllib_device *ieee,
 				RTLLIB_DEBUG(RTLLIB_DL_REORDER,
 					 "Pkt insert into buffer!! IndicateSeq: %d, NewSeq: %d\n",pTS->RxIndicateSeq, SeqNum);
 			}
-#endif
-		}
-		else {
+		} else {
 			/*
 			 * Packets are dropped if there is not enough reorder entries.
 			 * This part shall be modified!! We can just indicate all the
@@ -666,7 +659,6 @@ void RxReorderIndicatePacket( struct rtllib_device *ieee,
 	/* Check if there is any packet need indicate.*/
 	while(!list_empty(&pTS->RxPendingPktList)) {
 		RTLLIB_DEBUG(RTLLIB_DL_REORDER,"%s(): start RREORDER indicate\n",__FUNCTION__);
-#if 1
 		pReorderEntry = (PRX_REORDER_ENTRY)list_entry(pTS->RxPendingPktList.prev,RX_REORDER_ENTRY,List);
 		if( SN_LESS(pReorderEntry->SeqNum, pTS->RxIndicateSeq) ||
 				SN_EQUAL(pReorderEntry->SeqNum, pTS->RxIndicateSeq))
@@ -692,7 +684,6 @@ void RxReorderIndicatePacket( struct rtllib_device *ieee,
 			bPktInBuf = true;
 			break;
 		}
-#endif
 	}
 
 	/* Handling pending timer. Set this timer to prevent from long time Rx buffering.*/
@@ -711,20 +702,11 @@ void RxReorderIndicatePacket( struct rtllib_device *ieee,
 		bPktInBuf = false;
 	}
 
-#if 1
 	if(bPktInBuf && pTS->RxTimeoutIndicateSeq==0xffff) {
 		RTLLIB_DEBUG(RTLLIB_DL_REORDER,"%s(): SET rx timeout timer\n", __FUNCTION__);
 		pTS->RxTimeoutIndicateSeq = pTS->RxIndicateSeq;
-#if 0
-		if(timer_pending(&pTS->RxPktPendingTimer))
-			del_timer_sync(&pTS->RxPktPendingTimer);
-		pTS->RxPktPendingTimer.expires = jiffies + MSECS(pHTInfo->RxReorderPendingTime);
-		add_timer(&pTS->RxPktPendingTimer);
-#else
 		mod_timer(&pTS->RxPktPendingTimer,  jiffies + MSECS(pHTInfo->RxReorderPendingTime));
-#endif
 	}
-#endif
 }
 
 u8 parse_subframe(struct rtllib_device* ieee,struct sk_buff *skb,
@@ -1767,11 +1749,7 @@ int rtllib_parse_info_param(struct rtllib_device *ieee,
                         network->dtim_period = info_element->data[1];
                         if(ieee->state != RTLLIB_LINKED)
                                 break;
-#if 0
-                        network->last_dtim_sta_time[0] = stats->mac_time[0];
-#else
 			network->last_dtim_sta_time[0] = jiffies;
-#endif
                         network->last_dtim_sta_time[1] = stats->mac_time[1];
 
                         network->dtim_data = RTLLIB_DTIM_VALID;
@@ -1780,7 +1758,6 @@ int rtllib_parse_info_param(struct rtllib_device *ieee,
                         if(info_element->data[2] & 1)
                                 network->dtim_data |= RTLLIB_DTIM_MBCAST;
 
-#if 1
                         offset = (info_element->data[2] >> 1)*2;
 
 
@@ -1792,25 +1769,6 @@ int rtllib_parse_info_param(struct rtllib_device *ieee,
                         offset = (ieee->assoc_id / 8) - offset;
                         if(info_element->data[3+offset] & (1<<(ieee->assoc_id%8)))
                                 network->dtim_data |= RTLLIB_DTIM_UCAST;
-#else
-			{
-				u16 numSta = 0;
-				u16 offset_byte = 0;
-				u16 offset_bit = 0;
-
-				numSta = (info_element->data[2] &0xFE)*8;
-
-				if(ieee->assoc_id < numSta ||
-						ieee->assoc_id > (numSta + (info_element->len -3)*8))
-					break;
-
-				offset = ieee->assoc_id - numSta;
-				offset_byte = offset / 8;
-				offset_bit = offset % 8;
-				if(info_element->data[3+offset_byte] & (0x01<<offset_bit))
-					network->dtim_data |= RTLLIB_DTIM_UCAST;
-			}
-#endif
 
 			network->listen_interval = network->dtim_period;
 			break;
@@ -1952,16 +1910,6 @@ int rtllib_parse_info_param(struct rtllib_device *ieee,
 
 				}
 			}
-#if 0
-			if (tmp_htcap_len !=0)
-				{
-					u16 cap_ext = ((PHT_CAPABILITY_ELE)&info_element->data[0])->ExtHTCapInfo;
-					if ((cap_ext & 0x0c00) == 0x0c00)
-						{
-							network->ralink_cap_exist = true;
-						}
-				}
-#endif
 			if(info_element->len >= 3 &&
 				info_element->data[0] == 0x00 &&
 				info_element->data[1] == 0x0c &&
@@ -2317,13 +2265,9 @@ static inline int rtllib_network_init(
         }
 #endif
 
-#if 1
 	stats->signal = 30 + (stats->SignalStrength * 70) / 100;
 	stats->noise = rtllib_translate_todbm((u8)(100-stats->signal)) -25;
-#endif
-
 	memcpy(&network->stats, stats, sizeof(network->stats));
-
 	return 0;
 }
 
@@ -2416,19 +2360,10 @@ static inline void update_network(struct rtllib_network *dst,
 	/* qos related parameters */
 	qos_active = dst->qos_data.active;
 	old_param = dst->qos_data.param_count;
-#if 0
-	if(dst->flags & NETWORK_HAS_QOS_MASK){
-	}
-	else {
-		dst->qos_data.supported = src->qos_data.supported;
-		dst->qos_data.param_count = src->qos_data.param_count;
-	}
-#else
 	dst->qos_data.supported = src->qos_data.supported;
 	if(dst->flags & NETWORK_HAS_QOS_PARAMETERS){
 		memcpy(&dst->qos_data, &src->qos_data, sizeof(struct rtllib_qos_data));
 	}
-#endif
 	if(dst->qos_data.supported == 1) {
 		dst->QoS_Enable = 1;
 		if(dst->ssid_len)
@@ -2684,16 +2619,13 @@ void rtllib_rx_mgt(struct rtllib_device *ieee,
             RTLLIB_DEBUG_SCAN("Beacon\n");
             rtllib_process_probe_response(
                     ieee, (struct rtllib_probe_response *)header, stats);
-#if 1
             if(ieee->sta_sleep || (ieee->ps != RTLLIB_PS_DISABLED &&
                         ieee->iw_mode == IW_MODE_INFRA &&
                         ieee->state == RTLLIB_LINKED))
             {
                 tasklet_schedule(&ieee->ps_task);
             }
-#endif
             break;
-
         case RTLLIB_STYPE_PROBE_RESP:
             RTLLIB_DEBUG_MGMT("received PROBE RESPONSE (%d)\n",
                     WLAN_FC_GET_STYPE(header->frame_ctl));

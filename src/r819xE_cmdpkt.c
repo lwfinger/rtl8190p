@@ -179,39 +179,8 @@ cmpk_handle_tx_feedback(
 	cmpk_txfb_t		rx_tx_fb;	/* */
 
 	priv->stats.txfeedback++;
-
-
-#if 0
-	rx_tx_fb.TOK			= pMsg[2]>>7;
-	rx_tx_fb.Fail_Reason	= (pMsg[2] & 0x70) >> 4;
-	rx_tx_fb.TID			= (pMsg[2] & 0x0F);
-	rx_tx_fb.Qos_Pkt		= pMsg[3] >> 7;
-	rx_tx_fb.Bandwidth		= (pMsg[3] & 0x40) >> 6;
-	rx_tx_fb.Retry_Cnt		= pMsg[5];
-	rx_tx_fb.Pkt_ID			= (pMsg[6] << 8) | pMsg[7];
-	rx_tx_fb.Seq_Num		= (pMsg[8] << 8) | pMsg[9];
-	rx_tx_fb.S_Rate			= pMsg[10];
-	rx_tx_fb.F_Rate			= pMsg[11];
-	rx_tx_fb.S_RTS_Rate	= pMsg[12];
-	rx_tx_fb.F_RTS_Rate	= pMsg[13];
-	rx_tx_fb.pkt_length	= (pMsg[14] << 8) | pMsg[15];
-#endif
 	memcpy((u8*)&rx_tx_fb, pmsg, sizeof(cmpk_txfb_t));
 	cmpk_count_txstatistic(dev, &rx_tx_fb);
-#if 0
-	if (pAdapter->RegWirelessMode == WIRELESS_MODE_A ||
-		pAdapter->RegWirelessMode == WIRELESS_MODE_B ||
-		pAdapter->RegWirelessMode == WIRELESS_MODE_G)
-	{
-		pMgntInfo->CurrentOperaRate = (rx_tx_fb.F_Rate & 0x7F);
-	}
-	else if (pAdapter->RegWirelessMode == WIRELESS_MODE_N_24G ||
-			 pAdapter->RegWirelessMode == WIRELESS_MODE_N_5G)
-	{
-		pMgntInfo->HTCurrentOperaRate = (rx_tx_fb.F_Rate & 0x8F);
-	}
-#endif
-
 }	/* cmpk_Handle_Tx_Feedback */
 
 void

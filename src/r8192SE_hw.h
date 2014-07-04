@@ -20,18 +20,6 @@
 #define __INC_HAL8192SREG_H
 
 
-#if 0
-typedef enum _RT_RF_TYPE_DEF
-{
-	RF_1T2R = 0,
-	RF_2T4R,
-	RF_2T2R,
-	RF_1T1R,
-	RF_2T2R_GREEN,
-	RF_819X_MAX_TYPE
-}RT_RF_TYPE_DEF;
-#endif
-
 #define		SYS_ISO_CTRL			0x0000
 #define		SYS_FUNC_EN			0x0002
 #define		PMC_FSM				0x0004
@@ -507,7 +495,6 @@ Default: 00b.
 #define MSR_LINK_SHIFT     0
 #define MSR_LINK_ADHOC     1
 #define MSR_LINK_MASTER    3
-#if 1
 #define		MSR_NOLINK				0x00
 #define		MSR_ADHOC				0x01
 #define		MSR_INFRA				0x02
@@ -874,34 +861,28 @@ Default: 00b.
 #define		FW_RA_INIT						0xfd000026
 #define		FW_CTRL_DM_BY_DRIVER			0Xfd00002a
 #define		FW_RA_IOT_BG_COMB			0xfd000030
-#define		FW_RA_IOT_N_COMB				0xfd000031
-#define		FW_RA_REFRESH					0xfd0000a0
-#define		FW_RA_UPDATE_MASK				0xfd0000a2
-#define		FW_RA_DISABLE					0xfd0000a4
-#define		FW_RA_ACTIVE					0xfd0000a6
-#define		FW_RA_DISABLE_RSSI_MASK		0xfd0000ac
-#define		FW_RA_ENABLE_RSSI_MASK		0xfd0000ad
-#define		FW_RA_RESET					0xfd0000af
-#define		FW_DM_DISABLE					0xfd00aa00
-#define		FW_IQK_ENABLE					0xf0000020
+#define		FW_RA_IOT_N_COMB			0xfd000031
+#define		FW_RA_REFRESH				0xfd0000a0
+#define		FW_RA_UPDATE_MASK			0xfd0000a2
+#define		FW_RA_DISABLE				0xfd0000a4
+#define		FW_RA_ACTIVE				0xfd0000a6
+#define		FW_RA_DISABLE_RSSI_MASK			0xfd0000ac
+#define		FW_RA_ENABLE_RSSI_MASK			0xfd0000ad
+#define		FW_RA_RESET				0xfd0000af
+#define		FW_DM_DISABLE				0xfd00aa00
+#define		FW_IQK_ENABLE				0xf0000020
 #define		FW_IQK_SUCCESS				0x0000dddd
-#define		FW_IQK_FAIL					0x0000ffff
-#define		FW_OP_FAILURE					0xffffffff
+#define		FW_IQK_FAIL				0x0000ffff
+#define		FW_OP_FAILURE				0xffffffff
 #define		FW_TX_FEEDBACK_NONE			0xfb000000
 #define		FW_TX_FEEDBACK_DTM_ENABLE	(FW_TX_FEEDBACK_NONE | 0x1)
 #define		FW_TX_FEEDBACK_CCX_ENABLE	(FW_TX_FEEDBACK_NONE | 0x2)
 #define		FW_BB_RESET_ENABLE			0xff00000d
 #define		FW_BB_RESET_DISABLE			0xff00000e
-#define		FW_LPS_ENTER					0xfe000010
-#define		FW_LPS_LEAVE					0xfe000011
-#define		FW_INDIRECT_READ				0xf2000000
-#define		FW_INDIRECT_WRITE				0xf2000001
-
-
-
-
-
-
+#define		FW_LPS_ENTER				0xfe000010
+#define		FW_LPS_LEAVE				0xfe000011
+#define		FW_INDIRECT_READ			0xf2000000
+#define		FW_INDIRECT_WRITE			0xf2000001
 
 #define RFPC					0x5F
 #define RCR_9356SEL			BIT6
@@ -915,7 +896,6 @@ Default: 00b.
 #define CWR					0xDC
 #define RetryCTR				0xDE
 
-
 #define		LED1Cfg				UnusedRegister
 #define		LED0Cfg				UnusedRegister
 #define		GPI					UnusedRegister
@@ -924,9 +904,6 @@ Default: 00b.
 #define		SIFS				UnusedRegister
 
 #define		CPU_GEN_SYSTEM_RESET		0x00000001
-
-
-
 
 #define		CCX_COMMAND_REG			0x890
 #define		CLM_PERIOD_REG			0x894
@@ -949,9 +926,6 @@ Default: 00b.
 #define		NHM_RPI_COUNTER6		0x8DE
 #define		NHM_RPI_COUNTER7		0x8DF
 
-
 #define		HAL_8192S_HW_GPIO_OFF_BIT	BIT3
 #define		HAL_8192S_HW_GPIO_OFF_MASK	0xF7
 #define		HAL_8192S_HW_GPIO_WPS_BIT	BIT4
-
-#endif

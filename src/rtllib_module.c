@@ -127,14 +127,11 @@ static bool rtllib_wdev_alloc(struct rtllib_device *ieee)
 {
 	struct wireless_dev *wdev = &ieee->wdev;
 
-
-#if 1
 	ieee->wdev.wiphy = wiphy_new(&rtllib_config_ops, 0);
 	if (!ieee->wdev.wiphy) {
 		RTLLIB_ERROR("Unable to allocate wiphy.\n");
 		return false;
 	}
-
 
 	ieee->dev->ieee80211_ptr = &ieee->wdev;
 	ieee->wdev.iftype = NL80211_IFTYPE_STATION;
@@ -149,54 +146,7 @@ static bool rtllib_wdev_alloc(struct rtllib_device *ieee)
 	ieee->wdev.wiphy->interface_modes = BIT(NL80211_IFTYPE_STATION)
 		| BIT(NL80211_IFTYPE_ADHOC);
 
-#endif
-
-#if 0
-	memcpy(wdev->wiphy->perm_addr, ieee->dev->dev_addr, ETH_ALEN);
-	/* fill-out priv->ieee->bg_band */
-	if (geo->bg_channels) {
-		u8 i;
-		struct ieee80211_supported_band *bg_band = &ieee->bg_band;
-
-		bg_band->band = IEEE80211_BAND_2GHZ;
-		bg_band->n_channels = geo->bg_channels;
-		bg_band->channels =
-			kzalloc(geo->bg_channels *
-					sizeof(struct ieee80211_channel), GFP_KERNEL);
-		/* translate geo->bg to bg_band.channels */
-		for (i = 0; i < geo->bg_channels; i++) {
-			bg_band->channels[i].band = IEEE80211_BAND_2GHZ;
-			bg_band->channels[i].center_freq = geo->bg[i].freq;
-			bg_band->channels[i].hw_value = geo->bg[i].channel;
-			bg_band->channels[i].max_power = geo->bg[i].max_power;
-			if (geo->bg[i].flags & LIBIPW_CH_PASSIVE_ONLY)
-				bg_band->channels[i].flags |=
-					IEEE80211_CHAN_PASSIVE_SCAN;
-			if (geo->bg[i].flags & LIBIPW_CH_NO_IBSS)
-				bg_band->channels[i].flags |=
-					IEEE80211_CHAN_NO_IBSS;
-			if (geo->bg[i].flags & LIBIPW_CH_RADAR_DETECT)
-				bg_band->channels[i].flags |=
-					IEEE80211_CHAN_RADAR;
-			/* No equivalent for LIBIPW_CH_80211H_RULES,
-			 * LIBIPW_CH_UNIFORM_SPREADING, or
-			 * LIBIPW_CH_B_ONLY... */
-		}
-		/* point at bitrate info */
-		bg_band->bitrates = ipw2200_bg_rates;
-		bg_band->n_bitrates = ipw2200_num_bg_rates;
-
-		wdev->wiphy->bands[IEEE80211_BAND_2GHZ] = bg_band;
-	}
-
-	/* With that information in place, we can now register the wiphy... */
-	if (wiphy_register(wdev->wiphy) < 0) {
-		RTLLIB_ERROR("Couldn't register wiphy device\n");
-		goto out_err_register;
-	}
-#endif
 	return true;
-
 out_err_register:
 	wiphy_free(ieee->wdev.wiphy);
 out_err_new:
@@ -284,9 +234,6 @@ struct net_device *alloc_rtllib(int sizeof_priv)
 	HTUpdateDefaultSetting(ieee);
 	HTInitializeHTInfo(ieee);
 	TSInitialize(ieee);
-#if 0
-	INIT_WORK_RSL(&ieee->ht_onAssRsp, (void(*)(void*)) HTOnAssocRsp_wq, ieee);
-#endif
 	for (i = 0; i < IEEE_IBSS_MAC_HASH_SIZE; i++)
 		INIT_LIST_HEAD(&ieee->ibss_mac_hash[i]);
 

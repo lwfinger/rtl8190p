@@ -457,17 +457,8 @@ int rtllib_wx_set_essid(struct rtllib_device *ieee,
 	if (wrqu->essid.flags && wrqu->essid.length) {
 		strncpy(ieee->current_network.ssid, extra, len);
 		ieee->current_network.ssid_len = len;
-#if 0
-		{
-			int i;
-			for (i=0; i<len; i++)
-				printk("%c ", extra[i]);
-			printk("\n");
-		}
-#endif
 		ieee->ssid_set = 1;
-	}
-	else{
+	} else{
 		ieee->ssid_set = 0;
 		ieee->current_network.ssid[0] = '\0';
 		ieee->current_network.ssid_len = 0;
@@ -537,13 +528,6 @@ int rtllib_wx_get_name(struct rtllib_device *ieee,
 		strcat(wrqu->name, "g");
 	if (ieee->mode & (IEEE_N_24G | IEEE_N_5G))
 		strcat(wrqu->name, "n");
-#if 0
-	if((ieee->state == RTLLIB_LINKED) ||
-		(ieee->state == RTLLIB_LINKED_SCANNING))
-		strcat(wrqu->name," linked");
-	else if(ieee->state != RTLLIB_NOLINK)
-		strcat(wrqu->name," link..");
-#endif
 	return 0;
 }
 
@@ -554,17 +538,13 @@ int rtllib_wx_set_power(struct rtllib_device *ieee,
 				 union iwreq_data *wrqu, char *extra)
 {
 	int ret = 0;
-#if 1
-	if(
-		(!ieee->sta_wake_up) ||
-		(!ieee->enter_sleep_state) ||
-		(!ieee->ps_is_queue_empty)){
-
+	if ((!ieee->sta_wake_up) ||
+	    (!ieee->enter_sleep_state) ||
+	    (!ieee->ps_is_queue_empty)){
 		RTLLIB_DEBUG(RTLLIB_DL_ERR,"%s(): PS mode is tryied to be use but driver missed a callback\n\n",__FUNCTION__);
 
 		return -1;
 	}
-#endif
 	down(&ieee->wx_sem);
 
 	if (wrqu->power.disabled){

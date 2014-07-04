@@ -102,10 +102,7 @@ void Dot11d_Reset(struct rtllib_device *ieee)
 {
 	u32 i;
 	PRT_DOT11D_INFO pDot11dInfo = GET_DOT11D_INFO(ieee);
-#if 0
-	if(!pDot11dInfo->bEnabled)
-		return;
-#endif
+
 	memset(pDot11dInfo->channel_map, 0, MAX_CHANNEL_NUMBER+1);
 	memset(pDot11dInfo->MaxTxPwrDbmList, 0xFF, MAX_CHANNEL_NUMBER+1);
 	for (i=1; i<=11; i++) {
@@ -155,13 +152,11 @@ void Dot11d_UpdateCountryIe(struct rtllib_device *dev, u8 *pTaddr,
 
 		pTriple = (PCHNL_TXPOWER_TRIPLE)((u8*)pTriple + 3);
 	}
-#if 1
 	printk("Channel List:");
 	for(i=1; i<= MAX_CHANNEL_NUMBER; i++)
 		if(pDot11dInfo->channel_map[i] > 0)
 			printk(" %d", i);
 	printk("\n");
-#endif
 
 	UPDATE_CIE_SRC(dev, pTaddr);
 

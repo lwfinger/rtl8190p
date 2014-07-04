@@ -61,25 +61,6 @@ void InactivePsWorkItemCallback(struct net_device *dev)
 	//
 	// To solve CAM values miss in RF OFF, rewrite CAM values after RF ON. By Bruce, 2007-09-20.
 	//
-#if 0
-	if(pPSC->eInactivePowerState == eRfOn)
-	{
-		//
-		// To solve CAM values miss in RF OFF, rewrite CAM values after RF ON. By Bruce, 2007-09-20.
-		//
-		while( index < 4 )
-		{
-			if( ( pMgntInfo->SecurityInfo.PairwiseEncAlgorithm == WEP104_Encryption ) ||
-				(pMgntInfo->SecurityInfo.PairwiseEncAlgorithm == WEP40_Encryption) )
-			{
-				if( pMgntInfo->SecurityInfo.KeyLen[index] != 0)
-				pAdapter->HalFunc.SetKeyHandler(pAdapter, index, 0, false, pMgntInfo->SecurityInfo.PairwiseEncAlgorithm, true, false);
-
-			}
-			index++;
-		}
-	}
-#endif
 	pPSC->bSwRfProcessing = false;
 	RT_TRACE(COMP_PS, "InactivePsWorkItemCallback() <--------- \n");
 }

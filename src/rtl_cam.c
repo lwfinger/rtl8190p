@@ -179,28 +179,7 @@ void setKey(struct net_device *dev,
 	RT_TRACE(COMP_SEC,"=========>after set key, usconfig:%x\n", usConfig);
 	//	CAM_read_entry(dev, 0);
 }
-// This function seems not ready! WB
-#if 0
-void CamPrintDbgReg(struct net_device* dev)
-{
-	unsigned long rvalue;
-	unsigned char ucValue;
-	write_nic_dword(dev, DCAM, 0x80000000);
-	msleep(40);
-	rvalue = read_nic_dword(dev, DCAM);	//delay_ms(40);
-	RT_TRACE(COMP_SEC, " TX CAM=%8lX ",rvalue);
-	if((rvalue & 0x40000000) != 0x4000000)
-		RT_TRACE(COMP_SEC, "-->TX Key Not Found      ");
-	msleep(20);
-	write_nic_dword(dev, DCAM, 0x00000000);	//delay_ms(40);
-	rvalue = read_nic_dword(dev, DCAM);	//delay_ms(40);
-	RT_TRACE(COMP_SEC, "RX CAM=%8lX ",rvalue);
-	if((rvalue & 0x40000000) != 0x4000000)
-		RT_TRACE(COMP_SEC, "-->CAM Key Not Found   ");
-	ucValue = read_nic_byte(dev, SECR);
-	RT_TRACE(COMP_SEC, "WPA_Config=%x \n",ucValue);
-}
-#endif
+
 void CAM_read_entry(struct net_device *dev, u32 iIndex)
 {
 	u32 target_command=0;
@@ -217,7 +196,6 @@ void CAM_read_entry(struct net_device *dev, u32 iIndex)
 
 		//Check polling bit is clear
 		//	mdelay(1);
-#if 1
 		while((i--)>=0)
 		{
 			ulStatus = read_nic_dword(dev, RWCAM);
@@ -228,7 +206,6 @@ void CAM_read_entry(struct net_device *dev, u32 iIndex)
 				break;
 			}
 		}
-#endif
 		write_nic_dword(dev, RWCAM, target_command);
 		RT_TRACE(COMP_SEC,"CAM_read_entry(): WRITE A0: %x \n",target_command);
 		//	printk("CAM_read_entry(): WRITE A0: %lx \n",target_command);

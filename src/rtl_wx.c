@@ -45,41 +45,6 @@ static int r8192_wx_get_freq(struct net_device *dev,
 	return rtllib_wx_get_freq(priv->rtllib,a,wrqu,b);
 }
 
-
-#if 0
-
-static int r8192_wx_set_beaconinterval(struct net_device *dev, struct iw_request_info *aa,
-			  union iwreq_data *wrqu, char *b)
-{
-	int *parms = (int *)b;
-	int bi = parms[0];
-
-	struct r8192_priv *priv = rtllib_priv(dev);
-
-	down(&priv->wx_sem);
-	DMESG("setting beacon interval to %x",bi);
-
-	priv->rtllib->beacon_interval=bi;
-	rtl8192_commit(dev);
-	up(&priv->wx_sem);
-
-	return 0;
-}
-
-
-static int r8192_wx_set_forceassociate(struct net_device *dev, struct iw_request_info *aa,
-			  union iwreq_data *wrqu, char *extra)
-{
-	struct r8192_priv *priv=rtllib_priv(dev);
-	int *parms = (int *)extra;
-
-	priv->rtllib->force_associate = (parms[0] > 0);
-
-
-	return 0;
-}
-
-#endif
 static int r8192_wx_get_mode(struct net_device *dev, struct iw_request_info *a,
 			     union iwreq_data *wrqu, char *b)
 {

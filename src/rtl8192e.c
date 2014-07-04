@@ -189,13 +189,6 @@ static void rtl8192_read_eeprom_info(struct net_device* dev)
 		// when auto load failed,  the last address byte set to be a random one.
 		// added by david woo.2007/11/7
 		memcpy(dev->dev_addr, bMac_Tmp_Addr, 6);
-		#if 0
-		for(i = 0; i < 6; i++)
-		{
-			dev->PermanentAddress[i] = sMacAddr[i];
-			write_nic_byte(dev, IDR0+i, sMacAddr[i]);
-		}
-		#endif
 	}
 
 	RT_TRACE(COMP_INIT, "Permanent Address = %02x-%02x-%02x-%02x-%02x-%02x\n",
@@ -879,11 +872,6 @@ start:
 	{ // User disable RF via registry.
 		RT_TRACE((COMP_INIT|COMP_RF|COMP_POWER), "%s(): Turn off RF for RegRfOff ----------\n",__FUNCTION__);
 		MgntActSet_RF_State(dev, eRfOff, RF_CHANGE_BY_SW);
-#if 0//cosa, ask SD3 willis and he doesn't know what is this for
-		// Those action will be discard in MgntActSet_RF_State because off the same state
-	for(eRFPath = 0; eRFPath <pHalData->NumTotalRFPath; eRFPath++)
-		PHY_SetRFReg(dev, (RF90_RADIO_PATH_E)eRFPath, 0x4, 0xC00, 0x0);
-#endif
 	}
 	else if(priv->rtllib->RfOffReason > RF_CHANGE_BY_PS)
 	{ // H/W or S/W RF OFF before sleep.

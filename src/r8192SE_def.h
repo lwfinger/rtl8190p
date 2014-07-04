@@ -33,21 +33,6 @@
 #define RX_DESC_SIZE				24
 #define RX_DRV_INFO_SIZE_UNIT	8
 
-#if 0
-#define BK_QUEUE					0
-#define BE_QUEUE					1
-#define VI_QUEUE					2
-#define VO_QUEUE				3
-#define BEACON_QUEUE			4
-#define TXCMD_QUEUE				5
-#define MGNT_QUEUE				6
-#define HIGH_QUEUE				7
-#define HCCA_QUEUE				8
-
-#define LOW_QUEUE				BE_QUEUE
-#define NORMAL_QUEUE			MGNT_QUEUE
-#endif
-
 #define RX_MPDU_QUEUE			0
 #define RX_CMD_QUEUE			1
 #define RX_MAX_QUEUE			2
@@ -539,13 +524,6 @@ typedef struct _rx_desc_8192se{
 	u32		BufferAddress;
 
 	u32		NextRxDescAddress;
-
-#if 0
-	u32		BA_SSN:12;
-	u32		BA_VLD:1;
-	u32		RSVD:19;
-#endif
-
 } rx_desc, *prx_desc;
 
 
@@ -607,12 +585,6 @@ typedef struct _rx_desc_status_8192se{
 	u32		BufferAddress;
 
 	u32		NextRxDescAddress;
-
-#if 0
-	u32		BA_SSN:12;
-	u32		BA_VLD:1;
-	u32		RSVD:19;
-#endif
 }rx_desc_status, *prx_desc_status;
 
 typedef enum _HAL_FW_C2H_CMD_ID

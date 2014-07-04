@@ -1153,7 +1153,6 @@ struct ieee_ibss_seq {
  *       information for frames received.  Not setting these will not cause
  *       any adverse affects. */
 struct rtllib_rx_stats {
-#if 1
 	u32 mac_time[2];
 	s8 rssi;
 	u8 signal;
@@ -1214,8 +1213,6 @@ struct rtllib_rx_stats {
 #ifdef TCP_CSUM_OFFLOAD_RX
 	u8	tcp_csum_valid;
 #endif
-#endif
-
 };
 
 /* IEEE 802.11 requires that STA supports concurrent reception of at least
@@ -1582,7 +1579,6 @@ typedef union _frameqos {
 #define QOS_OUI_PARAM_SUB_TYPE          1
 #define QOS_VERSION_1                   1
 #define QOS_AIFSN_MIN_VALUE             2
-#if 1
 struct rtllib_qos_information_element {
         u8 elementID;
         u8 length;
@@ -1657,7 +1653,7 @@ struct rtllib_wmm_tspec_elem {
 	u16 surp_band_allow;
 	u16 medium_time;
 }__attribute__((packed));
-#endif
+
 enum eap_type {
 	EAP_PACKET = 0,
 	EAPOL_START,
@@ -1774,14 +1770,12 @@ enum {WMM_all_frame, WMM_two_frame, WMM_four_frame, WMM_six_frame};
 
 #define MAX_RECEIVE_BUFFER_SIZE 9100
 
-#if 1
 #define UP2AC(up) (		   \
 	((up) < 1) ? WME_AC_BE : \
 	((up) < 3) ? WME_AC_BK : \
 	((up) < 4) ? WME_AC_BE : \
 	((up) < 6) ? WME_AC_VI : \
 	WME_AC_VO)
-#endif
 #define AC2UP(_ac)	(       \
 	((_ac) == WME_AC_VO) ? 6 : \
 	((_ac) == WME_AC_VI) ? 5 : \
@@ -1883,7 +1877,6 @@ struct rtllib_network {
 	struct list_head list;
 };
 
-#if 1
 enum rtllib_state {
 
 	/* the card is not linked at all */
@@ -1921,17 +1914,6 @@ enum rtllib_state {
 	 */
 	RTLLIB_LINKED_SCANNING,
 };
-#else
-enum rtllib_state {
-        RTLLIB_UNINITIALIZED = 0,
-        RTLLIB_INITIALIZED,
-        RTLLIB_ASSOCIATING,
-        RTLLIB_ASSOCIATED,
-        RTLLIB_AUTHENTICATING,
-        RTLLIB_AUTHENTICATED,
-        RTLLIB_SHUTDOWN
-};
-#endif
 
 #define DEFAULT_MAX_SCAN_AGE (15 * HZ)
 #define DEFAULT_FTS 2346
@@ -2650,36 +2632,8 @@ struct rtllib_device {
 	void (*sta_wake_up) (struct net_device *dev);
 	void (*enter_sleep_state) (struct net_device *dev, u32 th, u32 tl);
 	short (*ps_is_queue_empty) (struct net_device *dev);
-#if 0
-	/* Typical STA methods */
-        int (*handle_auth) (struct net_device * dev,
-                            struct rtllib_auth * auth);
-        int (*handle_deauth) (struct net_device * dev,
-                              struct rtllib_deauth * auth);
-        int (*handle_action) (struct net_device * dev,
-                              struct rtllib_action * action,
-                              struct rtllib_rx_stats * stats);
-        int (*handle_disassoc) (struct net_device * dev,
-                                struct rtllib_disassoc * assoc);
-#endif
         int (*handle_beacon) (struct net_device * dev, struct rtllib_beacon * beacon, struct rtllib_network * network);
-#if 0
-        int (*handle_probe_response) (struct net_device * dev,
-                                      struct rtllib_probe_response * resp,
-                                      struct rtllib_network * network);
-        int (*handle_probe_request) (struct net_device * dev,
-                                     struct rtllib_probe_request * req,
-                                     struct rtllib_rx_stats * stats);
-#endif
         int (*handle_assoc_response) (struct net_device * dev, struct rtllib_assoc_response_frame * resp, struct rtllib_network * network);
-
-#if 0
-        /* Typical AP methods */
-        int (*handle_assoc_request) (struct net_device * dev);
-        int (*handle_reassoc_request) (struct net_device * dev,
-                                       struct rtllib_reassoc_request * req);
-#endif
-
 	/* check whether Tx hw resouce available */
 	short (*check_nic_enough_desc)(struct net_device *dev, int queue_index);
 	short (*get_nic_desc_num)(struct net_device *dev, int queue_index);

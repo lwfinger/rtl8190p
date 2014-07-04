@@ -893,11 +893,6 @@ typedef struct r8192_priv
 	// 2009/01/20 MH Add for new EEPROM format.
 	u8	TxPwrHt20Diff[2][14];				// HT 20<->40 Pwr diff
 	u8	TxPwrLegacyHtDiff[2][14];		// For HT<->legacy pwr diff
-#if 0//cosa, remove band-edge related stuff by SD3's request
-	u8	TxPwrbandEdgeHt40[2][2];		// Band edge for HY 40MHZlow/up channel
-	u8	TxPwrbandEdgeHt20[2][2];		// Band edge for HY 40MHZ low/up channel
-	u8	TxPwrbandEdgeLegacyOfdm[2][2];	// Band edge for legacy ofdm low/up channel
-#endif
 	u8	TxPwrSafetyFlag;				// Band edge enable flag
 	// Antenna gain offset, rf-c to rf-a
 	u8	HT2T_TxPwr_A[14];				// For channel 1~14 on path A.

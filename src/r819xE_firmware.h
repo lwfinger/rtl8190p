@@ -66,43 +66,5 @@ typedef struct _rt_firmware{
 	u8		  firmware_buf[MAX_FW_INIT_STEP][RTL8190_MAX_FIRMWARE_CODE_SIZE];
 	u16		  firmware_buf_size[MAX_FW_INIT_STEP];
 }rt_firmware, *prt_firmware;
-#if 0
-RT_STATUS
-CPUCheckMainCodeOKAndTurnOnCPU(
-	IN	PADAPTER			dev
-	);
 
-RT_STATUS
-CPUCheckFirmwareReady(
-	IN	PADAPTER			dev
-	);
-
-VOID
-FWInitializeParameters(
-	IN	PADAPTER		dev
-	);
-
-RT_STATUS
-FWSendDownloadCode(
-	IN	PADAPTER		dev,
-	IN	pu1Byte			CodeVirtualAddrress,
-	IN	u4Byte			BufferLen
-	);
-
-RT_STATUS
-FWSendNullPacket(
-	IN	PADAPTER		dev,
-	IN	u4Byte			Length
-	);
-
-RT_STATUS
-CmdSendPacket(
-	PADAPTER				dev,
-	PRT_TCB					pTcb,
-	PRT_TX_LOCAL_BUFFER	pBuf,
-	u4Byte					BufferLen,
-	u4Byte					PacketType,
-	BOOLEAN					bLastInitPacket
-	);
-#endif
 #endif

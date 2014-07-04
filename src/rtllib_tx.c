@@ -234,15 +234,8 @@ int rtllib_encrypt_fragment(
 	return 0;
 }
 
-
-void rtllib_txb_free(struct rtllib_txb *txb) {
-	if (unlikely(!txb))
-		return;
-#if 0
-	for (i = 0; i < txb->nr_frags; i++)
-		if (txb->fragments[i])
-			dev_kfree_skb_any(txb->fragments[i]);
-#endif
+void rtllib_txb_free(struct rtllib_txb *txb)
+{
 	kfree(txb);
 }
 

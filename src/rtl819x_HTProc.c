@@ -317,11 +317,7 @@ bool IsHTHalfNmodeAPs(struct rtllib_device* ieee)
 {
 	bool			retValue = false;
 	struct rtllib_network* net = &ieee->current_network;
-#if 0
-	if(ieee->bHalfNMode == false)
-		retValue = false;
-	else
-#endif
+
 	if((memcmp(net->bssid, BELKINF5D8233V1_RALINK, 3)==0) ||
 		     (memcmp(net->bssid, BELKINF5D82334V3_RALINK, 3)==0) ||
 		     (memcmp(net->bssid, PCI_RALINK, 3)==0) ||
@@ -387,22 +383,7 @@ void HTIOTPeerDetermine(struct rtllib_device* ieee)
 u8 HTIOTActIsDisableMCS14(struct rtllib_device* ieee, u8* PeerMacAddr)
 {
 	u8 ret = 0;
-#if 0
-#if (HAL_CODE_BASE==RTL8192 && DEV_BUS_TYPE==USB_INTERFACE)
-	if((memcmp(PeerMacAddr, UNKNOWN_BORADCOM, 3)==0) ||
-		(memcmp(PeerMacAddr, LINKSYSWRT330_LINKSYSWRT300_BROADCOM, 3)==0)
-	    )
-	{
-		ret = 1;
-	}
 
-
-	if(pHTInfo->bCurrentRT2RTAggregation)
-	{
-		ret = 1;
-	}
-#endif
-#endif
 	return ret;
  }
 
@@ -459,17 +440,6 @@ u8 HTIOTActIsDisableEDCATurbo(struct rtllib_device*	ieee, u8* PeerMacAddr)
 	u8	retValue = false;
 
 	return retValue;
-#if 0
-	if((memcmp(PeerMacAddr, UNKNOWN_BORADCOM, 3)==0)||
-		(memcmp(PeerMacAddr, LINKSYSWRT330_LINKSYSWRT300_BROADCOM, 3)==0)||
-		(memcmp(PeerMacAddr, LINKSYSWRT350_LINKSYSWRT150_BROADCOM, 3)==0))
-
-	{
-		retValue = 1;
-	}
-
-	return retValue;
-#endif
 }
 
 #ifdef RTL8192SU
@@ -1024,18 +994,12 @@ void HTOnAssocRsp(struct rtllib_device *ieee)
 			pHTInfo->CurrentAMPDUFactor = pHTInfo->AMPDU_Factor;
 
 	} else {
-#if 0
-		osTmp= PacketGetElement( asocpdu, EID_Vendor, OUI_SUB_REALTEK_AGG, OUI_SUBTYPE_DONT_CARE);
-		if(osTmp.Length >= 5)
-#endif
-		if (ieee->current_network.bssht.bdRT2RTAggregation)
-		{
+		if (ieee->current_network.bssht.bdRT2RTAggregation) {
 			if( ieee->pairwise_key_type != KEY_TYPE_NA)
 				pHTInfo->CurrentAMPDUFactor = pPeerHTCap->MaxRxAMPDUFactor;
 			else
 				pHTInfo->CurrentAMPDUFactor = HT_AGG_SIZE_64K;
-		}else
-		{
+		}else {
 			if(pPeerHTCap->MaxRxAMPDUFactor < HT_AGG_SIZE_32K)
 				pHTInfo->CurrentAMPDUFactor = pPeerHTCap->MaxRxAMPDUFactor;
 			else

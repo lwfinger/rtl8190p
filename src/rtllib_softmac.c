@@ -1573,10 +1573,6 @@ void rtllib_associate_step2(struct rtllib_device *ieee)
 	else{
 		softmac_mgmt_xmit(skb, ieee);
 		mod_timer(&ieee->associate_timer, jiffies + (HZ/2));
-#if 0
-		ieee->associate_timer.expires = jiffies + (HZ / 2);
-		add_timer(&ieee->associate_timer);
-#endif
 	}
 }
 
@@ -1685,26 +1681,7 @@ void rtllib_associate_complete(struct rtllib_device *ieee)
 {
 	del_timer_sync(&ieee->associate_timer);
 
-#if 0
-	for(i = 0; i < 6; i++) {
-	  ieee->seq_ctrl[i] = 0;
-	}
-#endif
 	ieee->state = RTLLIB_LINKED;
-#if 0
-	if (ieee->pHTInfo->bCurrentHTSupport)
-	{
-		printk("Successfully associated, ht enabled\n");
-		queue_work_rsl(ieee->wq, &ieee->ht_onAssRsp);
-	}
-	else
-	{
-		printk("Successfully associated, ht not enabled\n");
-		memset(ieee->dot11HTOperationalRateSet, 0, 16);
-		HTSetConnectBwMode(ieee, HT_CHANNEL_WIDTH_20, HT_EXTCHNL_OFFSET_NO_EXT);
-	}
-#endif
-
 	rtllib_sta_send_associnfo(ieee);
 
 	queue_work_rsl(ieee->wq, &ieee->associate_complete_wq);
@@ -2046,11 +2023,6 @@ rtllib_rx_assoc_rq(struct rtllib_device *ieee, struct sk_buff *skb)
 	}
 
 	printk(KERN_INFO"New client associated: "MAC_FMT"\n", MAC_ARG(dest));
-	#if 0
-	spin_lock_irqsave(&ieee->lock,flags);
-	add_associate(ieee,dest);
-	spin_unlock_irqrestore(&ieee->lock,flags);
-	#endif
 }
 
 
@@ -2496,17 +2468,6 @@ rtllib_rx_frame_softmac(struct rtllib_device *ieee, struct sk_buff *skb,
 					}
 				}
 			break;
-#if 0
-		case RTLLIB_STYPE_PROBE_REQ:
-
-			if ((ieee->softmac_features & IEEE_SOFTMAC_PROBERS) &&
-				((ieee->iw_mode == IW_MODE_ADHOC ||
-				ieee->iw_mode == IW_MODE_MASTER) &&
-				ieee->state == RTLLIB_LINKED)){
-				rtllib_rx_probe_rq(ieee, skb);
-			}
-			break;
-#endif
 		case RTLLIB_STYPE_DISASSOC:
 		case RTLLIB_STYPE_DEAUTH:
 
@@ -2578,7 +2539,6 @@ void rtllib_softmac_xmit(struct rtllib_txb *txb, struct rtllib_device *ieee)
 	if(tcb_desc->bMulticast) {
 		ieee->stats.multicast++;
 	}
-#if 1
 	/* if xmit available, just xmit it immediately, else just insert it to the wait queue */
 	for(i = 0; i < txb->nr_frags; i++) {
 #ifdef USB_TX_DRIVER_AGGREGATION_ENABLE
@@ -2613,7 +2573,6 @@ void rtllib_softmac_xmit(struct rtllib_txb *txb, struct rtllib_device *ieee)
 					ieee->dev,ieee->rate);
 		}
 	}
-#endif
 	rtllib_txb_free(txb);
 
 	spin_unlock_irqrestore(&ieee->lock,flags);
