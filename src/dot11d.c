@@ -132,12 +132,12 @@ void Dot11d_UpdateCountryIe(struct rtllib_device *dev, u8 *pTaddr,
 	pTriple = (PCHNL_TXPOWER_TRIPLE)(pCoutryIe + 3);
 	for(i = 0; i < NumTriples; i++)
 	{
-		if(MaxChnlNum >= pTriple->FirstChnl)
+		if (MaxChnlNum >= pTriple->FirstChnl)
 		{
 			printk("Dot11d_UpdateCountryIe(): Invalid country IE, skip it........1\n");
 			return;
 		}
-		if(MAX_CHANNEL_NUMBER < (pTriple->FirstChnl + pTriple->NumChnls))
+		if (MAX_CHANNEL_NUMBER < (pTriple->FirstChnl + pTriple->NumChnls))
 		{
 			printk("Dot11d_UpdateCountryIe(): Invalid country IE, skip it........2\n");
 			return;
@@ -154,7 +154,7 @@ void Dot11d_UpdateCountryIe(struct rtllib_device *dev, u8 *pTaddr,
 	}
 	printk("Channel List:");
 	for(i=1; i<= MAX_CHANNEL_NUMBER; i++)
-		if(pDot11dInfo->channel_map[i] > 0)
+		if (pDot11dInfo->channel_map[i] > 0)
 			printk(" %d", i);
 	printk("\n");
 
@@ -170,12 +170,12 @@ u8 DOT11D_GetMaxTxPwrInDbm( struct rtllib_device *dev, u8 Channel)
 	PRT_DOT11D_INFO pDot11dInfo = GET_DOT11D_INFO(dev);
 	u8 MaxTxPwrInDbm = 255;
 
-	if(MAX_CHANNEL_NUMBER < Channel)
+	if (MAX_CHANNEL_NUMBER < Channel)
 	{
 		printk("DOT11D_GetMaxTxPwrInDbm(): Invalid Channel\n");
 		return MaxTxPwrInDbm;
 	}
-	if(pDot11dInfo->channel_map[Channel])
+	if (pDot11dInfo->channel_map[Channel])
 	{
 		MaxTxPwrInDbm = pDot11dInfo->MaxTxPwrDbmList[Channel];
 	}
@@ -194,7 +194,7 @@ void DOT11D_ScanComplete( struct rtllib_device * dev)
 		break;
 
 	case DOT11D_STATE_DONE:
-		if( GET_CIE_WATCHDOG(dev) == 0 )
+		if ( GET_CIE_WATCHDOG(dev) == 0 )
 		{
 			Dot11d_Reset(dev);
 		}
@@ -208,12 +208,12 @@ int IsLegalChannel( struct rtllib_device * dev, u8 channel)
 {
 	PRT_DOT11D_INFO pDot11dInfo = GET_DOT11D_INFO(dev);
 
-	if(MAX_CHANNEL_NUMBER < channel)
+	if (MAX_CHANNEL_NUMBER < channel)
 	{
 		printk("IsLegalChannel(): Invalid Channel\n");
 		return 0;
 	}
-	if(pDot11dInfo->channel_map[channel] > 0)
+	if (pDot11dInfo->channel_map[channel] > 0)
 		return 1;
 	return 0;
 }
@@ -226,20 +226,20 @@ int ToLegalChannel( struct rtllib_device * dev, u8 channel)
 
 	for (i=1; i<= MAX_CHANNEL_NUMBER; i++)
 	{
-		if(pDot11dInfo->channel_map[i] > 0)
+		if (pDot11dInfo->channel_map[i] > 0)
 		{
 			default_chn = i;
 			break;
 		}
 	}
 
-	if(MAX_CHANNEL_NUMBER < channel)
+	if (MAX_CHANNEL_NUMBER < channel)
 	{
 		printk("IsLegalChannel(): Invalid Channel\n");
 		return default_chn;
 	}
 
-	if(pDot11dInfo->channel_map[channel] > 0)
+	if (pDot11dInfo->channel_map[channel] > 0)
 		return channel;
 
 	return default_chn;

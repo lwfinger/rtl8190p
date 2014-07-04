@@ -442,7 +442,7 @@ static int rtllib_tkip_encrypt(struct sk_buff *skb, int hdr_len, void *priv)
 		icv[2] = crc >> 16;
 		icv[3] = crc >> 24;
 
-#if(LINUX_VERSION_CODE < KERNEL_VERSION(2,6,24))
+#if (LINUX_VERSION_CODE < KERNEL_VERSION(2,6,24))
 		sg.page = virt_to_page(pos);
 		sg.offset = offset_in_page(pos);
 		sg.length = len + 4;
@@ -549,7 +549,7 @@ static int rtllib_tkip_decrypt(struct sk_buff *skb, int hdr_len, void *priv)
 
 		plen = skb->len - hdr_len - 12;
 
-#if(LINUX_VERSION_CODE < KERNEL_VERSION(2,6,24))
+#if (LINUX_VERSION_CODE < KERNEL_VERSION(2,6,24))
 		sg.page = virt_to_page(pos);
 		sg.offset = offset_in_page(pos);
 		sg.length = plen + 4;
@@ -609,11 +609,11 @@ static int rtllib_tkip_decrypt(struct sk_buff *skb, int hdr_len, void *priv)
 	skb_trim(skb, skb->len - 4);
 
 #ifdef JOHN_DUMP
-if( ((u16*)skb->data)[0] & 0x4000){
+if ( ((u16*)skb->data)[0] & 0x4000){
         printk("@@ rx decrypted skb->data");
         int i;
         for(i=0;i<skb->len;i++){
-                if( (i%24)==0 ) printk("\n");
+                if ( (i%24)==0 ) printk("\n");
                 printk("%2x ", ((u8*)skb->data)[i]);
         }
         printk("\n");
@@ -751,7 +751,7 @@ static int rtllib_michael_mic_add(struct sk_buff *skb, int hdr_len, void *priv)
 
 	michael_mic_hdr(skb, tkey->tx_hdr);
 
-	if(RTLLIB_QOS_HAS_SEQ(le16_to_cpu(hdr->frame_ctl))) {
+	if (RTLLIB_QOS_HAS_SEQ(le16_to_cpu(hdr->frame_ctl))) {
 		tkey->tx_hdr[12] = *(skb->data + hdr_len - 2) & 0x07;
 	}
 	pos = skb_put(skb, 8);
@@ -826,7 +826,7 @@ static int rtllib_michael_mic_verify(struct sk_buff *skb, int keyidx,
 		return -1;
 
 	michael_mic_hdr(skb, tkey->rx_hdr);
-	if(RTLLIB_QOS_HAS_SEQ(le16_to_cpu(hdr->frame_ctl))) {
+	if (RTLLIB_QOS_HAS_SEQ(le16_to_cpu(hdr->frame_ctl))) {
 		tkey->rx_hdr[12] = *(skb->data + hdr_len - 2) & 0x07;
 	}
 

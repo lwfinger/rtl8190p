@@ -70,7 +70,7 @@ void HTUpdateDefaultSetting(struct rtllib_device* ieee)
 
 	pHTInfo->bRegBW40MHz = 1;
 
-	if(pHTInfo->bRegBW40MHz)
+	if (pHTInfo->bRegBW40MHz)
 		pHTInfo->bRegSuppCCK = 1;
 	else
 		pHTInfo->bRegSuppCCK = true;
@@ -83,7 +83,7 @@ void HTUpdateDefaultSetting(struct rtllib_device* ieee)
 	pHTInfo->MPDU_Density = 0;
 
 	pHTInfo->SelfMimoPs = 3;
-	if(pHTInfo->SelfMimoPs == 2)
+	if (pHTInfo->SelfMimoPs == 2)
 		pHTInfo->SelfMimoPs = 3;
 	ieee->bTxDisableRateFallBack = 0;
 	ieee->bTxUseDriverAssingedRate = 0;
@@ -122,7 +122,7 @@ void HTDebugHTCapability(u8* CapIE, u8* TitleString )
 	static u8	EWC11NHTCap[] = {0x00, 0x90, 0x4c, 0x33};
 	PHT_CAPABILITY_ELE		pCapELE;
 
-	if(!memcmp(CapIE, EWC11NHTCap, sizeof(EWC11NHTCap)))
+	if (!memcmp(CapIE, EWC11NHTCap, sizeof(EWC11NHTCap)))
 	{
 		RTLLIB_DEBUG(RTLLIB_DL_HT, "EWC IE in %s()\n", __FUNCTION__);
 		pCapELE = (PHT_CAPABILITY_ELE)(&CapIE[4]);
@@ -150,7 +150,7 @@ void HTDebugHTInfo(u8*	InfoIE, u8* TitleString)
 	static u8	EWC11NHTInfo[] = {0x00, 0x90, 0x4c, 0x34};
 	PHT_INFORMATION_ELE		pHTInfoEle;
 
-	if(!memcmp(InfoIE, EWC11NHTInfo, sizeof(EWC11NHTInfo)))
+	if (!memcmp(InfoIE, EWC11NHTInfo, sizeof(EWC11NHTInfo)))
 	{
 		RTLLIB_DEBUG(RTLLIB_DL_HT, "EWC IE in %s()\n", __FUNCTION__);
 		pHTInfoEle = (PHT_INFORMATION_ELE)(&InfoIE[4]);
@@ -206,13 +206,13 @@ bool IsHTHalfNmode40Bandwidth(struct rtllib_device* ieee)
 	bool			retValue = false;
 	PRT_HIGH_THROUGHPUT	 pHTInfo = ieee->pHTInfo;
 
-	if(pHTInfo->bCurrentHTSupport == false )
+	if (pHTInfo->bCurrentHTSupport == false )
 		retValue = false;
-	else if(pHTInfo->bRegBW40MHz == false)
+	else if (pHTInfo->bRegBW40MHz == false)
 		retValue = false;
-	else if(!ieee->GetHalfNmodeSupportByAPsHandler(ieee->dev))
+	else if (!ieee->GetHalfNmodeSupportByAPsHandler(ieee->dev))
 		retValue = false;
-	else if(((PHT_CAPABILITY_ELE)(pHTInfo->PeerHTCapBuf))->ChlWidth)
+	else if (((PHT_CAPABILITY_ELE)(pHTInfo->PeerHTCapBuf))->ChlWidth)
 		retValue = true;
 	else
 		retValue = false;
@@ -225,20 +225,20 @@ bool IsHTHalfNmodeSGI(struct rtllib_device* ieee, bool is40MHz)
 	bool			retValue = false;
 	PRT_HIGH_THROUGHPUT	 pHTInfo = ieee->pHTInfo;
 
-	if(pHTInfo->bCurrentHTSupport == false )
+	if (pHTInfo->bCurrentHTSupport == false )
 		retValue = false;
-	else if(!ieee->GetHalfNmodeSupportByAPsHandler(ieee->dev))
+	else if (!ieee->GetHalfNmodeSupportByAPsHandler(ieee->dev))
 		retValue = false;
-	else if(is40MHz)
+	else if (is40MHz)
 	{
-		if(((PHT_CAPABILITY_ELE)(pHTInfo->PeerHTCapBuf))->ShortGI40Mhz)
+		if (((PHT_CAPABILITY_ELE)(pHTInfo->PeerHTCapBuf))->ShortGI40Mhz)
 			retValue = true;
 		else
 			retValue = false;
 	}
 	else
 	{
-		if(((PHT_CAPABILITY_ELE)(pHTInfo->PeerHTCapBuf))->ShortGI20Mhz)
+		if (((PHT_CAPABILITY_ELE)(pHTInfo->PeerHTCapBuf))->ShortGI20Mhz)
 			retValue = true;
 		else
 			retValue = false;
@@ -277,7 +277,7 @@ u16  TxCountToDataRate( struct rtllib_device* ieee, u8 nDataRate)
 	u8	is40MHz = 0;
 	u8	isShortGI = 0;
 
-	if(nDataRate < 12)
+	if (nDataRate < 12)
 	{
 		return CCKOFDMRate[nDataRate];
 	}
@@ -289,19 +289,19 @@ u16  TxCountToDataRate( struct rtllib_device* ieee, u8 nDataRate)
 			isShortGI = 0;
 
 		}
-		else if(nDataRate >=0x20  && nDataRate <= 0x2f )
+		else if (nDataRate >=0x20  && nDataRate <= 0x2f )
 		{
 			is40MHz = 1;
 			isShortGI = 0;
 
 		}
-		else if(nDataRate >= 0x30  && nDataRate <= 0x3f )
+		else if (nDataRate >= 0x30  && nDataRate <= 0x3f )
 		{
 			is40MHz = 0;
 			isShortGI = 1;
 
 		}
-		else if(nDataRate >= 0x40  && nDataRate <= 0x4f )
+		else if (nDataRate >= 0x40  && nDataRate <= 0x4f )
 		{
 			is40MHz = 1;
 			isShortGI = 1;
@@ -318,19 +318,19 @@ bool IsHTHalfNmodeAPs(struct rtllib_device* ieee)
 	bool			retValue = false;
 	struct rtllib_network* net = &ieee->current_network;
 
-	if((memcmp(net->bssid, BELKINF5D8233V1_RALINK, 3)==0) ||
+	if ((memcmp(net->bssid, BELKINF5D8233V1_RALINK, 3)==0) ||
 		     (memcmp(net->bssid, BELKINF5D82334V3_RALINK, 3)==0) ||
 		     (memcmp(net->bssid, PCI_RALINK, 3)==0) ||
 		     (memcmp(net->bssid, EDIMAX_RALINK, 3)==0) ||
 		     (memcmp(net->bssid, AIRLINK_RALINK, 3)==0) ||
 		     (net->ralink_cap_exist))
 		retValue = true;
-	else if((memcmp(net->bssid, UNKNOWN_BORADCOM, 3)==0) ||
+	else if ((memcmp(net->bssid, UNKNOWN_BORADCOM, 3)==0) ||
 		    (memcmp(net->bssid, LINKSYSWRT330_LINKSYSWRT300_BROADCOM, 3)==0)||
 		    (memcmp(net->bssid, LINKSYSWRT350_LINKSYSWRT150_BROADCOM, 3)==0)||
 		    (net->broadcom_cap_exist))
 		  retValue = true;
-	else if(net->bssht.bdRT2RTAggregation)
+	else if (net->bssht.bdRT2RTAggregation)
 		retValue = true;
 	else
 		retValue = false;
@@ -342,34 +342,34 @@ void HTIOTPeerDetermine(struct rtllib_device* ieee)
 {
 	PRT_HIGH_THROUGHPUT	pHTInfo = ieee->pHTInfo;
 	struct rtllib_network* net = &ieee->current_network;
-	if(net->bssht.bdRT2RTAggregation){
+	if (net->bssht.bdRT2RTAggregation){
 		pHTInfo->IOTPeer = HT_IOT_PEER_REALTEK;
-		if(net->bssht.RT2RT_HT_Mode & RT_HT_CAP_USE_92SE){
+		if (net->bssht.RT2RT_HT_Mode & RT_HT_CAP_USE_92SE){
 			pHTInfo->IOTPeer = HT_IOT_PEER_REALTEK_92SE;
 		}
-		if(net->bssht.RT2RT_HT_Mode & RT_HT_CAP_USE_SOFTAP){
+		if (net->bssht.RT2RT_HT_Mode & RT_HT_CAP_USE_SOFTAP){
 			pHTInfo->IOTPeer = HT_IOT_PEER_92U_SOFTAP;
 		}
 	}
-	else if(net->broadcom_cap_exist)
+	else if (net->broadcom_cap_exist)
 		pHTInfo->IOTPeer = HT_IOT_PEER_BROADCOM;
-	else if((memcmp(net->bssid, UNKNOWN_BORADCOM, 3)==0) ||
+	else if ((memcmp(net->bssid, UNKNOWN_BORADCOM, 3)==0) ||
 			(memcmp(net->bssid, LINKSYSWRT330_LINKSYSWRT300_BROADCOM, 3)==0)||
 			(memcmp(net->bssid, LINKSYSWRT350_LINKSYSWRT150_BROADCOM, 3)==0)/*||
 			(memcmp(net->bssid, NETGEAR834Bv2_BROADCOM, 3)==0) */)
 		pHTInfo->IOTPeer = HT_IOT_PEER_BROADCOM;
-	else if((memcmp(net->bssid, BELKINF5D8233V1_RALINK, 3)==0) ||
+	else if ((memcmp(net->bssid, BELKINF5D8233V1_RALINK, 3)==0) ||
 			(memcmp(net->bssid, BELKINF5D82334V3_RALINK, 3)==0) ||
 			(memcmp(net->bssid, PCI_RALINK, 3)==0) ||
 			(memcmp(net->bssid, EDIMAX_RALINK, 3)==0) ||
 			(memcmp(net->bssid, AIRLINK_RALINK, 3)==0) ||
 			 net->ralink_cap_exist)
 		pHTInfo->IOTPeer = HT_IOT_PEER_RALINK;
-	else if((net->atheros_cap_exist )||
+	else if ((net->atheros_cap_exist )||
 		(memcmp(net->bssid, DLINK_ATHEROS_1, 3) == 0)||
 		(memcmp(net->bssid, DLINK_ATHEROS_2, 3) == 0))
 		pHTInfo->IOTPeer = HT_IOT_PEER_ATHEROS;
-	else if((memcmp(net->bssid, CISCO_BROADCOM, 3)==0)||net->cisco_cap_exist)
+	else if ((memcmp(net->bssid, CISCO_BROADCOM, 3)==0)||net->cisco_cap_exist)
 		pHTInfo->IOTPeer = HT_IOT_PEER_CISCO;
 	else if ((memcmp(net->bssid, LINKSYS_MARVELL_4400N, 3) == 0) ||
 		  net->marvell_cap_exist)
@@ -393,7 +393,7 @@ bool HTIOTActIsDisableMCS15(struct rtllib_device* ieee)
 	bool retValue = false;
 
 #if defined(RTL8192U)
-	if(ieee->current_network.bssht.bdBandWidth == HT_CHANNEL_WIDTH_20_40)
+	if (ieee->current_network.bssht.bdBandWidth == HT_CHANNEL_WIDTH_20_40)
 	retValue = true;
 	else
 		retValue = false;
@@ -409,9 +409,9 @@ bool HTIOTActIsDisableMCSTwoSpatialStream(struct rtllib_device* ieee)
 #ifdef RTL8192U
 	struct rtllib_network* net = &ieee->current_network;
 
-	if((ieee->pHTInfo->bCurrentHTSupport == true) && (ieee->pairwise_key_type == KEY_TYPE_CCMP))
+	if ((ieee->pHTInfo->bCurrentHTSupport == true) && (ieee->pairwise_key_type == KEY_TYPE_CCMP))
 	{
-		if((memcmp(net->bssid, BELKINF5D8233V1_RALINK, 3)==0) ||
+		if ((memcmp(net->bssid, BELKINF5D8233V1_RALINK, 3)==0) ||
 				(memcmp(net->bssid, PCI_RALINK, 3)==0) ||
 				(memcmp(net->bssid, EDIMAX_RALINK, 3)==0))
 		{
@@ -424,7 +424,7 @@ bool HTIOTActIsDisableMCSTwoSpatialStream(struct rtllib_device* ieee)
 	if (ieee->rtllib_ap_sec_type &&
 		(ieee->rtllib_ap_sec_type(ieee)&(SEC_ALG_WEP|SEC_ALG_TKIP)))
 	{
-		if( (pHTInfo->IOTPeer != HT_IOT_PEER_ATHEROS) &&
+		if ( (pHTInfo->IOTPeer != HT_IOT_PEER_ATHEROS) &&
 			(pHTInfo->IOTPeer != HT_IOT_PEER_UNKNOWN) &&
 			(pHTInfo->IOTPeer != HT_IOT_PEER_MARVELL) &&
 			(pHTInfo->IOTPeer != HT_IOT_PEER_REALTEK_92SE) &&
@@ -447,7 +447,7 @@ bool HTIOTActIsEnableBETxOPLimit(struct rtllib_device* ieee)
 {
 	bool	retValue = false;
 
-	if(ieee->mode == IEEE_G)
+	if (ieee->mode == IEEE_G)
 		retValue = true;
 
 	return retValue;
@@ -459,7 +459,7 @@ u8 HTIOTActIsMgntUseCCK6M(struct rtllib_device* ieee,struct rtllib_network *netw
 	u8	retValue = 0;
 
 
-	if(ieee->pHTInfo->IOTPeer == HT_IOT_PEER_BROADCOM)
+	if (ieee->pHTInfo->IOTPeer == HT_IOT_PEER_BROADCOM)
 		retValue = 1;
 	return retValue;
 }
@@ -472,21 +472,21 @@ HTIOTActWAIOTBroadcom(struct rtllib_device* ieee)
 	u8		boundary=59;
 
 	pHTInfo->bWAIotBroadcom = false;
-	if(ieee->pHTInfo->IOTPeer == HT_IOT_PEER_BROADCOM)
+	if (ieee->pHTInfo->IOTPeer == HT_IOT_PEER_BROADCOM)
 	{
-		if(ieee->current_network.bssht.bdBandWidth == HT_CHANNEL_WIDTH_20_40)
+		if (ieee->current_network.bssht.bdBandWidth == HT_CHANNEL_WIDTH_20_40)
 		{
-			if(!(pHTInfo->bCurBW40MHz))
+			if (!(pHTInfo->bCurBW40MHz))
 			{
 				printk("===============>IOT Broadcom STA 20MHz.\n");
-				if(ieee->current_network.mode != WIRELESS_MODE_B)
+				if (ieee->current_network.mode != WIRELESS_MODE_B)
 				{
 					pHTInfo->bWAIotBroadcom = true;
 
-					if(ieee->b_customer_lenovo_id == true)
+					if (ieee->b_customer_lenovo_id == true)
 						boundary = 30;
 
-					if( ieee->current_network.RSSI >= boundary)
+					if ( ieee->current_network.RSSI >= boundary)
 						retValue = true;
 				}
 			}else{
@@ -500,7 +500,7 @@ HTIOTActWAIOTBroadcom(struct rtllib_device* ieee)
 u8 HTIOTActIsForcedCTS2Self(struct rtllib_device *ieee, struct rtllib_network *network)
 {
 	u8	retValue = 0;
-	if(ieee->pHTInfo->IOTPeer == HT_IOT_PEER_MARVELL)
+	if (ieee->pHTInfo->IOTPeer == HT_IOT_PEER_MARVELL)
 		retValue = 1;
 	return retValue;
 }
@@ -523,7 +523,7 @@ HTIOTActIsForcedAMSDU8K(struct rtllib_device *ieee, struct rtllib_network *netwo
 u8 HTIOTActIsCCDFsync(struct rtllib_device *ieee)
 {
 	u8	retValue = 0;
-	if(ieee->pHTInfo->IOTPeer == HT_IOT_PEER_BROADCOM)
+	if (ieee->pHTInfo->IOTPeer == HT_IOT_PEER_BROADCOM)
 		retValue = 1;
 	return retValue;
 }
@@ -550,7 +550,7 @@ HTIOTActDisableShortGI(struct rtllib_device* ieee,struct rtllib_network *network
 	u8	retValue = 0;
 	PRT_HIGH_THROUGHPUT	pHTInfo = ieee->pHTInfo;
 
-	if(pHTInfo->IOTPeer==HT_IOT_PEER_RALINK)
+	if (pHTInfo->IOTPeer==HT_IOT_PEER_RALINK)
 	{
 			retValue = 1;
 	}
@@ -564,7 +564,7 @@ HTIOTActDisableHighPower(struct rtllib_device* ieee,struct rtllib_network *netwo
 	u8	retValue = 0;
 
 #ifdef RTL8192SU
-	if(pHTInfo->IOTPeer==HT_IOT_PEER_RALINK ||
+	if (pHTInfo->IOTPeer==HT_IOT_PEER_RALINK ||
 		pHTInfo->IOTPeer==HT_IOT_PEER_REALTEK ||
 		pHTInfo->IOTPeer==HT_IOT_PEER_REALTEK_92SE)
 	{
@@ -580,10 +580,10 @@ HTIOTActDetermineRaFunc(struct rtllib_device* ieee,	bool	bPeerRx2ss)
 	PRT_HIGH_THROUGHPUT	pHTInfo = ieee->pHTInfo;
 	pHTInfo->IOTRaFunc &= HT_IOT_RAFUNC_DISABLE_ALL;
 
-	if(pHTInfo->IOTPeer == HT_IOT_PEER_RALINK && !bPeerRx2ss)
+	if (pHTInfo->IOTPeer == HT_IOT_PEER_RALINK && !bPeerRx2ss)
 		pHTInfo->IOTRaFunc |= HT_IOT_RAFUNC_PEER_1R;
 
-	if(pHTInfo->IOTAction & HT_IOT_ACT_AMSDU_ENABLE)
+	if (pHTInfo->IOTAction & HT_IOT_ACT_AMSDU_ENABLE)
 		pHTInfo->IOTRaFunc |= HT_IOT_RAFUNC_TX_AMSDU;
 
 	printk("!!!!!!!!!!!!!!!!!!!!!!!!!!!IOTRaFunc = %8.8x\n", pHTInfo->IOTRaFunc);
@@ -621,9 +621,9 @@ bool HTIOCActIsDisableCckRate(struct rtllib_device* ieee,struct rtllib_network *
 	bool	retValue = false;
 #if defined(RTL8192SU)
 	PRT_HIGH_THROUGHPUT	pHTInfo = ieee->pHTInfo;
-	if(pHTInfo->IOTPeer == HT_IOT_PEER_BROADCOM)
+	if (pHTInfo->IOTPeer == HT_IOT_PEER_BROADCOM)
 	{
-		if((memcmp(network->bssid, NETGEAR_BROADCOM, 3)==0)
+		if ((memcmp(network->bssid, NETGEAR_BROADCOM, 3)==0)
 			&& (network->bssht.bdBandWidth == HT_CHANNEL_WIDTH_20_40))
 			return true;
 	}
@@ -667,7 +667,7 @@ void HTConstructCapabilityElement(struct rtllib_device* ieee, u8* posHTCap, u8* 
 		return;
 	}
 	memset(posHTCap, 0, *len);
-	if(pHT->ePeerHTSpecVer == HT_SPEC_VER_EWC) {
+	if (pHT->ePeerHTSpecVer == HT_SPEC_VER_EWC) {
 		u8	EWC11NHTCap[] = {0x00, 0x90, 0x4c, 0x33};
 		memcpy(posHTCap, EWC11NHTCap, sizeof(EWC11NHTCap));
 		pCapELE = (PHT_CAPABILITY_ELE)&(posHTCap[4]);
@@ -676,7 +676,7 @@ void HTConstructCapabilityElement(struct rtllib_device* ieee, u8* posHTCap, u8* 
 	}
 
 	pCapELE->AdvCoding		= 0;
-	if(ieee->GetHalfNmodeSupportByAPsHandler(ieee->dev))
+	if (ieee->GetHalfNmodeSupportByAPsHandler(ieee->dev))
 		pCapELE->ChlWidth = 0;
 	else
 		pCapELE->ChlWidth = (pHT->bRegBW40MHz?1:0);
@@ -699,7 +699,7 @@ void HTConstructCapabilityElement(struct rtllib_device* ieee, u8* posHTCap, u8* 
 
 	RTLLIB_DEBUG(RTLLIB_DL_HT, "TX HT cap/info ele BW=%d MaxAMSDUSize:%d DssCCk:%d\n", pCapELE->ChlWidth, pCapELE->MaxAMSDUSize, pCapELE->DssCCk);
 
-	if( IsEncrypt)
+	if ( IsEncrypt)
 	{
 		pCapELE->MPDUDensity	= 7;
 		pCapELE->MaxRxAMPDUFactor	= 2;
@@ -711,16 +711,16 @@ void HTConstructCapabilityElement(struct rtllib_device* ieee, u8* posHTCap, u8* 
 	}
 
 	memcpy(pCapELE->MCS, ieee->Regdot11HTOperationalRateSet, 16);
-	if(pHT->IOTAction & HT_IOT_ACT_DISABLE_MCS15)
+	if (pHT->IOTAction & HT_IOT_ACT_DISABLE_MCS15)
 		pCapELE->MCS[1] &= 0x7f;
 
-	if(pHT->IOTAction & HT_IOT_ACT_DISABLE_MCS14)
+	if (pHT->IOTAction & HT_IOT_ACT_DISABLE_MCS14)
 		pCapELE->MCS[1] &= 0xbf;
 
-	if(pHT->IOTAction & HT_IOT_ACT_DISABLE_ALL_2SS)
+	if (pHT->IOTAction & HT_IOT_ACT_DISABLE_ALL_2SS)
 		pCapELE->MCS[1] &= 0x00;
 
-	if(ieee->GetHalfNmodeSupportByAPsHandler(ieee->dev))
+	if (ieee->GetHalfNmodeSupportByAPsHandler(ieee->dev))
 	{
 		int i;
 		for(i = 1; i< 16; i++)
@@ -733,7 +733,7 @@ void HTConstructCapabilityElement(struct rtllib_device* ieee, u8* posHTCap, u8* 
 	memset(pCapELE->TxBFCap, 0, 4);
 
 	pCapELE->ASCap = 0;
-	if(pHT->ePeerHTSpecVer == HT_SPEC_VER_EWC)
+	if (pHT->ePeerHTSpecVer == HT_SPEC_VER_EWC)
 		*len = 30 + 2;
 	else
 		*len = 26 + 2;
@@ -799,16 +799,16 @@ void HTConstructRT2RTAggElement(struct rtllib_device* ieee, u8* posRT2RTAgg, u8*
 	*posRT2RTAgg++ = 0x01;
 	*posRT2RTAgg = 0x10;
 
-	if(ieee->bSupportRemoteWakeUp) {
+	if (ieee->bSupportRemoteWakeUp) {
 		*posRT2RTAgg |= 0x08;
 	}
 
 	*len = 6 + 2;
 	return;
 #ifdef TODO
-#if(HAL_CODE_BASE == RTL8192 && DEV_BUS_TYPE == USB_INTERFACE)
+#if (HAL_CODE_BASE == RTL8192 && DEV_BUS_TYPE == USB_INTERFACE)
 	/*
-	if(IS_UNDER_11N_AES_MODE(Adapter))
+	if (IS_UNDER_11N_AES_MODE(Adapter))
 	{
 		posRT2RTAgg->Octet[5] |=RT_HT_CAP_USE_AMPDU;
 	}else
@@ -881,22 +881,22 @@ u8 HTGetHighestMCSRate(struct rtllib_device* ieee, u8* pMCSRateSet, u8* pMCSFilt
 
 	for(i = 0; i < 16; i++)
 	{
-		if(availableMcsRate[i] != 0)
+		if (availableMcsRate[i] != 0)
 			break;
 	}
-	if(i == 16)
+	if (i == 16)
 		return false;
 
 	for(i = 0; i < 16; i++)
 	{
-		if(availableMcsRate[i] != 0)
+		if (availableMcsRate[i] != 0)
 		{
 			bitMap = availableMcsRate[i];
 			for(j = 0; j < 8; j++)
 			{
-				if((bitMap%2) != 0)
+				if ((bitMap%2) != 0)
 				{
-					if(HTMcsToDataRate(ieee, (8*i+j)) > HTMcsToDataRate(ieee, mcsRate))
+					if (HTMcsToDataRate(ieee, (8*i+j)) > HTMcsToDataRate(ieee, mcsRate))
 						mcsRate = (8*i+j);
 				}
 				bitMap = bitMap>>1;
@@ -919,7 +919,7 @@ u8 HTFilterMCSRate( struct rtllib_device* ieee, u8* pSupportMCS, u8* pOperateMCS
 
 	HT_PickMCSRate(ieee, pOperateMCS);
 
-	if(ieee->GetHalfNmodeSupportByAPsHandler(ieee->dev))
+	if (ieee->GetHalfNmodeSupportByAPsHandler(ieee->dev))
 		pOperateMCS[1] = 0;
 
 	for(i=2; i<=15; i++)
@@ -939,19 +939,19 @@ void HTOnAssocRsp(struct rtllib_device *ieee)
 	static u8				EWC11NHTCap[] = {0x00, 0x90, 0x4c, 0x33};
 	static u8				EWC11NHTInfo[] = {0x00, 0x90, 0x4c, 0x34};
 
-	if( pHTInfo->bCurrentHTSupport == false )
+	if ( pHTInfo->bCurrentHTSupport == false )
 	{
 		RTLLIB_DEBUG(RTLLIB_DL_ERR, "<=== HTOnAssocRsp(): HT_DISABLE\n");
 		return;
 	}
 	RTLLIB_DEBUG(RTLLIB_DL_HT, "===> HTOnAssocRsp_wq(): HT_ENABLE\n");
 
-	if(!memcmp(pHTInfo->PeerHTCapBuf,EWC11NHTCap, sizeof(EWC11NHTCap)))
+	if (!memcmp(pHTInfo->PeerHTCapBuf,EWC11NHTCap, sizeof(EWC11NHTCap)))
 		pPeerHTCap = (PHT_CAPABILITY_ELE)(&pHTInfo->PeerHTCapBuf[4]);
 	else
 		pPeerHTCap = (PHT_CAPABILITY_ELE)(pHTInfo->PeerHTCapBuf);
 
-	if(!memcmp(pHTInfo->PeerHTInfoBuf, EWC11NHTInfo, sizeof(EWC11NHTInfo)))
+	if (!memcmp(pHTInfo->PeerHTInfoBuf, EWC11NHTInfo, sizeof(EWC11NHTInfo)))
 		pPeerHTInfo = (PHT_INFORMATION_ELE)(&pHTInfo->PeerHTInfoBuf[4]);
 	else
 		pPeerHTInfo = (PHT_INFORMATION_ELE)(pHTInfo->PeerHTInfoBuf);
@@ -973,7 +973,7 @@ void HTOnAssocRsp(struct rtllib_device *ieee)
 
 	nMaxAMSDUSize = (pPeerHTCap->MaxAMSDUSize==0)?3839:7935;
 
-	if(pHTInfo->nAMSDU_MaxSize > nMaxAMSDUSize )
+	if (pHTInfo->nAMSDU_MaxSize > nMaxAMSDUSize )
 		pHTInfo->nCurrent_AMSDU_MaxSize = nMaxAMSDUSize;
 	else
 		pHTInfo->nCurrent_AMSDU_MaxSize = pHTInfo->nAMSDU_MaxSize;
@@ -981,40 +981,40 @@ void HTOnAssocRsp(struct rtllib_device *ieee)
 	pHTInfo->bCurrentAMPDUEnable = pHTInfo->bAMPDUEnable;
 	if (ieee->rtllib_ap_sec_type &&
 	   (ieee->rtllib_ap_sec_type(ieee)&(SEC_ALG_WEP|SEC_ALG_TKIP))){
-		if( (pHTInfo->IOTPeer== HT_IOT_PEER_ATHEROS) ||
+		if ( (pHTInfo->IOTPeer== HT_IOT_PEER_ATHEROS) ||
 				(pHTInfo->IOTPeer == HT_IOT_PEER_UNKNOWN) )
 			pHTInfo->bCurrentAMPDUEnable = false;
 	}
 
-	if(!pHTInfo->bRegRT2RTAggregation)
+	if (!pHTInfo->bRegRT2RTAggregation)
 	{
-		if(pHTInfo->AMPDU_Factor > pPeerHTCap->MaxRxAMPDUFactor)
+		if (pHTInfo->AMPDU_Factor > pPeerHTCap->MaxRxAMPDUFactor)
 			pHTInfo->CurrentAMPDUFactor = pPeerHTCap->MaxRxAMPDUFactor;
 		else
 			pHTInfo->CurrentAMPDUFactor = pHTInfo->AMPDU_Factor;
 
 	} else {
 		if (ieee->current_network.bssht.bdRT2RTAggregation) {
-			if( ieee->pairwise_key_type != KEY_TYPE_NA)
+			if ( ieee->pairwise_key_type != KEY_TYPE_NA)
 				pHTInfo->CurrentAMPDUFactor = pPeerHTCap->MaxRxAMPDUFactor;
 			else
 				pHTInfo->CurrentAMPDUFactor = HT_AGG_SIZE_64K;
 		}else {
-			if(pPeerHTCap->MaxRxAMPDUFactor < HT_AGG_SIZE_32K)
+			if (pPeerHTCap->MaxRxAMPDUFactor < HT_AGG_SIZE_32K)
 				pHTInfo->CurrentAMPDUFactor = pPeerHTCap->MaxRxAMPDUFactor;
 			else
 				pHTInfo->CurrentAMPDUFactor = HT_AGG_SIZE_32K;
 		}
 	}
 
-	if(pHTInfo->MPDU_Density > pPeerHTCap->MPDUDensity)
+	if (pHTInfo->MPDU_Density > pPeerHTCap->MPDUDensity)
 		pHTInfo->CurrentMPDUDensity = pHTInfo->MPDU_Density;
 	else
 		pHTInfo->CurrentMPDUDensity = pPeerHTCap->MPDUDensity;
 	pHTInfo->bCurRxReorderEnable = pHTInfo->bRegRxReorderEnable;
 
 
-	if(pPeerHTCap->MCS[0] == 0)
+	if (pPeerHTCap->MCS[0] == 0)
 		pPeerHTCap->MCS[0] = 0xff;
 
 	HTIOTActDetermineRaFunc(ieee, ((pPeerHTCap->MCS[1])!=0));
@@ -1022,7 +1022,7 @@ void HTOnAssocRsp(struct rtllib_device *ieee)
 	HTFilterMCSRate(ieee, pPeerHTCap->MCS, ieee->dot11HTOperationalRateSet);
 
 	pHTInfo->PeerMimoPs = pPeerHTCap->MimoPwrSave;
-	if(pHTInfo->PeerMimoPs == MIMO_PS_STATIC)
+	if (pHTInfo->PeerMimoPs == MIMO_PS_STATIC)
 		pMcsFilter = MCS_FILTER_1SS;
 	else
 		pMcsFilter = MCS_FILTER_ALL;
@@ -1108,13 +1108,13 @@ void HTResetSelfAndSavePeerSetting(struct rtllib_device* ieee,	struct rtllib_net
 		pHTInfo->bCurrentHTSupport = true;
 		pHTInfo->ePeerHTSpecVer = pNetwork->bssht.bdHTSpecVer;
 
-		if(pNetwork->bssht.bdHTCapLen > 0 &&	pNetwork->bssht.bdHTCapLen <= sizeof(pHTInfo->PeerHTCapBuf))
+		if (pNetwork->bssht.bdHTCapLen > 0 &&	pNetwork->bssht.bdHTCapLen <= sizeof(pHTInfo->PeerHTCapBuf))
 			memcpy(pHTInfo->PeerHTCapBuf, pNetwork->bssht.bdHTCapBuf, pNetwork->bssht.bdHTCapLen);
 
-		if(pNetwork->bssht.bdHTInfoLen > 0 && pNetwork->bssht.bdHTInfoLen <= sizeof(pHTInfo->PeerHTInfoBuf))
+		if (pNetwork->bssht.bdHTInfoLen > 0 && pNetwork->bssht.bdHTInfoLen <= sizeof(pHTInfo->PeerHTInfoBuf))
 			memcpy(pHTInfo->PeerHTInfoBuf, pNetwork->bssht.bdHTInfoBuf, pNetwork->bssht.bdHTInfoLen);
 
-		if(pHTInfo->bRegRT2RTAggregation)
+		if (pHTInfo->bRegRT2RTAggregation)
 		{
 			pHTInfo->bCurrentRT2RTAggregation = pNetwork->bssht.bdRT2RTAggregation;
 			pHTInfo->bCurrentRT2RTLongSlotTime = pNetwork->bssht.bdRT2RTLongSlotTime;
@@ -1131,27 +1131,27 @@ void HTResetSelfAndSavePeerSetting(struct rtllib_device* ieee,	struct rtllib_net
 
 		pHTInfo->IOTAction = 0;
 		bIOTAction = HTIOTActIsDisableMCS14(ieee, pNetwork->bssid);
-		if(bIOTAction)
+		if (bIOTAction)
 			pHTInfo->IOTAction |= HT_IOT_ACT_DISABLE_MCS14;
 
 		bIOTAction = HTIOTActIsDisableMCS15(ieee);
-		if(bIOTAction)
+		if (bIOTAction)
 			pHTInfo->IOTAction |= HT_IOT_ACT_DISABLE_MCS15;
 
 		bIOTAction = HTIOTActIsDisableMCSTwoSpatialStream(ieee);
-		if(bIOTAction)
+		if (bIOTAction)
 			pHTInfo->IOTAction |= HT_IOT_ACT_DISABLE_ALL_2SS;
 
 
 		bIOTAction = HTIOTActIsDisableEDCATurbo(ieee, pNetwork->bssid);
-		if(bIOTAction)
+		if (bIOTAction)
 			pHTInfo->IOTAction |= HT_IOT_ACT_DISABLE_EDCA_TURBO;
 
 		bIOTAction = HTIOTActIsMgntUseCCK6M(ieee,pNetwork);
-		if(bIOTAction)
+		if (bIOTAction)
 			pHTInfo->IOTAction |= HT_IOT_ACT_MGNT_USE_CCK_6M;
 		bIOTAction = HTIOTActIsCCDFsync(ieee);
-		if(bIOTAction)
+		if (bIOTAction)
 			pHTInfo->IOTAction |= HT_IOT_ACT_CDD_FSYNC;
 		printk("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!IOTAction = %8.8x\n", pHTInfo->IOTAction);
 	}
@@ -1173,9 +1173,9 @@ void HTUpdateSelfAndPeerSetting(struct rtllib_device* ieee,	struct rtllib_networ
 	PRT_HIGH_THROUGHPUT	pHTInfo = ieee->pHTInfo;
 	PHT_INFORMATION_ELE		pPeerHTInfo = (PHT_INFORMATION_ELE)pNetwork->bssht.bdHTInfoBuf;
 
-	if(pHTInfo->bCurrentHTSupport)
+	if (pHTInfo->bCurrentHTSupport)
 	{
-		if(pNetwork->bssht.bdHTInfoLen != 0)
+		if (pNetwork->bssht.bdHTInfoLen != 0)
 			pHTInfo->CurrentOpMode = pPeerHTInfo->OptMode;
 
 	}
@@ -1185,7 +1185,7 @@ void HTUseDefaultSetting(struct rtllib_device* ieee)
 {
 	PRT_HIGH_THROUGHPUT pHTInfo = ieee->pHTInfo;
 
-	if(pHTInfo->bEnableHT)
+	if (pHTInfo->bEnableHT)
 	{
 		pHTInfo->bCurrentHTSupport = true;
 		pHTInfo->bCurSuppCCK = pHTInfo->bRegSuppCCK;
@@ -1221,9 +1221,9 @@ void HTUseDefaultSetting(struct rtllib_device* ieee)
 }
 u8 HTCCheck(struct rtllib_device* ieee, u8*	pFrame)
 {
-	if(ieee->pHTInfo->bCurrentHTSupport)
+	if (ieee->pHTInfo->bCurrentHTSupport)
 	{
-		if( (IsQoSDataFrame(pFrame) && Frame_Order(pFrame)) == 1)
+		if ( (IsQoSDataFrame(pFrame) && Frame_Order(pFrame)) == 1)
 		{
 			RTLLIB_DEBUG(RTLLIB_DL_HT, "HT CONTROL FILED EXIST!!\n");
 			return true;
@@ -1236,21 +1236,21 @@ void HTSetConnectBwMode(struct rtllib_device* ieee, HT_CHANNEL_WIDTH	Bandwidth, 
 {
 	PRT_HIGH_THROUGHPUT pHTInfo = ieee->pHTInfo;
 
-	if(pHTInfo->bRegBW40MHz == false)
+	if (pHTInfo->bRegBW40MHz == false)
 		return;
 
-	if(ieee->GetHalfNmodeSupportByAPsHandler(ieee->dev))
+	if (ieee->GetHalfNmodeSupportByAPsHandler(ieee->dev))
 		Bandwidth=HT_CHANNEL_WIDTH_20;
 
 
-	if(pHTInfo->bSwBwInProgress) {
+	if (pHTInfo->bSwBwInProgress) {
 		return;
 	}
-	if(Bandwidth==HT_CHANNEL_WIDTH_20_40)
+	if (Bandwidth==HT_CHANNEL_WIDTH_20_40)
 	 {
-		if(ieee->current_network.channel<2 && Offset==HT_EXTCHNL_OFFSET_LOWER)
+		if (ieee->current_network.channel<2 && Offset==HT_EXTCHNL_OFFSET_LOWER)
 			Offset = HT_EXTCHNL_OFFSET_NO_EXT;
-		if(Offset==HT_EXTCHNL_OFFSET_UPPER || Offset==HT_EXTCHNL_OFFSET_LOWER) {
+		if (Offset==HT_EXTCHNL_OFFSET_UPPER || Offset==HT_EXTCHNL_OFFSET_LOWER) {
 			pHTInfo->bCurBW40MHz = true;
 			pHTInfo->CurSTAExtChnlOffset = Offset;
 		} else {
@@ -1275,11 +1275,11 @@ void HTSetConnectBwModeCallback(struct rtllib_device* ieee)
 	PRT_HIGH_THROUGHPUT pHTInfo = ieee->pHTInfo;
 
 	RTLLIB_DEBUG(RTLLIB_DL_HT, "======>%s()\n", __FUNCTION__);
-	if(pHTInfo->bCurBW40MHz)
+	if (pHTInfo->bCurBW40MHz)
 	{
-		if(pHTInfo->CurSTAExtChnlOffset==HT_EXTCHNL_OFFSET_UPPER)
+		if (pHTInfo->CurSTAExtChnlOffset==HT_EXTCHNL_OFFSET_UPPER)
 			ieee->set_chan(ieee->dev, ieee->current_network.channel+2);
-		else if(pHTInfo->CurSTAExtChnlOffset==HT_EXTCHNL_OFFSET_LOWER)
+		else if (pHTInfo->CurSTAExtChnlOffset==HT_EXTCHNL_OFFSET_LOWER)
 			ieee->set_chan(ieee->dev, ieee->current_network.channel-2);
 		else
 			ieee->set_chan(ieee->dev, ieee->current_network.channel);

@@ -126,7 +126,7 @@ static void rtl8192_read_eeprom_info(struct net_device* dev)
 
 	//2 Read EEPROM ID to make sure autoload is success
 	EEPROMId = eprom_read(dev, 0);
-	if( EEPROMId != RTL8190_EEPROM_ID )
+	if ( EEPROMId != RTL8190_EEPROM_ID )
 	{
 		RT_TRACE(COMP_ERR, "EEPROM ID is invalid:%x, %x\n", EEPROMId, RTL8190_EEPROM_ID);
 		priv->AutoloadFailFlag=true;
@@ -140,7 +140,7 @@ static void rtl8192_read_eeprom_info(struct net_device* dev)
 	// Assign Chip Version ID
 	//
 	// Read IC Version && Channel Plan
-	if(!priv->AutoloadFailFlag)
+	if (!priv->AutoloadFailFlag)
 	{
 		// VID, PID
 		priv->eeprom_vid = eprom_read(dev, (EEPROM_VID >> 1));
@@ -178,7 +178,7 @@ static void rtl8192_read_eeprom_info(struct net_device* dev)
 	RT_TRACE(COMP_INIT,"EEPROM Customer ID: 0x%2x\n", priv->eeprom_CustomerID);
 
 	//2 Read Permanent MAC address
-	if(!priv->AutoloadFailFlag)
+	if (!priv->AutoloadFailFlag)
 	{
 		for(i = 0; i < 6; i += 2)
 		{
@@ -197,7 +197,7 @@ static void rtl8192_read_eeprom_info(struct net_device* dev)
 			dev->dev_addr[4], dev->dev_addr[5]);
 
 		//2 TX Power Check EEPROM Fail or not
-	if(priv->card_8192_version > VERSION_8190_BD) {
+	if (priv->card_8192_version > VERSION_8190_BD) {
 		priv->bTXPowerDataReadFromEEPORM = true;
 	} else {
 		priv->bTXPowerDataReadFromEEPORM = false;
@@ -206,10 +206,10 @@ static void rtl8192_read_eeprom_info(struct net_device* dev)
 	// 2007/11/15 MH 8190PCI Default=2T4R, 8192PCIE dafault=1T2R
 	priv->rf_type = RTL819X_DEFAULT_RF_TYPE;
 
-	if(priv->card_8192_version > VERSION_8190_BD)
+	if (priv->card_8192_version > VERSION_8190_BD)
 	{
 		// Read RF-indication and Tx Power gain index diff of legacy to HT OFDM rate.
-		if(!priv->AutoloadFailFlag)
+		if (!priv->AutoloadFailFlag)
 		{
 			tempval = (eprom_read(dev, (EEPROM_RFInd_PowerDiff>>1))) & 0xff;
 			priv->EEPROMLegacyHTTxPowerDiff = tempval & 0xf;	// bit[3:0]
@@ -227,7 +227,7 @@ static void rtl8192_read_eeprom_info(struct net_device* dev)
 			priv->EEPROMLegacyHTTxPowerDiff);
 
 		// Read ThermalMeter from EEPROM
-		if(!priv->AutoloadFailFlag)
+		if (!priv->AutoloadFailFlag)
 		{
 			priv->EEPROMThermalMeter = (u8)(((eprom_read(dev, (EEPROM_ThermalMeter>>1))) & 0xff00)>>8);
 		}
@@ -239,10 +239,10 @@ static void rtl8192_read_eeprom_info(struct net_device* dev)
 		//vivi, for tx power track
 		priv->TSSI_13dBm = priv->EEPROMThermalMeter *100;
 
-		if(priv->epromtype == EEPROM_93C46)
+		if (priv->epromtype == EEPROM_93C46)
 		{
 		// Read antenna tx power offset of B/C/D to A and CrystalCap from EEPROM
-		if(!priv->AutoloadFailFlag)
+		if (!priv->AutoloadFailFlag)
 		{
 				usValue = eprom_read(dev, (EEPROM_TxPwDiff_CrystalCap>>1));
 				priv->EEPROMAntPwDiff = (usValue&0x0fff);
@@ -261,7 +261,7 @@ static void rtl8192_read_eeprom_info(struct net_device* dev)
 		//
 		for(i=0; i<14; i+=2)
 		{
-			if(!priv->AutoloadFailFlag)
+			if (!priv->AutoloadFailFlag)
 			{
 				usValue = eprom_read(dev, (u16) ((EEPROM_TxPwIndex_CCK+i)>>1) );
 			}
@@ -275,7 +275,7 @@ static void rtl8192_read_eeprom_info(struct net_device* dev)
 		}
 		for(i=0; i<14; i+=2)
 		{
-			if(!priv->AutoloadFailFlag)
+			if (!priv->AutoloadFailFlag)
 			{
 				usValue = eprom_read(dev, (u16) ((EEPROM_TxPwIndex_OFDM_24G+i)>>1) );
 			}
@@ -288,10 +288,10 @@ static void rtl8192_read_eeprom_info(struct net_device* dev)
 			RT_TRACE(COMP_INIT, "OFDM 2.4G Tx Power Level, Index %d = 0x%02x\n", i+1, priv->EEPROMTxPowerLevelOFDM24G[i+1]);
 		}
 		}
-		else if(priv->epromtype== EEPROM_93C56)
+		else if (priv->epromtype== EEPROM_93C56)
 		{
 			// Read CrystalCap from EEPROM
-			if(!priv->AutoloadFailFlag)
+			if (!priv->AutoloadFailFlag)
 			{
 				priv->EEPROMAntPwDiff = EEPROM_Default_AntTxPowerDiff;
 				priv->EEPROMCrystalCap = (u8)(((eprom_read(dev, (EEPROM_C56_CrystalCap>>1))) & 0xf000)>>12);
@@ -305,7 +305,7 @@ static void rtl8192_read_eeprom_info(struct net_device* dev)
 			RT_TRACE(COMP_INIT, "EEPROMCrystalCap = %d\n", priv->EEPROMCrystalCap);
 
 			// Get Tx Power Level by Channel
-			if(!priv->AutoloadFailFlag)
+			if (!priv->AutoloadFailFlag)
 			{
 				// Read Tx power of Channel 1 ~ 14 from EEPROM.
 				for(i = 0; i < 12; i+=2)
@@ -365,7 +365,7 @@ static void rtl8192_read_eeprom_info(struct net_device* dev)
 		//
 		// Update HAL variables.
 		//
-		if(priv->epromtype == EEPROM_93C46)
+		if (priv->epromtype == EEPROM_93C46)
 		{
 			for(i=0; i<14; i++)
 			{
@@ -385,7 +385,7 @@ static void rtl8192_read_eeprom_info(struct net_device* dev)
 			priv->ThermalMeter[0] = (priv->EEPROMThermalMeter & 0xf);
 			priv->ThermalMeter[1] = ((priv->EEPROMThermalMeter & 0xf0)>>4);
 		}
-		else if(priv->epromtype == EEPROM_93C56)
+		else if (priv->epromtype == EEPROM_93C56)
 		{
 			//char	cck_pwr_diff_a=0, cck_pwr_diff_c=0;
 
@@ -431,7 +431,7 @@ static void rtl8192_read_eeprom_info(struct net_device* dev)
 		}
 	}
 
-	if(priv->rf_type == RF_1T2R)
+	if (priv->rf_type == RF_1T2R)
 	{
 		RT_TRACE(COMP_INIT, "\n1T2R config\n");
 	}
@@ -448,7 +448,7 @@ static void rtl8192_read_eeprom_info(struct net_device* dev)
 
 	priv->rf_chip= RF_8256;
 
-	if(priv->RegChannelPlan == 0xf)
+	if (priv->RegChannelPlan == 0xf)
 	{
 		priv->ChannelPlan = priv->eeprom_ChannelPlan;
 	}
@@ -460,7 +460,7 @@ static void rtl8192_read_eeprom_info(struct net_device* dev)
 	//
 	//  Used PID and DID to Set CustomerID
 	//
-	if( priv->eeprom_vid == 0x1186 &&  priv->eeprom_did == 0x3304 )
+	if ( priv->eeprom_vid == 0x1186 &&  priv->eeprom_did == 0x3304 )
 	{
 		priv->CustomerID =  RT_CID_DLINK;
 	}
@@ -481,7 +481,7 @@ static void rtl8192_read_eeprom_info(struct net_device* dev)
 			break;
 		case EEPROM_CID_TOSHIBA:        // Merge by Jacken, 2008/01/31
 			priv->CustomerID = RT_CID_TOSHIBA;
-			if(priv->eeprom_ChannelPlan&0x80)
+			if (priv->eeprom_ChannelPlan&0x80)
 				priv->ChannelPlan = priv->eeprom_ChannelPlan&0x7f;
 			else
 				priv->ChannelPlan = 0x0;
@@ -516,13 +516,13 @@ static void rtl8192_read_eeprom_info(struct net_device* dev)
 	}
 
 	//Avoid the channel plan array overflow, by Bruce, 2007-08-27.
-	if(priv->ChannelPlan > CHANNEL_PLAN_LEN - 1)
+	if (priv->ChannelPlan > CHANNEL_PLAN_LEN - 1)
 		priv->ChannelPlan = 0; //FCC
 	// force to world wide 13
 	priv->ChannelPlan = COUNTRY_CODE_WORLD_WIDE_13;
 
 	//2008.06.03, for WOL
-        //if( priv->eeprom_vid == 0x1186 &&  priv->eeprom_did == 0x3304)
+        //if ( priv->eeprom_vid == 0x1186 &&  priv->eeprom_did == 0x3304)
         //priv->rtllib->bSupportRemoteWakeUp = true;
         //else
         //priv->rtllib->bSupportRemoteWakeUp = false;
@@ -656,7 +656,7 @@ start:
 	priv->pFirmware->firmware_status = FW_STATUS_0_INIT;
 
 	// Set to eRfoff in order not to count receive count.
-	if(priv->RegRfOff == true)
+	if (priv->RegRfOff == true)
 		priv->rtllib->eRFPowerState = eRfOff;
 
 	//
@@ -664,10 +664,10 @@ start:
 	//3//
 	//3 Firmware Reset Or Not
 	ulRegRead = read_nic_dword(dev, CPU_GEN);
-	if(priv->pFirmware->firmware_status == FW_STATUS_0_INIT)
+	if (priv->pFirmware->firmware_status == FW_STATUS_0_INIT)
 	{	//called from MPInitialized. do nothing
 		ulRegRead |= CPU_GEN_SYSTEM_RESET;
-	}else if(priv->pFirmware->firmware_status == FW_STATUS_5_READY)
+	}else if (priv->pFirmware->firmware_status == FW_STATUS_5_READY)
 		ulRegRead |= CPU_GEN_FIRMWARE_RESET;	// Called from MPReset
 	else
 		RT_TRACE(COMP_ERR, "ERROR in %s(): undefined firmware state(%d)\n", __FUNCTION__,   priv->pFirmware->firmware_status);
@@ -684,7 +684,7 @@ start:
 	//rtl8192_dump_reg(dev);
 	RT_TRACE(COMP_INIT, "BB Config Start!\n");
 	rtStatus = rtl8192_BBConfig(dev);
-	if(rtStatus != true)
+	if (rtStatus != true)
 	{
 		RT_TRACE(COMP_ERR, "BB Config failed\n");
 		return rtStatus;
@@ -700,10 +700,10 @@ start:
 		//Loopback mode or not
 	priv->LoopbackMode = RTL819X_NO_LOOPBACK;
 	//priv->LoopbackMode = RTL819X_MAC_LOOPBACK;
-	if(priv->ResetProgress == RESET_TYPE_NORESET)
+	if (priv->ResetProgress == RESET_TYPE_NORESET)
 	{
 	ulRegRead = read_nic_dword(dev, CPU_GEN);
-	if(priv->LoopbackMode == RTL819X_NO_LOOPBACK)
+	if (priv->LoopbackMode == RTL819X_NO_LOOPBACK)
 	{
 		ulRegRead = ((ulRegRead & CPU_GEN_NO_LOOPBACK_MSK) | CPU_GEN_NO_LOOPBACK_SET);
 	}
@@ -766,7 +766,7 @@ start:
 	write_nic_byte(dev, ACK_TIMEOUT, 0x30);
 
 	//rtl8192_actset_wirelessmode(dev,priv->RegWirelessMode);
-	if(priv->ResetProgress == RESET_TYPE_NORESET)
+	if (priv->ResetProgress == RESET_TYPE_NORESET)
 	rtl8192_SetWirelessMode(dev, priv->rtllib->mode);
 	//-----------------------------------------------------------------------------
 	// Set up security related. 070106, by rcnjko:
@@ -810,7 +810,7 @@ start:
 	tmpvalue = read_nic_byte(dev, IC_VERRSION);
 	priv->IC_Cut= tmpvalue;
 	RT_TRACE(COMP_INIT, "priv->IC_Cut= 0x%x\n", priv->IC_Cut);
-	if(priv->IC_Cut>= IC_VersionCut_D)
+	if (priv->IC_Cut>= IC_VersionCut_D)
 	{
 		//pHalData->bDcut = true;
 		if (priv->IC_Cut== IC_VersionCut_D) {
@@ -868,17 +868,17 @@ start:
 	// RF Power Save
 	//2=======================================================
 #ifdef ENABLE_IPS
-	if(priv->RegRfOff == true)
+	if (priv->RegRfOff == true)
 	{ // User disable RF via registry.
 		RT_TRACE((COMP_INIT|COMP_RF|COMP_POWER), "%s(): Turn off RF for RegRfOff ----------\n",__FUNCTION__);
 		MgntActSet_RF_State(dev, eRfOff, RF_CHANGE_BY_SW);
 	}
-	else if(priv->rtllib->RfOffReason > RF_CHANGE_BY_PS)
+	else if (priv->rtllib->RfOffReason > RF_CHANGE_BY_PS)
 	{ // H/W or S/W RF OFF before sleep.
 		RT_TRACE((COMP_INIT|COMP_RF|COMP_POWER), "%s(): Turn off RF for RfOffReason(%d) ----------\n", __FUNCTION__,priv->rtllib->RfOffReason);
 		MgntActSet_RF_State(dev, eRfOff, priv->rtllib->RfOffReason);
 	}
-	else if(priv->rtllib->RfOffReason >= RF_CHANGE_BY_IPS)
+	else if (priv->rtllib->RfOffReason >= RF_CHANGE_BY_IPS)
 	{ // H/W or S/W RF OFF before sleep.
 		RT_TRACE((COMP_INIT|COMP_RF|COMP_POWER), "%s(): Turn off RF for RfOffReason(%d) ----------\n", __FUNCTION__,priv->rtllib->RfOffReason);
 		MgntActSet_RF_State(dev, eRfOff, priv->rtllib->RfOffReason);
@@ -897,7 +897,7 @@ start:
 	// But we should still tell upper layer we are in rf on state.
 	// 2007.07.16, by shien chang.
 	//
-		//if(!dev->bInHctTest)
+		//if (!dev->bInHctTest)
 	//IPSEnter(dev);
 
 	}
@@ -922,7 +922,7 @@ start:
 			}
 		}
 		for (i = 0; i<TxBBGainTableLength; i++) {
-			if(tmpRegC == priv->txbbgain_table[i].txbbgain_value)
+			if (tmpRegC == priv->txbbgain_table[i].txbbgain_value)
 			{
 				priv->rfc_txpowertrackingindex= (u8)i;
 				priv->rfc_txpowertrackingindex_real= (u8)i;
@@ -1081,7 +1081,7 @@ void  rtl8192_tx_fill_desc(struct net_device* dev, tx_desc * pdesc, cb_desc * cb
     pTxFwInfo->Short	= QueryIsShort(pTxFwInfo->TxHT, pTxFwInfo->TxRate, cb_desc);
 
     // Aggregation related */
-    if(cb_desc->bAMPDUEnable) {
+    if (cb_desc->bAMPDUEnable) {
         pTxFwInfo->AllowAggregation = 1;
         pTxFwInfo->RxMF = cb_desc->ampdu_factor;
         pTxFwInfo->RxAMD = cb_desc->ampdu_density;
@@ -1105,9 +1105,9 @@ void  rtl8192_tx_fill_desc(struct net_device* dev, tx_desc * pdesc, cb_desc * cb
     //
     // Set Bandwidth and sub-channel settings.
     //
-    if(priv->CurrentChannelBW == HT_CHANNEL_WIDTH_20_40)
+    if (priv->CurrentChannelBW == HT_CHANNEL_WIDTH_20_40)
     {
-        if(cb_desc->bPacketBW) {
+        if (cb_desc->bPacketBW) {
             pTxFwInfo->TxBandwidth = 1;
             pTxFwInfo->TxSubCarrier = 3;
         } else {
@@ -1189,7 +1189,7 @@ void  rtl8192_tx_fill_cmd_desc(struct net_device* dev, tx_desc_cmd * entry,
     entry->LINIP = cb_desc->bLastIniPkt;
     entry->FirstSeg = 1;//first segment
     entry->LastSeg = 1; //last segment
-    if(cb_desc->bCmdOrInit == DESC_PACKET_TYPE_INIT) {
+    if (cb_desc->bCmdOrInit == DESC_PACKET_TYPE_INIT) {
         entry->CmdInit = DESC_PACKET_TYPE_INIT;
     } else {
 	tx_desc* entry_tmp = (tx_desc*)entry;
@@ -1209,7 +1209,7 @@ u8 HwRateToMRate90(bool bIsHT, u8 rate)
 {
 	u8  ret_rate = 0x02;
 
-	if(!bIsHT) {
+	if (!bIsHT) {
 		switch(rate) {
 			case DESC90_RATE1M:   ret_rate = MGN_1M;         break;
 			case DESC90_RATE2M:   ret_rate = MGN_2M;         break;
@@ -1268,7 +1268,7 @@ bool rtl8192_rx_query_status_desc(struct net_device* dev, struct rtllib_rx_stats
 	stats->bHwError = pdesc->CRC32 | pdesc->ICV;
 
 	stats->Length = pdesc->Length;
-	if(stats->Length < 24)
+	if (stats->Length < 24)
 		stats->bHwError |= 1;
 
 	if (stats->bHwError) {
@@ -1310,7 +1310,7 @@ bool rtl8192_rx_query_status_desc(struct net_device* dev, struct rtllib_rx_stats
 		//
 		// Get Total offset of MPDU Frame Body
 		//
-		if((stats->RxBufShift + stats->RxDrvInfoSize) > 0)
+		if ((stats->RxBufShift + stats->RxDrvInfoSize) > 0)
 			stats->bShift = 1;
 
 		stats->RxIs40MHzPacket = pDrvInfo->BW;
@@ -1318,7 +1318,7 @@ bool rtl8192_rx_query_status_desc(struct net_device* dev, struct rtllib_rx_stats
 		TranslateRxSignalStuff819xpci(dev,skb, stats, pdesc, pDrvInfo);
 
 		// Rx A-MPDU */
-		if(pDrvInfo->FirstAGGR==1 || pDrvInfo->PartAggr == 1)
+		if (pDrvInfo->FirstAGGR==1 || pDrvInfo->PartAggr == 1)
 			RT_TRACE(COMP_RXDESC, "pDrvInfo->FirstAGGR = %d, pDrvInfo->PartAggr = %d\n",
 					pDrvInfo->FirstAGGR, pDrvInfo->PartAggr);
 		skb_trim(skb, skb->len - 4/*sCrcLng*/);
@@ -1391,9 +1391,9 @@ void rtl8192_update_ratr_table(struct net_device* dev)
 			break;
 	}
 	ratr_value &= 0x0FFFFFFF;
-	if(ieee->pHTInfo->bCurTxBW40MHz && ieee->pHTInfo->bCurShortGI40MHz){
+	if (ieee->pHTInfo->bCurTxBW40MHz && ieee->pHTInfo->bCurShortGI40MHz){
 		ratr_value |= 0x80000000;
-	}else if(!ieee->pHTInfo->bCurTxBW40MHz && ieee->pHTInfo->bCurShortGI20MHz){
+	}else if (!ieee->pHTInfo->bCurTxBW40MHz && ieee->pHTInfo->bCurShortGI20MHz){
 		ratr_value |= 0x80000000;
 	}
 	write_nic_dword(dev, RATR0+rate_index*4, ratr_value);

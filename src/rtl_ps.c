@@ -148,9 +148,9 @@ void rtllib_ips_leave_wq(struct net_device *dev)
 	RT_RF_POWER_STATE	rtState;
 	rtState = priv->rtllib->eRFPowerState;
 
-	if(priv->rtllib->PowerSaveControl.bInactivePs){
-		if(rtState == eRfOff){
-			if(priv->rtllib->RfOffReason > RF_CHANGE_BY_IPS)
+	if (priv->rtllib->PowerSaveControl.bInactivePs){
+		if (rtState == eRfOff){
+			if (priv->rtllib->RfOffReason > RF_CHANGE_BY_IPS)
 			{
 				RT_TRACE(COMP_ERR, "%s(): RF is OFF.\n",__FUNCTION__);
 				return;
@@ -184,7 +184,7 @@ bool MgntActSet_802_11_PowerSaveMode(struct net_device *dev,	u8 rtPsMode)
 	//u8 RpwmVal, FwPwrMode;
 
 	// Currently, we do not change power save mode on IBSS mode.
-	if(priv->rtllib->iw_mode == IW_MODE_ADHOC)
+	if (priv->rtllib->iw_mode == IW_MODE_ADHOC)
 		return false;
 
 	//
@@ -198,11 +198,11 @@ bool MgntActSet_802_11_PowerSaveMode(struct net_device *dev,	u8 rtPsMode)
 
 	// Update power save mode configured.
 	RT_TRACE(COMP_LPS,"%s(): set ieee->ps = %x\n",__FUNCTION__,rtPsMode);
-	if(!priv->ps_force) {
+	if (!priv->ps_force) {
 		priv->rtllib->ps = rtPsMode;
 	}
 	// Awake immediately
-	if(priv->rtllib->sta_sleep != 0 && rtPsMode == RTLLIB_PS_DISABLED)
+	if (priv->rtllib->sta_sleep != 0 && rtPsMode == RTLLIB_PS_DISABLED)
 	{
                 unsigned long flags;
 
@@ -245,15 +245,15 @@ void LeisurePSEnter(struct net_device *dev)
 
 	if (pPSC->bLeisurePs) {
 		// Idle for a while if we connect to AP a while ago.
-		if(pPSC->LpsIdleCount >= RT_CHECK_FOR_HANG_PERIOD) //  4 Sec
+		if (pPSC->LpsIdleCount >= RT_CHECK_FOR_HANG_PERIOD) //  4 Sec
 		{
 
-			if(priv->rtllib->ps == RTLLIB_PS_DISABLED)
+			if (priv->rtllib->ps == RTLLIB_PS_DISABLED)
 			{
 
 				RT_TRACE(COMP_LPS, "LeisurePSEnter(): Enter 802.11 power save mode...\n");
 
-				if(!pPSC->bFwCtrlLPS)
+				if (!pPSC->bFwCtrlLPS)
 				{
 					// Firmware workaround fix for PS-Poll issue. 2009/1/4, Emily
 					if (priv->rtllib->SetFwCmdHandler)
@@ -263,7 +263,7 @@ void LeisurePSEnter(struct net_device *dev)
 				}
 				MgntActSet_802_11_PowerSaveMode(dev, RTLLIB_PS_MBCAST|RTLLIB_PS_UNICAST);
 
-				/*if(pPSC->RegRfPsLevel & RT_RF_LPS_LEVEL_ASPM)
+				/*if (pPSC->RegRfPsLevel & RT_RF_LPS_LEVEL_ASPM)
 				{
 					RT_ENABLE_ASPM(pAdapter);
 					RT_SET_PS_LEVEL(pAdapter, RT_RF_LPS_LEVEL_ASPM);
@@ -293,13 +293,13 @@ void LeisurePSLeave(struct net_device *dev)
 
 	if (pPSC->bLeisurePs)
 	{
-		if(priv->rtllib->ps != RTLLIB_PS_DISABLED)
+		if (priv->rtllib->ps != RTLLIB_PS_DISABLED)
 		{
 			// move to lps_wakecomplete()
 			RT_TRACE(COMP_LPS, "LeisurePSLeave(): Busy Traffic , Leave 802.11 power save..\n");
 			MgntActSet_802_11_PowerSaveMode(dev, RTLLIB_PS_DISABLED);
 
-			if(!pPSC->bFwCtrlLPS) // Fw will control this by itself in powersave v2.
+			if (!pPSC->bFwCtrlLPS) // Fw will control this by itself in powersave v2.
 			{
 				// Firmware workaround fix for PS-Poll issue. 2009/1/4, Emily
 				if (priv->rtllib->SetFwCmdHandler)

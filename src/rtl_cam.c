@@ -120,9 +120,9 @@ void setKey(struct net_device *dev,
 	struct r8192_priv *priv = (struct r8192_priv *)rtllib_priv(dev);
 	RT_RF_POWER_STATE	rtState;
 	rtState = priv->rtllib->eRFPowerState;
-	if(priv->rtllib->PowerSaveControl.bInactivePs){
-		if(rtState == eRfOff){
-			if(priv->rtllib->RfOffReason > RF_CHANGE_BY_IPS)
+	if (priv->rtllib->PowerSaveControl.bInactivePs){
+		if (rtState == eRfOff){
+			if (priv->rtllib->RfOffReason > RF_CHANGE_BY_IPS)
 			{
 				RT_TRACE(COMP_ERR, "%s(): RF is OFF.\n",__FUNCTION__);
 				return ;
@@ -151,7 +151,7 @@ void setKey(struct net_device *dev,
 		TargetCommand  = i+CAM_CONTENT_COUNT*EntryNo;
 		TargetCommand |= BIT31|BIT16;
 
-		if(i==0){//MAC|Config
+		if (i==0){//MAC|Config
 			TargetContent = (u32)(*(MacAddr+0)) << 16|
 				(u32)(*(MacAddr+1)) << 24|
 				(u32)usConfig;
@@ -160,7 +160,7 @@ void setKey(struct net_device *dev,
 			write_nic_dword(dev, RWCAM, TargetCommand);
 			//		printk("setkey cam =%8x\n", read_cam(dev, i+6*EntryNo));
 		}
-		else if(i==1){//MAC
+		else if (i==1){//MAC
 			TargetContent = (u32)(*(MacAddr+2))	 |
 				(u32)(*(MacAddr+3)) <<  8|
 				(u32)(*(MacAddr+4)) << 16|
@@ -169,7 +169,7 @@ void setKey(struct net_device *dev,
 			write_nic_dword(dev, RWCAM, TargetCommand);
 		}
 		else {	//Key Material
-			if(KeyContent != NULL)
+			if (KeyContent != NULL)
 			{
 				write_nic_dword(dev, WCAMI, (u32)(*(KeyContent+i-2)) );
 				write_nic_dword(dev, RWCAM, TargetCommand);
@@ -199,7 +199,7 @@ void CAM_read_entry(struct net_device *dev, u32 iIndex)
 		while((i--)>=0)
 		{
 			ulStatus = read_nic_dword(dev, RWCAM);
-			if(ulStatus & BIT31){
+			if (ulStatus & BIT31){
 				continue;
 			}
 			else{
@@ -241,7 +241,7 @@ void CamRestoreAllEntry(	struct net_device *dev)
 		{
 			{
 				MacAddr = CAM_CONST_ADDR[EntryId];
-				if(priv->rtllib->swcamtable[EntryId].bused )
+				if (priv->rtllib->swcamtable[EntryId].bused )
 				{
 					setKey(dev,
 							EntryId ,
@@ -256,11 +256,11 @@ void CamRestoreAllEntry(	struct net_device *dev)
 		}
 
 	}
-	else if(priv->rtllib->pairwise_key_type == KEY_TYPE_TKIP)
+	else if (priv->rtllib->pairwise_key_type == KEY_TYPE_TKIP)
 	{
 
 		{
-			if(priv->rtllib->iw_mode == IW_MODE_ADHOC)
+			if (priv->rtllib->iw_mode == IW_MODE_ADHOC)
 			{
 				setKey(dev,
 						4,
@@ -285,11 +285,11 @@ void CamRestoreAllEntry(	struct net_device *dev)
 
 		}
 	}
-	else if(priv->rtllib->pairwise_key_type == KEY_TYPE_CCMP)
+	else if (priv->rtllib->pairwise_key_type == KEY_TYPE_CCMP)
 	{
 
 		{
-			if(priv->rtllib->iw_mode == IW_MODE_ADHOC)
+			if (priv->rtllib->iw_mode == IW_MODE_ADHOC)
 			{
 				setKey(dev,
 						4,
@@ -316,12 +316,12 @@ void CamRestoreAllEntry(	struct net_device *dev)
 
 
 
-	if(priv->rtllib->group_key_type == KEY_TYPE_TKIP)
+	if (priv->rtllib->group_key_type == KEY_TYPE_TKIP)
 	{
 		MacAddr = CAM_CONST_BROAD;
 		for(EntryId=1 ; EntryId<4 ; EntryId++)
 		{
-			if(priv->rtllib->swcamtable[EntryId].bused )
+			if (priv->rtllib->swcamtable[EntryId].bused )
 			{
 				setKey(dev,
 						EntryId,
@@ -333,9 +333,9 @@ void CamRestoreAllEntry(	struct net_device *dev)
 				      );
 			}
 		}
-		if(priv->rtllib->iw_mode == IW_MODE_ADHOC)
+		if (priv->rtllib->iw_mode == IW_MODE_ADHOC)
 		{
-			if(priv->rtllib->swcamtable[0].bused ){
+			if (priv->rtllib->swcamtable[0].bused ){
 				setKey(dev,
 						0,
 						0,
@@ -351,11 +351,11 @@ void CamRestoreAllEntry(	struct net_device *dev)
 				return;
 			}
 		}
-	} else if(priv->rtllib->group_key_type == KEY_TYPE_CCMP) {
+	} else if (priv->rtllib->group_key_type == KEY_TYPE_CCMP) {
 		MacAddr = CAM_CONST_BROAD;
 		for(EntryId=1; EntryId<4 ; EntryId++)
 		{
-			if(priv->rtllib->swcamtable[EntryId].bused )
+			if (priv->rtllib->swcamtable[EntryId].bused )
 			{
 				setKey(dev,
 				       EntryId ,

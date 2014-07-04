@@ -179,7 +179,7 @@ static int rtllib_frag_cache_invalidate(struct rtllib_device *ieee,
 	struct rtllib_hdr_4addrqos *hdr_4addrqos;
 	u8 tid;
 
-	if(((fc & RTLLIB_FCTL_DSTODS) == RTLLIB_FCTL_DSTODS)&&RTLLIB_QOS_HAS_SEQ(fc)) {
+	if (((fc & RTLLIB_FCTL_DSTODS) == RTLLIB_FCTL_DSTODS)&&RTLLIB_QOS_HAS_SEQ(fc)) {
 	  hdr_4addrqos = (struct rtllib_hdr_4addrqos *)hdr;
 	  tid = le16_to_cpu(hdr_4addrqos->qos_ctl) & RTLLIB_QCTL_TID;
 	  tid = UP2AC(tid);
@@ -383,12 +383,12 @@ static int is_duplicate_packet(struct rtllib_device *ieee,
 	struct rtllib_hdr_4addrqos *hdr_4addrqos;
 	u8 tid;
 
-	if(((fc & RTLLIB_FCTL_DSTODS) == RTLLIB_FCTL_DSTODS)&&RTLLIB_QOS_HAS_SEQ(fc)) {
+	if (((fc & RTLLIB_FCTL_DSTODS) == RTLLIB_FCTL_DSTODS)&&RTLLIB_QOS_HAS_SEQ(fc)) {
 	  hdr_4addrqos = (struct rtllib_hdr_4addrqos *)header;
 	  tid = le16_to_cpu(hdr_4addrqos->qos_ctl) & RTLLIB_QCTL_TID;
 	  tid = UP2AC(tid);
 	  tid ++;
-	} else if(RTLLIB_QOS_HAS_SEQ(fc)) {
+	} else if (RTLLIB_QOS_HAS_SEQ(fc)) {
 	  hdr_3addrqos = (struct rtllib_hdr_3addrqos*)header;
 	  tid = le16_to_cpu(hdr_3addrqos->qos_ctl) & RTLLIB_QCTL_TID;
 	  tid = UP2AC(tid);
@@ -466,11 +466,11 @@ AddReorderEntry(
 #if  1
 	while(pList->next != &pTS->RxPendingPktList)
 	{
-		if( SN_LESS(pReorderEntry->SeqNum, ((PRX_REORDER_ENTRY)list_entry(pList->next,RX_REORDER_ENTRY,List))->SeqNum) )
+		if ( SN_LESS(pReorderEntry->SeqNum, ((PRX_REORDER_ENTRY)list_entry(pList->next,RX_REORDER_ENTRY,List))->SeqNum) )
 		{
 			pList = pList->next;
 		}
-		else if( SN_EQUAL(pReorderEntry->SeqNum, ((PRX_REORDER_ENTRY)list_entry(pList->next,RX_REORDER_ENTRY,List))->SeqNum) )
+		else if ( SN_EQUAL(pReorderEntry->SeqNum, ((PRX_REORDER_ENTRY)list_entry(pList->next,RX_REORDER_ENTRY,List))->SeqNum) )
 		{
 			return false;
 		}
@@ -560,12 +560,12 @@ void RxReorderIndicatePacket( struct rtllib_device *ieee,
 	bool			bMatchWinStart = false, bPktInBuf = false;
 	RTLLIB_DEBUG(RTLLIB_DL_REORDER,"%s(): Seq is %d,pTS->RxIndicateSeq is %d, WinSize is %d\n",__FUNCTION__,SeqNum,pTS->RxIndicateSeq,WinSize);
 	/* Rx Reorder initialize condition.*/
-	if(pTS->RxIndicateSeq == 0xffff) {
+	if (pTS->RxIndicateSeq == 0xffff) {
 		pTS->RxIndicateSeq = SeqNum;
 	}
 
 	/* Drop out the packet which SeqNum is smaller than WinStart */
-	if(SN_LESS(SeqNum, pTS->RxIndicateSeq)) {
+	if (SN_LESS(SeqNum, pTS->RxIndicateSeq)) {
 		RTLLIB_DEBUG(RTLLIB_DL_REORDER,"Packet Drop! IndicateSeq: %d, NewSeq: %d\n",
 				 pTS->RxIndicateSeq, SeqNum);
 		pHTInfo->RxReorderDropCounter++;
@@ -585,11 +585,11 @@ void RxReorderIndicatePacket( struct rtllib_device *ieee,
 	 * 1. Incoming SeqNum is equal to WinStart =>Window shift 1
 	 * 2. Incoming SeqNum is larger than the WinEnd => Window shift N
 	 */
-	if(SN_EQUAL(SeqNum, pTS->RxIndicateSeq)) {
+	if (SN_EQUAL(SeqNum, pTS->RxIndicateSeq)) {
 		pTS->RxIndicateSeq = (pTS->RxIndicateSeq + 1) % 4096;
 		bMatchWinStart = true;
-	} else if(SN_LESS(WinEnd, SeqNum)) {
-		if(SeqNum >= (WinSize - 1)) {
+	} else if (SN_LESS(WinEnd, SeqNum)) {
+		if (SeqNum >= (WinSize - 1)) {
 			pTS->RxIndicateSeq = SeqNum + 1 -WinSize;
 		} else {
 			pTS->RxIndicateSeq = 4095 - (WinSize - (SeqNum +1)) + 1;
@@ -606,7 +606,7 @@ void RxReorderIndicatePacket( struct rtllib_device *ieee,
 	 * 1. All packets with SeqNum smaller than WinStart => Indicate
 	 * 2. All packets with SeqNum larger than or equal to WinStart => Buffer it.
 	 */
-	if(bMatchWinStart) {
+	if (bMatchWinStart) {
 		/* Current packet is going to be indicated.*/
 		RTLLIB_DEBUG(RTLLIB_DL_REORDER, "Packets indication!! IndicateSeq: %d, NewSeq: %d\n",\
 				pTS->RxIndicateSeq, SeqNum);
@@ -614,7 +614,7 @@ void RxReorderIndicatePacket( struct rtllib_device *ieee,
 		index = 1;
 	} else {
 		/* Current packet is going to be inserted into pending list.*/
-		if(!list_empty(&ieee->RxReorder_Unused_List)) {
+		if (!list_empty(&ieee->RxReorder_Unused_List)) {
 			pReorderEntry = (PRX_REORDER_ENTRY)list_entry(ieee->RxReorder_Unused_List.next,RX_REORDER_ENTRY,List);
 			list_del_init(&pReorderEntry->List);
 
@@ -622,7 +622,7 @@ void RxReorderIndicatePacket( struct rtllib_device *ieee,
 			pReorderEntry->SeqNum = SeqNum;
 			pReorderEntry->prxb = prxb;
 
-			if(!AddReorderEntry(pTS, pReorderEntry)) {
+			if (!AddReorderEntry(pTS, pReorderEntry)) {
 				RTLLIB_DEBUG(RTLLIB_DL_REORDER, "%s(): Duplicate packet is dropped!! IndicateSeq: %d, NewSeq: %d\n",
 					__FUNCTION__, pTS->RxIndicateSeq, SeqNum);
 				list_add_tail(&pReorderEntry->List,&ieee->RxReorder_Unused_List);
@@ -660,11 +660,11 @@ void RxReorderIndicatePacket( struct rtllib_device *ieee,
 	while(!list_empty(&pTS->RxPendingPktList)) {
 		RTLLIB_DEBUG(RTLLIB_DL_REORDER,"%s(): start RREORDER indicate\n",__FUNCTION__);
 		pReorderEntry = (PRX_REORDER_ENTRY)list_entry(pTS->RxPendingPktList.prev,RX_REORDER_ENTRY,List);
-		if( SN_LESS(pReorderEntry->SeqNum, pTS->RxIndicateSeq) ||
+		if ( SN_LESS(pReorderEntry->SeqNum, pTS->RxIndicateSeq) ||
 				SN_EQUAL(pReorderEntry->SeqNum, pTS->RxIndicateSeq))
 		{
 			/* This protect buffer from overflow. */
-			if(index >= REORDER_WIN_SIZE) {
+			if (index >= REORDER_WIN_SIZE) {
 				RTLLIB_DEBUG(RTLLIB_DL_ERR, "RxReorderIndicatePacket(): Buffer overflow!! \n");
 				bPktInBuf = true;
 				break;
@@ -672,7 +672,7 @@ void RxReorderIndicatePacket( struct rtllib_device *ieee,
 
 			list_del_init(&pReorderEntry->List);
 
-			if(SN_EQUAL(pReorderEntry->SeqNum, pTS->RxIndicateSeq))
+			if (SN_EQUAL(pReorderEntry->SeqNum, pTS->RxIndicateSeq))
 				pTS->RxIndicateSeq = (pTS->RxIndicateSeq + 1) % 4096;
 
 			RTLLIB_DEBUG(RTLLIB_DL_REORDER,"Packets indication!! IndicateSeq: %d, NewSeq: %d\n",pTS->RxIndicateSeq, SeqNum);
@@ -687,14 +687,14 @@ void RxReorderIndicatePacket( struct rtllib_device *ieee,
 	}
 
 	/* Handling pending timer. Set this timer to prevent from long time Rx buffering.*/
-	if(index>0) {
-		if(timer_pending(&pTS->RxPktPendingTimer))
+	if (index>0) {
+		if (timer_pending(&pTS->RxPktPendingTimer))
 		{
 			del_timer_sync(&pTS->RxPktPendingTimer);
 		}
 		pTS->RxTimeoutIndicateSeq = 0xffff;
 
-		if(index>REORDER_WIN_SIZE){
+		if (index>REORDER_WIN_SIZE){
 			RTLLIB_DEBUG(RTLLIB_DL_ERR, "RxReorderIndicatePacket(): Rx Reorer buffer full!! \n");
 			return;
 		}
@@ -702,7 +702,7 @@ void RxReorderIndicatePacket( struct rtllib_device *ieee,
 		bPktInBuf = false;
 	}
 
-	if(bPktInBuf && pTS->RxTimeoutIndicateSeq==0xffff) {
+	if (bPktInBuf && pTS->RxTimeoutIndicateSeq==0xffff) {
 		RTLLIB_DEBUG(RTLLIB_DL_REORDER,"%s(): SET rx timeout timer\n", __FUNCTION__);
 		pTS->RxTimeoutIndicateSeq = pTS->RxIndicateSeq;
 		mod_timer(&pTS->RxPktPendingTimer,  jiffies + MSECS(pHTInfo->RxReorderPendingTime));
@@ -726,26 +726,26 @@ u8 parse_subframe(struct rtllib_device* ieee,struct sk_buff *skb,
 	u8             *data_ptr;
 	/* just for debug purpose */
 	SeqNum = WLAN_GET_SEQ_SEQ(le16_to_cpu(hdr->seq_ctl));
-	if((RTLLIB_QOS_HAS_SEQ(fc))&&\
+	if ((RTLLIB_QOS_HAS_SEQ(fc))&&\
 			(((frameqos *)(skb->data + RTLLIB_3ADDR_LEN))->field.reserved)) {
 		bIsAggregateFrame = true;
 	}
 
-	if(RTLLIB_QOS_HAS_SEQ(fc)) {
+	if (RTLLIB_QOS_HAS_SEQ(fc)) {
 		LLCOffset += 2;
 	}
-	if(rx_stats->bContainHTC) {
+	if (rx_stats->bContainHTC) {
 		LLCOffset += sHTCLng;
 	}
 	ChkLength = LLCOffset;/* + (Frame_WEP(frame)!=0 ?Adapter->MgntInfo.SecurityInfo.EncryptionHeadOverhead:0);*/
 
-	if( skb->len <= ChkLength ) {
+	if ( skb->len <= ChkLength ) {
 		return 0;
 	}
 
 	skb_pull(skb, LLCOffset);
 	ieee->bIsAggregateFrame = bIsAggregateFrame;
-	if(!bIsAggregateFrame) {
+	if (!bIsAggregateFrame) {
 		rxb->nr_subframes = 1;
 #ifndef RTK_DMP_PLATFORM
 #ifdef JOHN_NOCPY
@@ -769,7 +769,7 @@ u8 parse_subframe(struct rtllib_device* ieee,struct sk_buff *skb,
 			nSubframe_Length = *((u16*)(skb->data + 12));
 			nSubframe_Length = (nSubframe_Length>>8) + (nSubframe_Length<<8);
 
-			if(skb->len<(ETHERNET_HEADER_SIZE + nSubframe_Length)) {
+			if (skb->len<(ETHERNET_HEADER_SIZE + nSubframe_Length)) {
 				printk("%s: A-MSDU parse error!! pRfd->nTotalSubframe : %d\n",\
 						__FUNCTION__,rxb->nr_subframes);
 				printk("%s: A-MSDU parse error!! Subframe Length: %d\n",__FUNCTION__, nSubframe_Length);
@@ -794,19 +794,19 @@ u8 parse_subframe(struct rtllib_device* ieee,struct sk_buff *skb,
 #endif
 			sub_skb->dev = ieee->dev;
 			rxb->subframes[rxb->nr_subframes++] = sub_skb;
-			if(rxb->nr_subframes >= MAX_SUBFRAME_COUNT) {
+			if (rxb->nr_subframes >= MAX_SUBFRAME_COUNT) {
 				RTLLIB_DEBUG_RX("ParseSubframe(): Too many Subframes! Packets dropped!\n");
 				break;
 			}
 			skb_pull(skb,nSubframe_Length);
 
-			if(skb->len != 0) {
+			if (skb->len != 0) {
 				nPadding_Length = 4 - ((nSubframe_Length + ETHERNET_HEADER_SIZE) % 4);
-				if(nPadding_Length == 4) {
+				if (nPadding_Length == 4) {
 					nPadding_Length = 0;
 				}
 
-				if(skb->len < nPadding_Length) {
+				if (skb->len < nPadding_Length) {
 					return 0;
 				}
 
@@ -868,13 +868,13 @@ int rtllib_rx(struct rtllib_device *ieee, struct sk_buff *skb,
 	sc = le16_to_cpu(hdr->seq_ctl);
 	frag = WLAN_GET_SEQ_FRAG(sc);
 	hdrlen = rtllib_get_hdrlen(fc);
-	if(skb->len < hdrlen){
+	if (skb->len < hdrlen){
 		printk("%s():ERR!!! skb->len is smaller than hdrlen\n",__FUNCTION__);
 		goto rx_dropped;
 	}
 
 	if (HTCCheck(ieee, skb->data)) {
-		if(net_ratelimit())
+		if (net_ratelimit())
 			printk("find HTCControl\n");
 		hdrlen += 4;
 		rx_stats->bContainHTC = 1;
@@ -949,11 +949,11 @@ int rtllib_rx(struct rtllib_device *ieee, struct sk_buff *skb,
 	if (skb->len < RTLLIB_DATA_HDR3_LEN)
 		goto rx_dropped;
 
-	if( (ieee->pHTInfo->bCurRxReorderEnable == false) ||
+	if ( (ieee->pHTInfo->bCurRxReorderEnable == false) ||
 		!ieee->current_network.qos_data.active ||
 		!IsDataFrame(skb->data) ||
 		IsLegacyDataFrame(skb->data)) {
-		if(!((type == RTLLIB_FTYPE_MGMT) && (stype == RTLLIB_STYPE_BEACON))){
+		if (!((type == RTLLIB_FTYPE_MGMT) && (stype == RTLLIB_STYPE_BEACON))){
 			if (is_duplicate_packet(ieee, hdr)){
 				goto rx_dropped;
 			}
@@ -1072,7 +1072,7 @@ int rtllib_rx(struct rtllib_device *ieee, struct sk_buff *skb,
 
 		/* {broad,multi}cast packets to our BSSID go through */
 		if (is_multicast_ether_addr(hdr->addr1)) {
-			if(!memcmp(hdr->addr3, ieee->current_network.bssid, ETH_ALEN))
+			if (!memcmp(hdr->addr3, ieee->current_network.bssid, ETH_ALEN))
 				break;
 			else
 				goto rx_dropped;
@@ -1186,7 +1186,7 @@ int rtllib_rx(struct rtllib_device *ieee, struct sk_buff *skb,
 	ieee->LinkDetectInfo.NumRxOkInPeriod++;
 
 	hdr = (struct rtllib_hdr_4addr *) skb->data;
-	if((!is_multicast_ether_addr(hdr->addr1)) && (!is_broadcast_ether_addr(hdr->addr1)))
+	if ((!is_multicast_ether_addr(hdr->addr1)) && (!is_broadcast_ether_addr(hdr->addr1)))
 		unicast_packet = true;
 	if (crypt && !(fc & RTLLIB_FCTL_WEP) && !ieee->open_wep) {
 		if (/*ieee->ieee802_1x &&*/
@@ -1229,31 +1229,31 @@ int rtllib_rx(struct rtllib_device *ieee, struct sk_buff *skb,
 		goto rx_dropped;
 	}
 /*
-	if(rtllib_is_eapol_frame(ieee, skb, hdrlen)) {
+	if (rtllib_is_eapol_frame(ieee, skb, hdrlen)) {
 		printk(KERN_WARNING "RX: IEEE802.1X EPAOL frame!\n");
 	}
 */
-	if(ieee->current_network.qos_data.active && IsQoSDataFrame(skb->data)
+	if (ieee->current_network.qos_data.active && IsQoSDataFrame(skb->data)
 		&& !is_multicast_ether_addr(hdr->addr1) && !is_broadcast_ether_addr(hdr->addr1))
 	{
 		TID = Frame_QoSTID(skb->data);
 		SeqNum = WLAN_GET_SEQ_SEQ(sc);
 		GetTs(ieee,(PTS_COMMON_INFO*) &pTS,hdr->addr2,TID,RX_DIR,true);
-		if(TID !=0 && TID !=3){
+		if (TID !=0 && TID !=3){
 			ieee->bis_any_nonbepkts = true;
 		}
 	}
 	/* skb: hdr + (possible reassembled) full plaintext payload */
 	payload = skb->data + hdrlen;
 	rxb = (struct rtllib_rxb*)kmalloc(sizeof(struct rtllib_rxb),GFP_ATOMIC);
-	if(rxb == NULL)
+	if (rxb == NULL)
 	{
 		RTLLIB_DEBUG(RTLLIB_DL_ERR,"%s(): kmalloc rxb error\n",__FUNCTION__);
 		goto rx_dropped;
 	}
 	/* to parse amsdu packets */
 	/* qos data packets & reserved bit is 1 */
-	if(parse_subframe(ieee,skb,rx_stats,rxb,src,dst) == 0) {
+	if (parse_subframe(ieee,skb,rx_stats,rxb,src,dst) == 0) {
 		/* only to free rxb, and not submit the packets to upper layer */
 		for(i =0; i < rxb->nr_subframes; i++) {
 			dev_kfree_skb(rxb->subframes[i]);
@@ -1265,20 +1265,20 @@ int rtllib_rx(struct rtllib_device *ieee, struct sk_buff *skb,
 
 #if !defined(RTL8192SU) && !defined(RTL8192U)
 #ifdef ENABLE_LPS
-	if(unicast_packet) {
+	if (unicast_packet) {
 		if (type == RTLLIB_FTYPE_DATA) {
-			if(ieee->bIsAggregateFrame)
+			if (ieee->bIsAggregateFrame)
 				ieee->LinkDetectInfo.NumRxUnicastOkInPeriod+=rxb->nr_subframes;
 			else
 				ieee->LinkDetectInfo.NumRxUnicastOkInPeriod++;
 
-			if((ieee->state == RTLLIB_LINKED) /*&& !MgntInitAdapterInProgress(pMgntInfo)*/)
+			if ((ieee->state == RTLLIB_LINKED) /*&& !MgntInitAdapterInProgress(pMgntInfo)*/)
 			{
-				if(	((ieee->LinkDetectInfo.NumRxUnicastOkInPeriod +ieee->LinkDetectInfo.NumTxOkInPeriod) > 8 ) ||
+				if (	((ieee->LinkDetectInfo.NumRxUnicastOkInPeriod +ieee->LinkDetectInfo.NumTxOkInPeriod) > 8 ) ||
 					(ieee->LinkDetectInfo.NumRxUnicastOkInPeriod > 2) )
 				{
 #ifdef ENABLE_LPS
-					if(ieee->LeisurePSLeave)
+					if (ieee->LeisurePSLeave)
 						ieee->LeisurePSLeave(dev);
 #endif
 				}
@@ -1288,7 +1288,7 @@ int rtllib_rx(struct rtllib_device *ieee, struct sk_buff *skb,
 #endif
 #endif
 	ieee->last_rx_ps_time = jiffies;
-	if(ieee->pHTInfo->bCurRxReorderEnable == false ||pTS == NULL){
+	if (ieee->pHTInfo->bCurRxReorderEnable == false ||pTS == NULL){
 		for(i = 0; i<rxb->nr_subframes; i++) {
 			struct sk_buff *sub_skb = rxb->subframes[i];
 
@@ -1315,7 +1315,7 @@ int rtllib_rx(struct rtllib_device *ieee, struct sk_buff *skb,
 
 				stats->rx_packets++;
 				stats->rx_bytes += sub_skb->len;
-				if(is_multicast_ether_addr(dst)) {
+				if (is_multicast_ether_addr(dst)) {
 					stats->multicast++;
 				}
 
@@ -1470,7 +1470,7 @@ static int rtllib_qos_convert_ac_to_parameters(struct rtllib_qos_parameter_info 
 		aci = (ac_params->aci_aifsn & 0x60) >> 5;
 		acm = (ac_params->aci_aifsn & 0x10) >> 4;
 
-		if(aci >= QOS_QUEUE_NUM)
+		if (aci >= QOS_QUEUE_NUM)
 			continue;
 		switch (aci) {
 			case 1:
@@ -1595,20 +1595,20 @@ static inline void rtllib_extract_country_ie(
 	u8 * addr2
 )
 {
-	if(IS_DOT11D_ENABLE(ieee))
+	if (IS_DOT11D_ENABLE(ieee))
 	{
-		if(info_element->len!= 0)
+		if (info_element->len!= 0)
 		{
 			memcpy(network->CountryIeBuf, info_element->data, info_element->len);
 			network->CountryIeLen = info_element->len;
 
-			if(!IS_COUNTRY_IE_VALID(ieee))
+			if (!IS_COUNTRY_IE_VALID(ieee))
 			{
 				Dot11d_UpdateCountryIe(ieee, addr2, info_element->len, info_element->data);
 			}
 		}
 
-		if(IS_EQUAL_CIE_SRC(ieee, addr2) )
+		if (IS_EQUAL_CIE_SRC(ieee, addr2) )
 		{
 			UPDATE_CIE_WATCHDOG(ieee);
 		}
@@ -1740,14 +1740,14 @@ int rtllib_parse_info_param(struct rtllib_device *ieee,
 			break;
 
 		case MFIE_TYPE_TIM:
-			if(info_element->len < 4)
+			if (info_element->len < 4)
 				break;
 
 			network->tim.tim_count = info_element->data[0];
 			network->tim.tim_period = info_element->data[1];
 
                         network->dtim_period = info_element->data[1];
-                        if(ieee->state != RTLLIB_LINKED)
+                        if (ieee->state != RTLLIB_LINKED)
                                 break;
 			network->last_dtim_sta_time[0] = jiffies;
                         network->last_dtim_sta_time[1] = stats->mac_time[1];
@@ -1755,19 +1755,19 @@ int rtllib_parse_info_param(struct rtllib_device *ieee,
                         network->dtim_data = RTLLIB_DTIM_VALID;
 
 
-                        if(info_element->data[2] & 1)
+                        if (info_element->data[2] & 1)
                                 network->dtim_data |= RTLLIB_DTIM_MBCAST;
 
                         offset = (info_element->data[2] >> 1)*2;
 
 
-                        if(ieee->assoc_id < 8*offset ||
+                        if (ieee->assoc_id < 8*offset ||
                                 ieee->assoc_id > 8*(offset + info_element->len -3))
 
                                 break;
 
                         offset = (ieee->assoc_id / 8) - offset;
-                        if(info_element->data[3+offset] & (1<<(ieee->assoc_id%8)))
+                        if (info_element->data[3+offset] & (1<<(ieee->assoc_id%8)))
                                 network->dtim_data |= RTLLIB_DTIM_UCAST;
 
 			network->listen_interval = network->dtim_period;
@@ -1815,22 +1815,22 @@ int rtllib_parse_info_param(struct rtllib_device *ieee,
                                 network->Turbo_Enable = 1;
                         }
 
-			if(tmp_htcap_len == 0){
-				if(info_element->len >= 4 &&
+			if (tmp_htcap_len == 0){
+				if (info_element->len >= 4 &&
 				   info_element->data[0] == 0x00 &&
 				   info_element->data[1] == 0x90 &&
 				   info_element->data[2] == 0x4c &&
 				   info_element->data[3] == 0x033){
 
 						tmp_htcap_len = min(info_element->len,(u8)MAX_IE_LEN);
-						if(tmp_htcap_len != 0){
+						if (tmp_htcap_len != 0){
 							network->bssht.bdHTSpecVer = HT_SPEC_VER_EWC;
 							network->bssht.bdHTCapLen = tmp_htcap_len > sizeof(network->bssht.bdHTCapBuf)?\
 								sizeof(network->bssht.bdHTCapBuf):tmp_htcap_len;
 							memcpy(network->bssht.bdHTCapBuf,info_element->data,network->bssht.bdHTCapLen);
 						}
 				}
-				if(tmp_htcap_len != 0){
+				if (tmp_htcap_len != 0){
 					network->bssht.bdSupportHT = true;
 					network->bssht.bdHT1R = ((((PHT_CAPABILITY_ELE)(network->bssht.bdHTCapBuf))->MCS[1]) == 0);
 				}else{
@@ -1840,17 +1840,17 @@ int rtllib_parse_info_param(struct rtllib_device *ieee,
 			}
 
 
-			if(tmp_htinfo_len == 0){
-				if(info_element->len >= 4 &&
+			if (tmp_htinfo_len == 0){
+				if (info_element->len >= 4 &&
 					info_element->data[0] == 0x00 &&
 					info_element->data[1] == 0x90 &&
 					info_element->data[2] == 0x4c &&
 					info_element->data[3] == 0x034){
 
 						tmp_htinfo_len = min(info_element->len,(u8)MAX_IE_LEN);
-						if(tmp_htinfo_len != 0){
+						if (tmp_htinfo_len != 0){
 							network->bssht.bdHTSpecVer = HT_SPEC_VER_EWC;
-							if(tmp_htinfo_len){
+							if (tmp_htinfo_len){
 								network->bssht.bdHTInfoLen = tmp_htinfo_len > sizeof(network->bssht.bdHTInfoBuf)?\
 									sizeof(network->bssht.bdHTInfoBuf):tmp_htinfo_len;
 								memcpy(network->bssht.bdHTInfoBuf,info_element->data,network->bssht.bdHTInfoLen);
@@ -1861,9 +1861,9 @@ int rtllib_parse_info_param(struct rtllib_device *ieee,
 				}
 			}
 
-			if(ieee->aggregation){
-				if(network->bssht.bdSupportHT){
-					if(info_element->len >= 4 &&
+			if (ieee->aggregation){
+				if (network->bssht.bdSupportHT){
+					if (info_element->len >= 4 &&
 						info_element->data[0] == 0x00 &&
 						info_element->data[1] == 0xe0 &&
 						info_element->data[2] == 0x4c &&
@@ -1873,27 +1873,27 @@ int rtllib_parse_info_param(struct rtllib_device *ieee,
 						memcpy(ht_realtek_agg_buf,info_element->data,info_element->len);
 
 					}
-					if(ht_realtek_agg_len >= 5){
+					if (ht_realtek_agg_len >= 5){
 						network->realtek_cap_exit = true;
 						network->bssht.bdRT2RTAggregation = true;
 
-						if((ht_realtek_agg_buf[4] == 1) && (ht_realtek_agg_buf[5] & 0x02))
+						if ((ht_realtek_agg_buf[4] == 1) && (ht_realtek_agg_buf[5] & 0x02))
 						network->bssht.bdRT2RTLongSlotTime = true;
 
-						if((ht_realtek_agg_buf[4]==1) && (ht_realtek_agg_buf[5] & RT_HT_CAP_USE_92SE))
+						if ((ht_realtek_agg_buf[4]==1) && (ht_realtek_agg_buf[5] & RT_HT_CAP_USE_92SE))
 						{
 							network->bssht.RT2RT_HT_Mode |= RT_HT_CAP_USE_92SE;
 						}
 					}
 				}
-				if(ht_realtek_agg_len >= 5){
-					if((ht_realtek_agg_buf[5] & RT_HT_CAP_USE_SOFTAP))
+				if (ht_realtek_agg_len >= 5){
+					if ((ht_realtek_agg_buf[5] & RT_HT_CAP_USE_SOFTAP))
 						network->bssht.RT2RT_HT_Mode |= RT_HT_CAP_USE_SOFTAP;
 				}
 			}
 
 			{
-				if((info_element->len >= 3 &&
+				if ((info_element->len >= 3 &&
 					 info_element->data[0] == 0x00 &&
 					 info_element->data[1] == 0x05 &&
 					 info_element->data[2] == 0xb5) ||
@@ -1910,14 +1910,14 @@ int rtllib_parse_info_param(struct rtllib_device *ieee,
 
 				}
 			}
-			if(info_element->len >= 3 &&
+			if (info_element->len >= 3 &&
 				info_element->data[0] == 0x00 &&
 				info_element->data[1] == 0x0c &&
 				info_element->data[2] == 0x43)
 			{
 				network->ralink_cap_exist = true;
 			}
-			if((info_element->len >= 3 &&
+			if ((info_element->len >= 3 &&
 				info_element->data[0] == 0x00 &&
 				info_element->data[1] == 0x03 &&
 				info_element->data[2] == 0x7f) ||
@@ -1936,30 +1936,30 @@ int rtllib_parse_info_param(struct rtllib_device *ieee,
 				{
 					network->marvell_cap_exist = true;
 				}
-			if(info_element->len >= 3 &&
+			if (info_element->len >= 3 &&
 				info_element->data[0] == 0x00 &&
 				info_element->data[1] == 0x40 &&
 				info_element->data[2] == 0x96)
 			{
 				network->cisco_cap_exist = true;
 			}
-			if(info_element->len > 4 &&
+			if (info_element->len > 4 &&
 				info_element->data[0] == 0x00 &&
 				info_element->data[1] == 0x40 &&
 				info_element->data[2] == 0x96 &&
 				info_element->data[3] == 0x01)
 			{
-				if(info_element->len == 6)
+				if (info_element->len == 6)
 				{
 					memcpy(network->CcxRmState, &info_element[4], 2);
-					if(network->CcxRmState[0] != 0)
+					if (network->CcxRmState[0] != 0)
 					{
 						network->bCcxRmEnable = true;
 					}
 					else
 						network->bCcxRmEnable = false;
 					network->MBssidMask = network->CcxRmState[1] & 0x07;
-					if(network->MBssidMask != 0)
+					if (network->MBssidMask != 0)
 					{
 						network->bMBssidValid = true;
 						network->MBssidMask = 0xff << (network->MBssidMask);
@@ -1976,13 +1976,13 @@ int rtllib_parse_info_param(struct rtllib_device *ieee,
 					network->bCcxRmEnable = false;
 				}
 			}
-			if(info_element->len > 4  &&
+			if (info_element->len > 4  &&
 				info_element->data[0] == 0x00 &&
 				info_element->data[1] == 0x40 &&
 				info_element->data[2] == 0x96 &&
 				info_element->data[3] == 0x03)
 			{
-				if(info_element->len == 5)
+				if (info_element->len == 5)
 				{
 					network->bWithCcxVerNum = true;
 					network->BssCcxVerNumber = info_element->data[4];
@@ -1993,7 +1993,7 @@ int rtllib_parse_info_param(struct rtllib_device *ieee,
 					network->BssCcxVerNumber = 0;
 				}
 			}
-			if(info_element->len > 4  &&
+			if (info_element->len > 4  &&
 				info_element->data[0] == 0x00 &&
 				info_element->data[1] == 0x50 &&
 				info_element->data[2] == 0xf2 &&
@@ -2021,7 +2021,7 @@ int rtllib_parse_info_param(struct rtllib_device *ieee,
 			RTLLIB_DEBUG_SCAN("MFIE_TYPE_HT_CAP: %d bytes\n",
 					     info_element->len);
 			tmp_htcap_len = min(info_element->len,(u8)MAX_IE_LEN);
-			if(tmp_htcap_len != 0){
+			if (tmp_htcap_len != 0){
 				network->bssht.bdHTSpecVer = HT_SPEC_VER_EWC;
 				network->bssht.bdHTCapLen = tmp_htcap_len > sizeof(network->bssht.bdHTCapBuf)?\
 					sizeof(network->bssht.bdHTCapBuf):tmp_htcap_len;
@@ -2044,7 +2044,7 @@ int rtllib_parse_info_param(struct rtllib_device *ieee,
 			RTLLIB_DEBUG_SCAN("MFIE_TYPE_HT_INFO: %d bytes\n",
 					     info_element->len);
 			tmp_htinfo_len = min(info_element->len,(u8)MAX_IE_LEN);
-			if(tmp_htinfo_len){
+			if (tmp_htinfo_len){
 				network->bssht.bdHTSpecVer = HT_SPEC_VER_IEEE;
 				network->bssht.bdHTInfoLen = tmp_htinfo_len > sizeof(network->bssht.bdHTInfoBuf)?\
 					sizeof(network->bssht.bdHTInfoBuf):tmp_htinfo_len;
@@ -2055,11 +2055,11 @@ int rtllib_parse_info_param(struct rtllib_device *ieee,
 		case MFIE_TYPE_AIRONET:
 			RTLLIB_DEBUG_SCAN("MFIE_TYPE_AIRONET: %d bytes\n",
 					     info_element->len);
-			if(info_element->len >IE_CISCO_FLAG_POSITION)
+			if (info_element->len >IE_CISCO_FLAG_POSITION)
 			{
 				network->bWithAironetIE = true;
 
-				if(	(info_element->data[IE_CISCO_FLAG_POSITION]&SUPPORT_CKIP_MIC)	||
+				if (	(info_element->data[IE_CISCO_FLAG_POSITION]&SUPPORT_CKIP_MIC)	||
 					(info_element->data[IE_CISCO_FLAG_POSITION]&SUPPORT_CKIP_PK)	)
 				{
 					network->bCkipSupported = true;
@@ -2099,7 +2099,7 @@ int rtllib_parse_info_param(struct rtllib_device *ieee,
 		    data[info_element->len];
 	}
 
-	if(!network->atheros_cap_exist && !network->broadcom_cap_exist &&
+	if (!network->atheros_cap_exist && !network->broadcom_cap_exist &&
 		!network->cisco_cap_exist && !network->ralink_cap_exist && !network->bssht.bdRT2RTAggregation)
 		network->unknown_cap_exist = true;
 	else
@@ -2111,23 +2111,23 @@ static inline u8 rtllib_SignalStrengthTranslate(u8  CurrSS)
 {
 	u8 RetSS;
 
-	if(CurrSS >= 71 && CurrSS <= 100)
+	if (CurrSS >= 71 && CurrSS <= 100)
 		RetSS = 90 + ((CurrSS - 70) / 3);
-	else if(CurrSS >= 41 && CurrSS <= 70)
+	else if (CurrSS >= 41 && CurrSS <= 70)
 		RetSS = 78 + ((CurrSS - 40) / 3);
-	else if(CurrSS >= 31 && CurrSS <= 40)
+	else if (CurrSS >= 31 && CurrSS <= 40)
 		RetSS = 66 + (CurrSS - 30);
-	else if(CurrSS >= 21 && CurrSS <= 30)
+	else if (CurrSS >= 21 && CurrSS <= 30)
 		RetSS = 54 + (CurrSS - 20);
-	else if(CurrSS >= 5 && CurrSS <= 20)
+	else if (CurrSS >= 5 && CurrSS <= 20)
 		RetSS = 42 + (((CurrSS - 5) * 2) / 3);
-	else if(CurrSS == 4)
+	else if (CurrSS == 4)
 		RetSS = 36;
-	else if(CurrSS == 3)
+	else if (CurrSS == 3)
 		RetSS = 27;
-	else if(CurrSS == 2)
+	else if (CurrSS == 2)
 		RetSS = 18;
-	else if(CurrSS == 1)
+	else if (CurrSS == 1)
 		RetSS = 9;
 	else
 		RetSS = CurrSS;
@@ -2231,10 +2231,10 @@ static inline int rtllib_network_init(
 		return 1;
 	}
 
-	if(network->bssht.bdSupportHT){
-		if(network->mode == IEEE_A)
+	if (network->bssht.bdSupportHT){
+		if (network->mode == IEEE_A)
 			network->mode = IEEE_N_5G;
-		else if(network->mode & (IEEE_G | IEEE_B))
+		else if (network->mode & (IEEE_G | IEEE_B))
 			network->mode = IEEE_N_24G;
 	}
 	if (rtllib_is_empty_essid(network->ssid, network->ssid_len))
@@ -2245,13 +2245,13 @@ static inline int rtllib_network_init(
             static u8 Netgear845T_Mac[3] = {0x00, 0x1B, 0x2F};
             static u8 Buffalo300N_Mac[3] = {0x00, 0x16, 0x01};
 
-            if(ieee->RF_Type == RF_1T1R || ieee->b1SSSupport == true)
+            if (ieee->RF_Type == RF_1T1R || ieee->b1SSSupport == true)
             {
-                if((memcmp(network->bssid, Netgear845T_Mac, 3)==0) ||(memcmp(network->bssid, Buffalo300N_Mac, 3)==0))
+                if ((memcmp(network->bssid, Netgear845T_Mac, 3)==0) ||(memcmp(network->bssid, Buffalo300N_Mac, 3)==0))
                 {
                     network->bIsNetgear854T = true;
                     network->bssht.bdSupportHT = false;
-                    if(network->mode == WIRELESS_MODE_N_24G)
+                    if (network->mode == WIRELESS_MODE_N_24G)
                     {
                         network->mode = WIRELESS_MODE_B | WIRELESS_MODE_G;
                     }
@@ -2301,9 +2301,9 @@ static inline void update_network(struct rtllib_network *dst,
 	dst->rates_len = src->rates_len;
 	memcpy(dst->rates_ex, src->rates_ex, src->rates_ex_len);
 	dst->rates_ex_len = src->rates_ex_len;
-	if(src->ssid_len > 0)
+	if (src->ssid_len > 0)
 	{
-		if(dst->ssid_len == 0)
+		if (dst->ssid_len == 0)
 		{
 			memset(dst->hidden_ssid, 0, sizeof(dst->hidden_ssid));
 			dst->hidden_ssid_len = src->ssid_len;
@@ -2361,12 +2361,12 @@ static inline void update_network(struct rtllib_network *dst,
 	qos_active = dst->qos_data.active;
 	old_param = dst->qos_data.param_count;
 	dst->qos_data.supported = src->qos_data.supported;
-	if(dst->flags & NETWORK_HAS_QOS_PARAMETERS){
+	if (dst->flags & NETWORK_HAS_QOS_PARAMETERS){
 		memcpy(&dst->qos_data, &src->qos_data, sizeof(struct rtllib_qos_data));
 	}
-	if(dst->qos_data.supported == 1) {
+	if (dst->qos_data.supported == 1) {
 		dst->QoS_Enable = 1;
-		if(dst->ssid_len)
+		if (dst->ssid_len)
 			RTLLIB_DEBUG_QOS
 				("QoS the network %s is QoS supported\n",
 				dst->ssid);
@@ -2379,7 +2379,7 @@ static inline void update_network(struct rtllib_network *dst,
 
 	/* dst->last_associate is not overwritten */
 	dst->wmm_info = src->wmm_info;
-	if(src->wmm_param[0].ac_aci_acm_aifsn|| \
+	if (src->wmm_param[0].ac_aci_acm_aifsn|| \
 	   src->wmm_param[1].ac_aci_acm_aifsn|| \
 	   src->wmm_param[2].ac_aci_acm_aifsn|| \
 	   src->wmm_param[1].ac_aci_acm_aifsn) {
@@ -2466,29 +2466,29 @@ static inline void rtllib_process_probe_response(
 	if (!IsLegalChannel(ieee, network->channel))
 		goto free_network;
 
-	if(ieee->bGlobalDomain){
+	if (ieee->bGlobalDomain){
 		if (WLAN_FC_GET_STYPE(beacon->header.frame_ctl) == RTLLIB_STYPE_PROBE_RESP){
-			if(IS_COUNTRY_IE_VALID(ieee) ){
-				if( !IsLegalChannel(ieee, network->channel) ){
+			if (IS_COUNTRY_IE_VALID(ieee) ){
+				if ( !IsLegalChannel(ieee, network->channel) ){
 					printk("GetScanInfo(): For Country code, filter probe response at channel(%d).\n", network->channel);
 					goto free_network;
 				}
 			}
 			else{
-				if(network->channel > 11){
+				if (network->channel > 11){
 					printk("GetScanInfo(): For Global Domain, filter probe response at channel(%d).\n", network->channel);
 					goto free_network;
 				}
 			}
 		}else{
-			if(IS_COUNTRY_IE_VALID(ieee) ){
-				if( !IsLegalChannel(ieee, network->channel) ){
+			if (IS_COUNTRY_IE_VALID(ieee) ){
+				if ( !IsLegalChannel(ieee, network->channel) ){
 					printk("GetScanInfo(): For Country code, filter beacon at channel(%d).\n",network->channel);
 					goto free_network;
 				}
 			}
 			else{
-				if(network->channel > 14){
+				if (network->channel > 14){
 					printk("GetScanInfo(): For Global Domain, filter beacon at channel(%d).\n",network->channel);
 					goto free_network;
 				}
@@ -2507,18 +2507,18 @@ static inline void rtllib_process_probe_response(
 	 * already there. */
 
 	spin_lock_irqsave(&ieee->lock, flags);
-	if(is_same_network(&ieee->current_network, network, (network->ssid_len?1:0))) {
+	if (is_same_network(&ieee->current_network, network, (network->ssid_len?1:0))) {
 		update_network(&ieee->current_network, network);
 		if ((ieee->current_network.mode == IEEE_N_24G ||
 		     ieee->current_network.mode == IEEE_G) &&
 		    ieee->current_network.berp_info_valid) {
-			if(ieee->current_network.erp_value& ERP_UseProtection)
+			if (ieee->current_network.erp_value& ERP_UseProtection)
 				ieee->current_network.buseprotection = true;
 			else
 				ieee->current_network.buseprotection = false;
 		}
-		if(is_beacon(beacon->header.frame_ctl)) {
-			if(ieee->state == RTLLIB_LINKED)
+		if (is_beacon(beacon->header.frame_ctl)) {
+			if (ieee->state == RTLLIB_LINKED)
 				ieee->LinkDetectInfo.NumRecvBcnInPeriod++;
 		}
 	}
@@ -2561,7 +2561,7 @@ static inline void rtllib_process_probe_response(
 #endif
 		memcpy(target, network, sizeof(*target));
 		list_add_tail(&target->list, &ieee->network_list);
-		if(ieee->softmac_features & IEEE_SOFTMAC_ASSOCIATE)
+		if (ieee->softmac_features & IEEE_SOFTMAC_ASSOCIATE)
 			rtllib_softmac_new_net(ieee, network);
 	} else {
 		RTLLIB_DEBUG_SCAN("Updating '%s' (" MAC_FMT ") via %s.\n",
@@ -2577,7 +2577,7 @@ static inline void rtllib_process_probe_response(
 		 * net and call the new_net handler
 		 */
 		renew = !time_after(target->last_scanned + ieee->scan_age, jiffies);
-		if((!target->ssid_len) &&
+		if ((!target->ssid_len) &&
 			(((network->ssid_len > 0) && (target->hidden_ssid_len == 0))
 			|| ((ieee->current_network.ssid_len == network->ssid_len) &&
 			   (strncmp(ieee->current_network.ssid, network->ssid, network->ssid_len) == 0) &&
@@ -2586,14 +2586,14 @@ static inline void rtllib_process_probe_response(
 			renew = 1;
 		}
 		update_network(target, network);
-		if(renew && (ieee->softmac_features & IEEE_SOFTMAC_ASSOCIATE))
+		if (renew && (ieee->softmac_features & IEEE_SOFTMAC_ASSOCIATE))
 			rtllib_softmac_new_net(ieee, network);
 	}
 
 	spin_unlock_irqrestore(&ieee->lock, flags);
 	if (is_beacon(beacon->header.frame_ctl)&&is_same_network(&ieee->current_network, network, (network->ssid_len?1:0))&&\
 		(ieee->state == RTLLIB_LINKED)) {
-		if(ieee->handle_beacon != NULL) {
+		if (ieee->handle_beacon != NULL) {
 			ieee->handle_beacon(ieee->dev,beacon,&ieee->current_network);
 		}
 	}
@@ -2607,7 +2607,7 @@ void rtllib_rx_mgt(struct rtllib_device *ieee,
 		      struct rtllib_rx_stats *stats)
 {
     struct rtllib_hdr_4addr *header = (struct rtllib_hdr_4addr *)skb->data ;
-    if(WLAN_FC_GET_STYPE(header->frame_ctl) != RTLLIB_STYPE_PROBE_RESP &&
+    if (WLAN_FC_GET_STYPE(header->frame_ctl) != RTLLIB_STYPE_PROBE_RESP &&
             WLAN_FC_GET_STYPE(header->frame_ctl) != RTLLIB_STYPE_BEACON)
         ieee->last_rx_ps_time = jiffies;
 
@@ -2619,7 +2619,7 @@ void rtllib_rx_mgt(struct rtllib_device *ieee,
             RTLLIB_DEBUG_SCAN("Beacon\n");
             rtllib_process_probe_response(
                     ieee, (struct rtllib_probe_response *)header, stats);
-            if(ieee->sta_sleep || (ieee->ps != RTLLIB_PS_DISABLED &&
+            if (ieee->sta_sleep || (ieee->ps != RTLLIB_PS_DISABLED &&
                         ieee->iw_mode == IW_MODE_INFRA &&
                         ieee->state == RTLLIB_LINKED))
             {

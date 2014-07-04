@@ -172,7 +172,7 @@ struct net_device *alloc_rtllib(int sizeof_priv)
 	ieee->dev = dev;
 
 #ifdef CONFIG_CRDA
-	if(!rtllib_wdev_alloc(ieee))
+	if (!rtllib_wdev_alloc(ieee))
 		goto failed;
 #endif
 

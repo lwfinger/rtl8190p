@@ -62,7 +62,7 @@ int rtl8192E_suspend (struct pci_dev *pdev, pm_message_t state)
 	// Call MgntActSet_RF_State instead to prevent RF config race condition.
 	// By Bruce, 2008-01-17.
 	//
-	if(!priv->rtllib->bSupportRemoteWakeUp) {
+	if (!priv->rtllib->bSupportRemoteWakeUp) {
 		MgntActSet_RF_State(dev, eRfOff, RF_CHANGE_BY_INIT);
 		// 2006.11.30. System reset bit
 		ulRegRead = read_nic_dword(dev, CPU_GEN);
@@ -85,7 +85,7 @@ int rtl8192E_suspend (struct pci_dev *pdev, pm_message_t state)
 out_pci_suspend:
 	RT_TRACE(COMP_POWER, "r8192E support WOL call??????????????????????\n");
 	printk("r8192E support WOL call??????????????????????\n");
-	if(priv->rtllib->bSupportRemoteWakeUp) {
+	if (priv->rtllib->bSupportRemoteWakeUp) {
 		RT_TRACE(COMP_POWER, "r8192E support WOL call!!!!!!!!!!!!!!!!!!.\n");
 	}
 	pci_save_state(pdev);
@@ -113,7 +113,7 @@ int rtl8192E_resume (struct pci_dev *pdev)
     pci_set_power_state(pdev, PCI_D0);
 
     err = pci_enable_device(pdev);
-    if(err) {
+    if (err) {
         printk(KERN_ERR "%s: pci_enable_device failed on resume\n",
                 dev->name);
         return err;
@@ -135,12 +135,12 @@ int rtl8192E_resume (struct pci_dev *pdev)
     pci_enable_wake(pdev, PCI_D0, 0);
 
 #ifdef ENABLE_GPIO_RADIO_CTL
-    if(priv->polling_timer_on == 0){//add for S3/S4
+    if (priv->polling_timer_on == 0){//add for S3/S4
         check_rfctrl_gpio_timer((unsigned long)dev);
     }
 #endif
 
-    if(!netif_running(dev)){
+    if (!netif_running(dev)){
         printk("RTL819XE:UI is open out of resume function\n");
         goto out;
     }

@@ -75,7 +75,7 @@ void rtllib_ccmp_aes_encrypt(struct crypto_tfm *tfm,
 #if ( defined(BUILT_IN_CRYPTO) || ((LINUX_VERSION_CODE < KERNEL_VERSION(2,6,21)) && (!OPENSUSE_SLED)) )
 	struct scatterlist src, dst;
 
-#if(LINUX_VERSION_CODE < KERNEL_VERSION(2,6,24))
+#if (LINUX_VERSION_CODE < KERNEL_VERSION(2,6,24))
 	src.page = virt_to_page(pt);
 	src.offset = offset_in_page(pt);
 	src.length = AES_BLOCK_LEN;

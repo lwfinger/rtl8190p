@@ -75,10 +75,10 @@ static inline char *rtl819x_translate_scan(struct rtllib_device *ieee,
 	/* Add the ESSID */
 	iwe.cmd = SIOCGIWESSID;
 	iwe.u.data.flags = 1;
-	if(network->ssid_len > 0){
+	if (network->ssid_len > 0){
 		iwe.u.data.length = min(network->ssid_len, (u8)32);
 		start = iwe_stream_add_point_rsl(info, start, stop, &iwe, network->ssid);
-        }else if(network->hidden_ssid_len == 0){
+        }else if (network->hidden_ssid_len == 0){
 		iwe.u.data.length = sizeof("<hidden>");
 		start = iwe_stream_add_point_rsl(info, start, stop, &iwe, "<hidden>");
         }else {
@@ -88,7 +88,7 @@ static inline char *rtl819x_translate_scan(struct rtllib_device *ieee,
 	/* Add the protocol name */
 	iwe.cmd = SIOCGIWNAME;
 	for(i=0; i<(sizeof(rtllib_modes)/sizeof(rtllib_modes[0])); i++) {
-		if(network->mode&(1<<i)) {
+		if (network->mode&(1<<i)) {
 			sprintf(pname,rtllib_modes[i].mode_string,rtllib_modes[i].mode_size);
 			pname +=rtllib_modes[i].mode_size;
 		}
@@ -292,7 +292,7 @@ int rtllib_wx_get_scan(struct rtllib_device *ieee,
 
 	list_for_each_entry(network, &ieee->network_list, list) {
 		i++;
-		if((stop-ev)<200)
+		if ((stop-ev)<200)
 		{
 			err = -E2BIG;
 			break;
@@ -512,7 +512,7 @@ int rtllib_wx_get_encode(struct rtllib_device *ieee,
 
 	RTLLIB_DEBUG_WX("GET_ENCODE\n");
 
-	if(ieee->iw_mode == IW_MODE_MONITOR)
+	if (ieee->iw_mode == IW_MODE_MONITOR)
 		return -1;
 
 	key = erq->flags & IW_ENCODE_INDEX;
@@ -792,7 +792,7 @@ int rtllib_wx_set_mlme(struct rtllib_device *ieee,
 			/* leave break out intentionly */
 
 		case IW_MLME_DISASSOC:
-			if(deauth == true) {
+			if (deauth == true) {
 				printk("disauth packet !\n");
 			} else {
 				printk("dis associate packet!\n");
@@ -835,15 +835,15 @@ int rtllib_wx_set_auth(struct rtllib_device *ieee,
 		break;
 
 	case IW_AUTH_80211_AUTH_ALG:
-		if(data->value & IW_AUTH_ALG_SHARED_KEY){
+		if (data->value & IW_AUTH_ALG_SHARED_KEY){
 			ieee->open_wep = 0;
 			ieee->auth_mode = 1;
 		}
-		else if(data->value & IW_AUTH_ALG_OPEN_SYSTEM){
+		else if (data->value & IW_AUTH_ALG_OPEN_SYSTEM){
 			ieee->open_wep = 1;
 			ieee->auth_mode = 0;
 		}
-		else if(data->value & IW_AUTH_ALG_LEAP){
+		else if (data->value & IW_AUTH_ALG_LEAP){
 			ieee->open_wep = 1;
 			ieee->auth_mode = 2;
 		}

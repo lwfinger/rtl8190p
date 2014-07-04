@@ -51,20 +51,20 @@ void RxPktPendingTimeout(unsigned long data)
 
 	spin_lock_irqsave(&(ieee->reorder_spinlock), flags);
 	RTLLIB_DEBUG(RTLLIB_DL_REORDER,"==================>%s()\n",__FUNCTION__);
-	if(pRxTs->RxTimeoutIndicateSeq != 0xffff)
+	if (pRxTs->RxTimeoutIndicateSeq != 0xffff)
 	{
 		while(!list_empty(&pRxTs->RxPendingPktList))
 		{
 			pReorderEntry = (PRX_REORDER_ENTRY)list_entry(pRxTs->RxPendingPktList.prev,RX_REORDER_ENTRY,List);
-			if(index == 0)
+			if (index == 0)
 				pRxTs->RxIndicateSeq = pReorderEntry->SeqNum;
 
-			if( SN_LESS(pReorderEntry->SeqNum, pRxTs->RxIndicateSeq) ||
+			if ( SN_LESS(pReorderEntry->SeqNum, pRxTs->RxIndicateSeq) ||
 				SN_EQUAL(pReorderEntry->SeqNum, pRxTs->RxIndicateSeq)	)
 			{
 				list_del_init(&pReorderEntry->List);
 
-				if(SN_EQUAL(pReorderEntry->SeqNum, pRxTs->RxIndicateSeq))
+				if (SN_EQUAL(pReorderEntry->SeqNum, pRxTs->RxIndicateSeq))
 					pRxTs->RxIndicateSeq = (pRxTs->RxIndicateSeq + 1) % 4096;
 
 				RTLLIB_DEBUG(RTLLIB_DL_REORDER,"RxPktPendingTimeout(): IndicateSeq: %d\n", pReorderEntry->SeqNum);
@@ -81,11 +81,11 @@ void RxPktPendingTimeout(unsigned long data)
 		}
 	}
 
-	if(index>0)
+	if (index>0)
 	{
 		pRxTs->RxTimeoutIndicateSeq = 0xffff;
 
-		if(index > REORDER_WIN_SIZE){
+		if (index > REORDER_WIN_SIZE){
 			RTLLIB_DEBUG(RTLLIB_DL_ERR, "RxReorderIndicatePacket(): Rx Reorer buffer full!! \n");
 			spin_unlock_irqrestore(&(ieee->reorder_spinlock), flags);
 			return;
@@ -95,7 +95,7 @@ void RxPktPendingTimeout(unsigned long data)
 
 	}
 
-	if(bPktInBuf && (pRxTs->RxTimeoutIndicateSeq==0xffff))
+	if (bPktInBuf && (pRxTs->RxTimeoutIndicateSeq==0xffff))
 	{
 		pRxTs->RxTimeoutIndicateSeq = pRxTs->RxIndicateSeq;
 		mod_timer(&pRxTs->RxPktPendingTimer,  jiffies + MSECS(ieee->pHTInfo->RxReorderPendingTime));
@@ -215,7 +215,7 @@ void TSInitialize(struct rtllib_device *ieee)
 	for(count = 0; count < REORDER_ENTRY_NUM; count++)
 	{
 		list_add_tail( &pRxReorderEntry->List,&ieee->RxReorder_Unused_List);
-		if(count == (REORDER_ENTRY_NUM-1))
+		if (count == (REORDER_ENTRY_NUM-1))
 			break;
 		pRxReorderEntry = &ieee->RxReorderEntry[count+1];
 	}
@@ -227,7 +227,7 @@ void AdmitTS(struct rtllib_device *ieee, PTS_COMMON_INFO pTsCommonInfo, u32 Inac
 	del_timer_sync(&pTsCommonInfo->SetupTimer);
 	del_timer_sync(&pTsCommonInfo->InactTimer);
 
-	if(InactTime!=0)
+	if (InactTime!=0)
 		mod_timer(&pTsCommonInfo->InactTimer, jiffies + MSECS(InactTime));
 }
 
@@ -238,9 +238,9 @@ PTS_COMMON_INFO SearchAdmitTRStream(struct rtllib_device *ieee, u8*	Addr, u8 TID
 	bool				search_dir[4] = {0, 0, 0, 0};
 	struct list_head*		psearch_list;
 	PTS_COMMON_INFO	pRet = NULL;
-	if(ieee->iw_mode == IW_MODE_MASTER)
+	if (ieee->iw_mode == IW_MODE_MASTER)
 	{
-		if(TxRxSelect == TX_DIR)
+		if (TxRxSelect == TX_DIR)
 		{
 			search_dir[DIR_DOWN] = true;
 			search_dir[DIR_BI_DIR]= true;
@@ -251,16 +251,16 @@ PTS_COMMON_INFO SearchAdmitTRStream(struct rtllib_device *ieee, u8*	Addr, u8 TID
 			search_dir[DIR_BI_DIR]= true;
 		}
 	}
-	else if(ieee->iw_mode == IW_MODE_ADHOC)
+	else if (ieee->iw_mode == IW_MODE_ADHOC)
 	{
-		if(TxRxSelect == TX_DIR)
+		if (TxRxSelect == TX_DIR)
 			search_dir[DIR_UP]	= true;
 		else
 			search_dir[DIR_DOWN] = true;
 	}
 	else
 	{
-		if(TxRxSelect == TX_DIR)
+		if (TxRxSelect == TX_DIR)
 		{
 			search_dir[DIR_UP]	= true;
 			search_dir[DIR_BI_DIR]= true;
@@ -274,29 +274,29 @@ PTS_COMMON_INFO SearchAdmitTRStream(struct rtllib_device *ieee, u8*	Addr, u8 TID
 		}
 	}
 
-	if(TxRxSelect == TX_DIR)
+	if (TxRxSelect == TX_DIR)
 		psearch_list = &ieee->Tx_TS_Admit_List;
 	else
 		psearch_list = &ieee->Rx_TS_Admit_List;
 
 	for(dir = 0; dir <= DIR_BI_DIR; dir++)
 	{
-		if(search_dir[dir] ==false )
+		if (search_dir[dir] ==false )
 			continue;
 		list_for_each_entry(pRet, psearch_list, List){
 			if (memcmp(pRet->Addr, Addr, 6) == 0)
 				if (pRet->TSpec.f.TSInfo.field.ucTSID == TID)
-					if(pRet->TSpec.f.TSInfo.field.ucDirection == dir)
+					if (pRet->TSpec.f.TSInfo.field.ucDirection == dir)
 					{
 						break;
 					}
 
 		}
-		if(&pRet->List  != psearch_list)
+		if (&pRet->List  != psearch_list)
 			break;
 	}
 
-	if(&pRet->List  != psearch_list){
+	if (&pRet->List  != psearch_list){
 		return pRet ;
 	}
 	else
@@ -314,12 +314,12 @@ void MakeTSEntry(
 {
 	u8	count;
 
-	if(pTsCommonInfo == NULL)
+	if (pTsCommonInfo == NULL)
 		return;
 
 	memcpy(pTsCommonInfo->Addr, Addr, 6);
 
-	if(pTSPEC != NULL)
+	if (pTSPEC != NULL)
 		memcpy((u8*)(&(pTsCommonInfo->TSpec)), (u8*)pTSPEC, sizeof(TSPEC_BODY));
 
 	for(count = 0; count < TCLAS_Num; count++)
@@ -339,7 +339,7 @@ bool GetTs(
 	)
 {
 	u8	UP = 0;
-	if(is_broadcast_ether_addr(Addr) || is_multicast_ether_addr(Addr))
+	if (is_broadcast_ether_addr(Addr) || is_multicast_ether_addr(Addr))
 	{
 		RTLLIB_DEBUG(RTLLIB_DL_ERR, "ERR! get TS for Broadcast or Multicast\n");
 		return false;
@@ -383,13 +383,13 @@ bool GetTs(
 			Addr,
 			UP,
 			TxRxSelect);
-	if(*ppTS != NULL)
+	if (*ppTS != NULL)
 	{
 		return true;
 	}
 	else
 	{
-		if(bAddNewTs == false)
+		if (bAddNewTs == false)
 		{
 			RTLLIB_DEBUG(RTLLIB_DL_TS, "add new TS failed(tid:%d)\n", UP);
 			return false;
@@ -412,11 +412,11 @@ bool GetTs(
 								((TxRxSelect==TX_DIR)?DIR_DOWN:DIR_UP):
 								((TxRxSelect==TX_DIR)?DIR_UP:DIR_DOWN);
 			RTLLIB_DEBUG(RTLLIB_DL_TS, "to add Ts\n");
-			if(!list_empty(pUnusedList))
+			if (!list_empty(pUnusedList))
 			{
 				(*ppTS) = list_entry(pUnusedList->next, TS_COMMON_INFO, List);
 				list_del_init(&(*ppTS)->List);
-				if(TxRxSelect==TX_DIR)
+				if (TxRxSelect==TX_DIR)
 				{
 					PTX_TS_RECORD tmp = container_of(*ppTS, TX_TS_RECORD, TsCommonInfo);
 					ResetTxTsEntry(tmp);
@@ -463,11 +463,11 @@ void RemoveTsEntry(
 	del_timer_sync(&pTs->InactTimer);
 	TsInitDelBA(ieee, pTs, TxRxSelect);
 
-	if(TxRxSelect == RX_DIR)
+	if (TxRxSelect == RX_DIR)
 	{
 		PRX_REORDER_ENTRY	pRxReorderEntry;
 		PRX_TS_RECORD		pRxTS = (PRX_TS_RECORD)pTs;
-		if(timer_pending(&pRxTS->RxPktPendingTimer))
+		if (timer_pending(&pRxTS->RxPktPendingTimer))
 			del_timer_sync(&pRxTS->RxPktPendingTimer);
 
                 while(!list_empty(&pRxTS->RxPendingPktList))
@@ -578,9 +578,9 @@ void RemoveAllTS(struct rtllib_device* ieee)
 
 void TsStartAddBaProcess(struct rtllib_device* ieee, PTX_TS_RECORD	pTxTS)
 {
-	if(pTxTS->bAddBaReqInProgress == false) {
+	if (pTxTS->bAddBaReqInProgress == false) {
 		pTxTS->bAddBaReqInProgress = true;
-		if(pTxTS->bAddBaReqDelayed) {
+		if (pTxTS->bAddBaReqDelayed) {
 			RTLLIB_DEBUG(RTLLIB_DL_BA, "TsStartAddBaProcess(): Delayed Start ADDBA after 60 sec!!\n");
 			mod_timer(&pTxTS->TsAddBaTimer, jiffies + MSECS(TS_ADDBA_DELAY));
 		} else {

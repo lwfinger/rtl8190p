@@ -176,7 +176,7 @@ iwe_stream_add_event_rsl(struct iw_request_info *info,
 			int        event_len)      /* Real size of payload */
 {
         /* Check if it's possible */
-        if((stream + event_len) < ends) {
+        if ((stream + event_len) < ends) {
                 iwe->len = event_len;
 		ndelay(1);
                 memcpy(stream, (char *) iwe, event_len);
@@ -917,7 +917,7 @@ do { if (rtllib_debug_level & (level)) \
 /* I want to see ASCII 33 to 126 only. Otherwise, I print '?'. Annie, 2005-11-22.*/
 #define PRINTABLE(_ch)  (_ch>'!' && _ch<'~')
 #define RTLLIB_PRINT_STR(_Comp, _TitleString, _Ptr, _Len)				\
-                        if((_Comp) & level)							\
+                        if ((_Comp) & level)							\
                         {                                                                       \
                                 int             __i;                                            \
                                 u8  buffer[MAX_STR_LEN];					\
@@ -926,7 +926,7 @@ do { if (rtllib_debug_level & (level)) \
                                 memcpy(buffer, (u8 *)_Ptr, length );				\
                                 for( __i=0; __i<MAX_STR_LEN; __i++ )                            \
                                 {                                                               \
-                                     if( !PRINTABLE(buffer[__i]) )   buffer[__i] = '?';		\
+                                     if ( !PRINTABLE(buffer[__i]) )   buffer[__i] = '?';		\
                                 }                                                               \
                                 buffer[length] = '\0';                                          \
                                 printk("Rtl819x: ");						\
@@ -2760,7 +2760,7 @@ static inline int rtllib_get_hdrlen(u16 fc)
 	case RTLLIB_FTYPE_DATA:
 		if ((fc & RTLLIB_FCTL_FROMDS) && (fc & RTLLIB_FCTL_TODS))
 			hdrlen = RTLLIB_4ADDR_LEN; /* Addr4 */
-		if(RTLLIB_QOS_HAS_SEQ(fc))
+		if (RTLLIB_QOS_HAS_SEQ(fc))
 			hdrlen += 2; /* QOS ctrl*/
 		break;
 	case RTLLIB_FTYPE_CTL:

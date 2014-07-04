@@ -35,7 +35,7 @@ void PHY_SetRF8256Bandwidth(struct net_device* dev , HT_CHANNEL_WIDTH Bandwidth)
 		switch(Bandwidth)
 		{
 			case HT_CHANNEL_WIDTH_20:
-				if(priv->card_8192_version == VERSION_8190_BD || priv->card_8192_version == VERSION_8190_BE)
+				if (priv->card_8192_version == VERSION_8190_BD || priv->card_8192_version == VERSION_8190_BE)
 				{
 					rtl8192_phy_SetRFReg(dev, (RF90_RADIO_PATH_E)eRFPath, 0x0b, bMask12Bits, 0x100);
 					rtl8192_phy_SetRFReg(dev, (RF90_RADIO_PATH_E)eRFPath, 0x2c, bMask12Bits, 0x3d7);
@@ -49,7 +49,7 @@ void PHY_SetRF8256Bandwidth(struct net_device* dev , HT_CHANNEL_WIDTH Bandwidth)
 
 				break;
 			case HT_CHANNEL_WIDTH_20_40:
-				if(priv->card_8192_version == VERSION_8190_BD ||priv->card_8192_version == VERSION_8190_BE) {
+				if (priv->card_8192_version == VERSION_8190_BD ||priv->card_8192_version == VERSION_8190_BE) {
 					rtl8192_phy_SetRFReg(dev, (RF90_RADIO_PATH_E)eRFPath, 0x0b, bMask12Bits, 0x300);
 					rtl8192_phy_SetRFReg(dev, (RF90_RADIO_PATH_E)eRFPath, 0x2c, bMask12Bits, 0x3ff);
 					rtl8192_phy_SetRFReg(dev, (RF90_RADIO_PATH_E)eRFPath, 0x0e, bMask12Bits, 0x0e1);
@@ -118,7 +118,7 @@ bool phy_RF8256_Config_ParaFile(struct net_device* dev)
 		rtl8192_phy_SetRFReg(dev, (RF90_RADIO_PATH_E) eRFPath, 0x0, bMask12Bits, 0xbf);
 
 		rtStatus = rtl8192_phy_checkBBAndRF(dev, HW90_BLOCK_RF, (RF90_RADIO_PATH_E)eRFPath);
-		if(rtStatus!= true)
+		if (rtStatus!= true)
 		{
 			RT_TRACE(COMP_ERR, "PHY_RF8256_Config():Check Radio[%d] Fail!!\n", eRFPath);
 			goto phy_RF8256_Config_ParaFile_Fail;
@@ -178,7 +178,7 @@ bool phy_RF8256_Config_ParaFile(struct net_device* dev)
 			break;
 		}
 
-		if(ret){
+		if (ret){
 			RT_TRACE(COMP_ERR, "phy_RF8256_Config_ParaFile():Radio[%d] Fail!!", eRFPath);
 			goto phy_RF8256_Config_ParaFile_Fail;
 		}
@@ -202,8 +202,8 @@ void PHY_SetRF8256CCKTxPower(struct net_device*	dev, u8	powerlevel)
 	TxAGC |= ((powerlevel<<8)|powerlevel);
 	TxAGC += priv->CCKTxPowerLevelOriginalOffset;
 
-	if(priv->bDynamicTxLowPower == true) {
-		if(priv->CustomerID == RT_CID_819x_Netcore)
+	if (priv->bDynamicTxLowPower == true) {
+		if (priv->CustomerID == RT_CID_819x_Netcore)
 			TxAGC = 0x2222;
 		else
 		TxAGC += ((priv->CckPwEnl<<8)|priv->CckPwEnl);
@@ -211,15 +211,15 @@ void PHY_SetRF8256CCKTxPower(struct net_device*	dev, u8	powerlevel)
 
 	byte0 = (u8)(TxAGC & 0xff);
 	byte1 = (u8)((TxAGC & 0xff00)>>8);
-	if(byte0 > 0x24)
+	if (byte0 > 0x24)
 		byte0 = 0x24;
-	if(byte1 > 0x24)
+	if (byte1 > 0x24)
 		byte1 = 0x24;
-	if(priv->rf_type == RF_2T4R) {
-		if(priv->RF_C_TxPwDiff > 0) {
-			if( (byte0 + (u8)priv->RF_C_TxPwDiff) > 0x24)
+	if (priv->rf_type == RF_2T4R) {
+		if (priv->RF_C_TxPwDiff > 0) {
+			if ( (byte0 + (u8)priv->RF_C_TxPwDiff) > 0x24)
 				byte0 = 0x24 - priv->RF_C_TxPwDiff;
-			if( (byte1 + (u8)priv->RF_C_TxPwDiff) > 0x24)
+			if ( (byte1 + (u8)priv->RF_C_TxPwDiff) > 0x24)
 				byte1 = 0x24 - priv->RF_C_TxPwDiff;
 		}
 	}
@@ -234,7 +234,7 @@ void PHY_SetRF8256OFDMTxPower(struct net_device* dev, u8 powerlevel)
 	u32				TxAGC1=0, TxAGC2=0, TxAGC2_tmp = 0;
 	u8				i, byteVal1[4], byteVal2[4], byteVal3[4];
 
-	if(priv->bDynamicTxHighPower == true)
+	if (priv->bDynamicTxHighPower == true)
 	{
 		TxAGC1 |= ((powerlevel<<24)|(powerlevel<<16)|(powerlevel<<8)|powerlevel);
 		TxAGC2_tmp = TxAGC1;
@@ -258,28 +258,28 @@ void PHY_SetRF8256OFDMTxPower(struct net_device* dev, u8 powerlevel)
 	for(i=0; i<4; i++)
 	{
 		byteVal1[i] = (u8)(  (TxAGC1 & (0xff<<(i*8))) >>(i*8) );
-		if(byteVal1[i] > 0x24)
+		if (byteVal1[i] > 0x24)
 			byteVal1[i] = 0x24;
 		byteVal2[i] = (u8)(  (TxAGC2 & (0xff<<(i*8))) >>(i*8) );
-		if(byteVal2[i] > 0x24)
+		if (byteVal2[i] > 0x24)
 			byteVal2[i] = 0x24;
 
 		byteVal3[i] = (u8)(  (TxAGC2_tmp & (0xff<<(i*8))) >>(i*8) );
-		if(byteVal3[i] > 0x24)
+		if (byteVal3[i] > 0x24)
 			byteVal3[i] = 0x24;
 	}
 
-	if(priv->rf_type == RF_2T4R)
+	if (priv->rf_type == RF_2T4R)
 	{
-		if(priv->RF_C_TxPwDiff > 0)
+		if (priv->RF_C_TxPwDiff > 0)
 		{
 			for(i=0; i<4; i++)
 			{
-				if( (byteVal1[i] + (u8)priv->RF_C_TxPwDiff) > 0x24)
+				if ( (byteVal1[i] + (u8)priv->RF_C_TxPwDiff) > 0x24)
 					byteVal1[i] = 0x24 - priv->RF_C_TxPwDiff;
-				if( (byteVal2[i] + (u8)priv->RF_C_TxPwDiff) > 0x24)
+				if ( (byteVal2[i] + (u8)priv->RF_C_TxPwDiff) > 0x24)
 					byteVal2[i] = 0x24 - priv->RF_C_TxPwDiff;
-				if( (byteVal3[i] + (u8)priv->RF_C_TxPwDiff) > 0x24)
+				if ( (byteVal3[i] + (u8)priv->RF_C_TxPwDiff) > 0x24)
 					byteVal3[i] = 0x24 - priv->RF_C_TxPwDiff;
 			}
 		}

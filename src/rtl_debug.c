@@ -163,7 +163,7 @@ static ssize_t rtl_dbgfs_register_read(struct file *file,
 	//  to avoid hardware sleep when access register
 	rtl_hardware_grab(dev);
 
-	if(!priv->debug->hw_type) {
+	if (!priv->debug->hw_type) {
 		page_no = (priv->debug->hw_offset > 0x0f)? 0x0f: priv->debug->hw_offset;
 		len += snprintf(buf + len,count - len,
 				"\n#################### MAC page- %x##################\n ", page_no);
@@ -230,7 +230,7 @@ int rtl_debug_module_init(struct r8192_priv *priv, const char *name)
 
 	debug->debug_register = debugfs_create_file("debug_register", S_IRUGO,
 			 debug->dir_drv, priv, &rtl_register_debug);
-	if(!debug->debug_register) {
+	if (!debug->debug_register) {
 		ret = -ENOENT;
 		goto err;
 	}
@@ -291,7 +291,7 @@ static int proc_get_stats_ap(char *page, char **start,
 		len += snprintf(page + len, count - len,
                 "%s ", target->ssid);
 
-		if(target->wpa_ie_len>0 || target->rsn_ie_len>0){
+		if (target->wpa_ie_len>0 || target->rsn_ie_len>0){
 	                len += snprintf(page + len, count - len,
 		        "WPA\n");
 		}
@@ -832,7 +832,7 @@ static int proc_get_cam_register(char *page, char **start,
 				"\n#################### SECURITY CAM ##################\n ");
 	for(j=0; j<TOTAL_CAM_ENTRY; j++)
 	{
-		if((j>6) && (j<31))
+		if ((j>6) && (j<31))
 			continue;
 		len += snprintf(page + len, count - len, "\nD:  %2x > ",j);
 		for(entry_i=0;entry_i<CAM_CONTENT_COUNT;entry_i++)
@@ -845,7 +845,7 @@ static int proc_get_cam_register(char *page, char **start,
 			while((i--)>=0)
 			{
 				ulStatus = read_nic_dword(dev, RWCAM);
-				if(ulStatus & BIT31){
+				if (ulStatus & BIT31){
 					continue;
 				}
 				else{

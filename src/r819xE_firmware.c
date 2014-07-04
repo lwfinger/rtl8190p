@@ -50,7 +50,7 @@ bool fw_download_code(struct net_device *dev, u8 *code_virtual_address, u32 buff
 	firmware_init_param(dev);
 	frag_threshold = pfirmware->cmdpacket_frag_thresold;
 	do {
-		if((buffer_len - frag_offset) > frag_threshold) {
+		if ((buffer_len - frag_offset) > frag_threshold) {
 			frag_length = frag_threshold ;
 			bLastIniPkt = 0;
 
@@ -77,7 +77,7 @@ bool fw_download_code(struct net_device *dev, u8 *code_virtual_address, u32 buff
 		tcb_desc->txbuf_size= (u16)i;
 		skb_put(skb, i);
 
-		if(!priv->rtllib->check_nic_enough_desc(dev,tcb_desc->queue_index)||
+		if (!priv->rtllib->check_nic_enough_desc(dev,tcb_desc->queue_index)||
 			(!skb_queue_empty(&priv->rtllib->skb_waitQ[tcb_desc->queue_index]))||\
 			(priv->rtllib->queue_stop) ) {
 			RT_TRACE(COMP_FIRMWARE, "===================> tx full!\n");
@@ -118,7 +118,7 @@ fwSendNullPacket(
 	memset(ptr_buf,0,Length);
 	tcb_desc->txbuf_size= (u16)Length;
 
-	if(!priv->rtllib->check_nic_enough_desc(dev,tcb_desc->queue_index)||
+	if (!priv->rtllib->check_nic_enough_desc(dev,tcb_desc->queue_index)||
 			(!skb_queue_empty(&priv->rtllib->skb_waitQ[tcb_desc->queue_index]))||\
 			(priv->rtllib->queue_stop) ) {
 			RT_TRACE(COMP_FIRMWARE,"===================NULL packet================> tx full!\n");
@@ -144,7 +144,7 @@ bool CPUcheck_maincodeok_turnonCPU(struct net_device *dev)
 		msleep(2);
 	}
 
-	if(!(CPU_status&CPU_GEN_PUT_CODE_OK)) {
+	if (!(CPU_status&CPU_GEN_PUT_CODE_OK)) {
 		RT_TRACE(COMP_ERR, "Download Firmware: Put code fail!\n");
 		goto CPUCheckMainCodeOKAndTurnOnCPU_Fail;
 	} else {
@@ -158,12 +158,12 @@ bool CPUcheck_maincodeok_turnonCPU(struct net_device *dev)
 	timeout = jiffies + MSECS(20);
 	while (time_before(jiffies, timeout)) {
 		CPU_status = read_nic_dword(dev, CPU_GEN);
-		if(CPU_status&CPU_GEN_BOOT_RDY)
+		if (CPU_status&CPU_GEN_BOOT_RDY)
 			break;
 		msleep(2);
 	}
 
-	if(!(CPU_status&CPU_GEN_BOOT_RDY)) {
+	if (!(CPU_status&CPU_GEN_BOOT_RDY)) {
 		goto CPUCheckMainCodeOKAndTurnOnCPU_Fail;
 	} else {
 		RT_TRACE(COMP_FIRMWARE, "Download Firmware: Boot ready!\n");
@@ -192,7 +192,7 @@ bool CPUcheck_firmware_ready(struct net_device *dev)
 		msleep(2);
 	}
 
-	if(!(CPU_status&CPU_GEN_FIRM_RDY))
+	if (!(CPU_status&CPU_GEN_FIRM_RDY))
 		goto CPUCheckFirmwareReady_Fail;
 	else
 		RT_TRACE(COMP_FIRMWARE, "Download Firmware: Firmware ready!\n");
@@ -280,7 +280,7 @@ bool init_firmware(struct net_device *dev)
 		rst_opt = OPT_SYSTEM_RESET;
 		starting_state = FW_INIT_STEP0_BOOT;
 
-	}else if(pfirmware->firmware_status == FW_STATUS_5_READY) {
+	}else if (pfirmware->firmware_status == FW_STATUS_5_READY) {
 		rst_opt = OPT_FIRMWARE_RESET;
 		starting_state = FW_INIT_STEP2_DATA;
 	}else {
@@ -293,28 +293,28 @@ bool init_firmware(struct net_device *dev)
 	priv->firmware_source = FW_SOURCE_HEADER_FILE;
 #endif
 	for(init_step = starting_state; init_step <= FW_INIT_STEP2_DATA; init_step++) {
-		if(rst_opt == OPT_SYSTEM_RESET) {
+		if (rst_opt == OPT_SYSTEM_RESET) {
 			switch(priv->firmware_source) {
 			case FW_SOURCE_IMG_FILE: {
 #if LINUX_VERSION_CODE > KERNEL_VERSION(2,5,0) && defined(USE_FW_SOURCE_IMG_FILE)
 				const struct firmware	*fw_entry;
 				int rc;
-				if(pfirmware->firmware_buf_size[init_step] == 0) {
+				if (pfirmware->firmware_buf_size[init_step] == 0) {
 					const char *fw_name[3] = {"rtlwifi/rtl8190p_boot.img",
 								  "rtlwifi/rtl8190p_main.img",
 								  "rtlwifi/rtl8190p_data.img"
 					                         };
 					rc = request_firmware(&fw_entry, fw_name[init_step],&priv->pdev->dev);
-					if(rc < 0 ) {
+					if (rc < 0 ) {
 						RT_TRACE(COMP_FIRMWARE, "request firmware fail!\n");
 						goto download_firmware_fail;
 					}
-					if(fw_entry->size > sizeof(pfirmware->firmware_buf[init_step])) {
+					if (fw_entry->size > sizeof(pfirmware->firmware_buf[init_step])) {
 						RT_TRACE(COMP_FIRMWARE, "img file size exceed the container buffer fail!\n");
 						goto download_firmware_fail;
 					}
 
-					if(init_step != FW_INIT_STEP1_MAIN) {
+					if (init_step != FW_INIT_STEP1_MAIN) {
 						memcpy(pfirmware->firmware_buf[init_step],fw_entry->data,fw_entry->size);
 						pfirmware->firmware_buf_size[init_step] = fw_entry->size;
 
@@ -325,7 +325,7 @@ bool init_firmware(struct net_device *dev)
 					}
 
 #if LINUX_VERSION_CODE > KERNEL_VERSION(2,5,0)
-						if(rst_opt == OPT_SYSTEM_RESET) {
+						if (rst_opt == OPT_SYSTEM_RESET) {
 							release_firmware(fw_entry);
 						}
 #endif
@@ -338,7 +338,7 @@ bool init_firmware(struct net_device *dev)
 				case FW_SOURCE_HEADER_FILE:
 					mapped_file =  firmware_img_buf[init_step];
 					file_length  = firmware_img_len[init_step];
-					if(init_step == FW_INIT_STEP2_DATA) {
+					if (init_step == FW_INIT_STEP2_DATA) {
 						memcpy(pfirmware->firmware_buf[init_step], mapped_file, file_length);
 						pfirmware->firmware_buf_size[init_step] = file_length;
 					}
@@ -349,13 +349,13 @@ bool init_firmware(struct net_device *dev)
 			}
 
 
-		}else if(rst_opt == OPT_FIRMWARE_RESET ) {
+		}else if (rst_opt == OPT_FIRMWARE_RESET ) {
 			mapped_file = pfirmware->firmware_buf[init_step];
 			file_length = pfirmware->firmware_buf_size[init_step];
 		}
 
 		rt_status = fw_download_code(dev,mapped_file,file_length);
-		if(rt_status != true) {
+		if (rt_status != true) {
 			goto download_firmware_fail;
 		}
 

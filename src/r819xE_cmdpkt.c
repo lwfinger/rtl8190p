@@ -58,7 +58,7 @@
 	frag_threshold = pfirmware->cmdpacket_frag_thresold;
 
         do {
-		if((buffer_len - frag_offset) > frag_threshold) {
+		if ((buffer_len - frag_offset) > frag_threshold) {
 			frag_length = frag_threshold ;
 			bLastIniPkt = 0;
 
@@ -69,7 +69,7 @@
 
 		skb  = dev_alloc_skb(frag_length + priv->rtllib->tx_headroom + 4);
 
-		if(skb == NULL) {
+		if (skb == NULL) {
 			rt_status = false;
 			goto Failed;
 		}
@@ -117,7 +117,7 @@ cmpk_count_txstatistic(
 #endif
 
 #ifdef TODO
-	if(pAdapter->bInHctTest)
+	if (pAdapter->bInHctTest)
 		return;
 #endif
 	if (pstx_fb->tok)
@@ -191,7 +191,7 @@ cmdpkt_beacontimerinterrupt_819xusb(
 	struct r8192_priv *priv = rtllib_priv(dev);
 	u16 tx_rate;
 	{
-		if((priv->rtllib->current_network.mode == IEEE_A)  ||
+		if ((priv->rtllib->current_network.mode == IEEE_A)  ||
 			(priv->rtllib->current_network.mode == IEEE_N_5G) ||
 			((priv->rtllib->current_network.mode == IEEE_N_24G)  && (!priv->rtllib->pHTInfo->bCurSuppCCK)))
 		{
@@ -228,7 +228,7 @@ cmpk_handle_interrupt_status(
 	}
 
 
-	if(	priv->rtllib->iw_mode == IW_MODE_ADHOC)
+	if (	priv->rtllib->iw_mode == IW_MODE_ADHOC)
 	{
 		rx_intr_status.interrupt_status = *((u32 *)(pmsg + 4));
 

@@ -35,7 +35,7 @@ int rtllib_wx_set_freq(struct rtllib_device *ieee, struct iw_request_info *a,
 
 	down(&ieee->wx_sem);
 
-	if(ieee->iw_mode == IW_MODE_INFRA){
+	if (ieee->iw_mode == IW_MODE_INFRA){
 		ret = 0;
 		goto out;
 	}
@@ -69,8 +69,8 @@ int rtllib_wx_set_freq(struct rtllib_device *ieee, struct iw_request_info *a,
 		ieee->current_network.channel = fwrq->m;
 		ieee->set_chan(ieee->dev, ieee->current_network.channel);
 
-		if(ieee->iw_mode == IW_MODE_ADHOC || ieee->iw_mode == IW_MODE_MASTER)
-			if(ieee->state == RTLLIB_LINKED){
+		if (ieee->iw_mode == IW_MODE_ADHOC || ieee->iw_mode == IW_MODE_MASTER)
+			if (ieee->state == RTLLIB_LINKED){
 
 			rtllib_stop_send_beacons(ieee);
 			rtllib_start_send_beacons(ieee);
@@ -383,7 +383,7 @@ void rtllib_wx_sync_scan_wq(void *data)
 	if (ieee->data_hard_resume)
 		ieee->data_hard_resume(ieee->dev);
 
-	if(ieee->iw_mode == IW_MODE_ADHOC || ieee->iw_mode == IW_MODE_MASTER)
+	if (ieee->iw_mode == IW_MODE_ADHOC || ieee->iw_mode == IW_MODE_MASTER)
 		rtllib_start_send_beacons(ieee);
 
 	netif_carrier_on(ieee->dev);
@@ -445,7 +445,7 @@ int rtllib_wx_set_essid(struct rtllib_device *ieee,
 		goto out;
 	}
 
-	if(proto_started)
+	if (proto_started)
 		rtllib_stop_protocol(ieee,true);
 
 
@@ -490,7 +490,7 @@ out:
 
 	down(&ieee->wx_sem);
 
-	if(enable)
+	if (enable)
 		ieee->raw_tx = 1;
 	else
 		ieee->raw_tx = 0;
@@ -498,16 +498,16 @@ out:
 	printk(KERN_INFO"raw TX is %s\n",
 	      ieee->raw_tx ? "enabled" : "disabled");
 
-	if(ieee->iw_mode == IW_MODE_MONITOR)
+	if (ieee->iw_mode == IW_MODE_MONITOR)
 	{
-		if(prev == 0 && ieee->raw_tx){
+		if (prev == 0 && ieee->raw_tx){
 			if (ieee->data_hard_resume)
 				ieee->data_hard_resume(ieee->dev);
 
 			netif_carrier_on(ieee->dev);
 		}
 
-		if(prev && ieee->raw_tx == 1)
+		if (prev && ieee->raw_tx == 1)
 			netif_carrier_off(ieee->dev);
 	}
 
@@ -596,7 +596,7 @@ int rtllib_wx_get_power(struct rtllib_device *ieee,
 
 	down(&ieee->wx_sem);
 
-	if(ieee->ps == RTLLIB_PS_DISABLED){
+	if (ieee->ps == RTLLIB_PS_DISABLED){
 		wrqu->power.disabled = 1;
 		goto exit;
 	}

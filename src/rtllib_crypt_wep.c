@@ -203,7 +203,7 @@ static int prism2_wep_encrypt(struct sk_buff *skb, int hdr_len, void *priv)
 		icv[2] = crc >> 16;
 		icv[3] = crc >> 24;
 
-	#if(LINUX_VERSION_CODE < KERNEL_VERSION(2,6,24))
+	#if (LINUX_VERSION_CODE < KERNEL_VERSION(2,6,24))
 		sg.page = virt_to_page(pos);
 		sg.offset = offset_in_page(pos);
 		sg.length = len + 4;
@@ -265,7 +265,7 @@ static int prism2_wep_decrypt(struct sk_buff *skb, int hdr_len, void *priv)
 
 	if (!tcb_desc->bHwSec)
 	{
-	#if(LINUX_VERSION_CODE < KERNEL_VERSION(2,6,24))
+	#if (LINUX_VERSION_CODE < KERNEL_VERSION(2,6,24))
 		sg.page = virt_to_page(pos);
 		sg.offset = offset_in_page(pos);
 		sg.length = plen + 4;
