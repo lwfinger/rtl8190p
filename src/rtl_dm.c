@@ -739,7 +739,7 @@ static void dm_TXPowerTrackingCallback_TSSI(struct net_device * dev)
 			}
 			else
 			{
-						//switch(Adapter->HardwareType)
+						//switch (Adapter->HardwareType)
 						{
 								{
 						if (priv->rfc_txpowertrackingindex > 0)
@@ -783,7 +783,7 @@ static void dm_TXPowerTrackingCallback_TSSI(struct net_device * dev)
 				}
 				else
 				{
-					//switch(Adapter->HardwareType)
+					//switch (Adapter->HardwareType)
 					{
 							{
 					if (priv->rfc_txpowertrackingindex < (TxBBGainTableLength - 1))
@@ -802,7 +802,7 @@ static void dm_TXPowerTrackingCallback_TSSI(struct net_device * dev)
 			priv->CCKPresentAttentuation_difference
 				= priv->rfa_txpowertrackingindex - priv->rfa_txpowertracking_default;
 			} else {
-				//switch(Adapter->HardwareType)
+				//switch (Adapter->HardwareType)
 				{
 				priv->CCKPresentAttentuation_difference
 					= priv->rfc_txpowertrackingindex - priv->rfc_txpowertracking_default;
@@ -3333,7 +3333,7 @@ void dm_check_fsync(struct net_device *dev)
 	{
 		if (priv->rtllib->bfsync_enable == 0)
 		{
-			switch(priv->rtllib->fsync_state)
+			switch (priv->rtllib->fsync_state)
 			{
 				case Default_Fsync:
 					dm_StartHWFsync(dev);
@@ -3351,7 +3351,7 @@ void dm_check_fsync(struct net_device *dev)
 		}
 		else
 		{
-			switch(priv->rtllib->fsync_state)
+			switch (priv->rtllib->fsync_state)
 			{
 				case Default_Fsync:
 					dm_StartSWFsync(dev);
@@ -3379,7 +3379,7 @@ void dm_check_fsync(struct net_device *dev)
 	}
 	else
 	{
-		switch(priv->rtllib->fsync_state)
+		switch (priv->rtllib->fsync_state)
 		{
 			case HW_Fsync:
 				dm_EndHWFsync(dev);

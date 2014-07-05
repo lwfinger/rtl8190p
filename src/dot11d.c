@@ -187,7 +187,7 @@ void DOT11D_ScanComplete( struct rtllib_device * dev)
 {
 	PRT_DOT11D_INFO pDot11dInfo = GET_DOT11D_INFO(dev);
 
-	switch(pDot11dInfo->State)
+	switch (pDot11dInfo->State)
 	{
 	case DOT11D_STATE_LEARNED:
 		pDot11dInfo->State = DOT11D_STATE_DONE;

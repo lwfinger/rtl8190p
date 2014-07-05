@@ -32,7 +32,7 @@ void PHY_SetRF8256Bandwidth(struct net_device* dev , HT_CHANNEL_WIDTH Bandwidth)
 		if (!rtl8192_phy_CheckIsLegalRFPath(dev, eRFPath))
 				continue;
 
-		switch(Bandwidth)
+		switch (Bandwidth)
 		{
 			case HT_CHANNEL_WIDTH_20:
 				if (priv->card_8192_version == VERSION_8190_BD || priv->card_8192_version == VERSION_8190_BE)
@@ -96,7 +96,7 @@ bool phy_RF8256_Config_ParaFile(struct net_device* dev)
 		pPhyReg = &priv->PHYRegDef[eRFPath];
 
 
-		switch(eRFPath)
+		switch (eRFPath)
 		{
 		case RF90_PATH_A:
 		case RF90_PATH_C:
@@ -126,7 +126,7 @@ bool phy_RF8256_Config_ParaFile(struct net_device* dev)
 
 		RetryTimes = ConstRetryTimes;
 		RF3_Final_Value = 0;
-		switch(eRFPath)
+		switch (eRFPath)
 		{
 		case RF90_PATH_A:
 			while(RF3_Final_Value!=RegValueToBeCheck && RetryTimes!=0)
@@ -166,7 +166,7 @@ bool phy_RF8256_Config_ParaFile(struct net_device* dev)
 			break;
 		}
 
-		switch(eRFPath)
+		switch (eRFPath)
 		{
 		case RF90_PATH_A:
 		case RF90_PATH_C:

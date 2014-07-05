@@ -661,7 +661,7 @@ MgntActSet_RF_State(
 
 	rtState = priv->rtllib->eRFPowerState;
 
-	switch(StateToSet)
+	switch (StateToSet)
 	{
 	case eRfOn:
 		//
@@ -1290,7 +1290,7 @@ u8 rtl8192_getSupportedWireleeMode(struct net_device*dev)
 	struct r8192_priv *priv = rtllib_priv(dev);
 	u8 ret = 0;
 
-	switch(priv->rf_chip) {
+	switch (priv->rf_chip) {
 	case RF_8225:
 	case RF_8256:
 	case RF_6052:
@@ -2464,7 +2464,7 @@ u8 MapHwQueueToFirmwareQueue(u8 QueueID, u8 priority)
 {
 	u8 QueueSelect = 0x0;       //defualt set to
 
-	switch(QueueID) {
+	switch (QueueID) {
 	case BE_QUEUE:
 		QueueSelect = QSLT_BE;  //or QSelect = pTcb->priority;
 		break;
@@ -3262,7 +3262,7 @@ void rtl8192_query_rxphystatus(
 		{
 			report = pcck_buf->cck_agc_rpt & 0xc0;
 			report = report>>6;
-			switch(report)
+			switch (report)
 			{
 				//Fixed by Jacken from Bryant 2008-03-20
 				//Original value is -38 , -26 , -14 , -2
@@ -3285,7 +3285,7 @@ void rtl8192_query_rxphystatus(
 		{
 			report = pcck_buf->cck_agc_rpt & 0x60;
 			report = report>>5;
-			switch(report)
+			switch (report)
 			{
 				case 0x3:
 					rx_pwr_all = -35 - ((pcck_buf->cck_agc_rpt & 0x1f)<<1) ;
@@ -3552,7 +3552,7 @@ void UpdateReceivedRateHistogramStatistics8190(
 	else
 		preamble_guardinterval = 0;// long
 
-	switch(pstats->rate)
+	switch (pstats->rate)
 	{
 		//
 		// CCK rate
@@ -4388,7 +4388,7 @@ bool rtl8192_pci_findadapter(struct pci_dev *pdev, struct net_device *dev)
 
 		// 8192e and and 8192se may have the same device ID 8192. However, their Revision
 		// ID is different
-		switch(RevisionID)
+		switch (RevisionID)
 		{
 			case HAL_HW_PCI_REVISION_ID_8192PCIE:
 				printk("Adapter(8192 PCI-E) is found - DeviceID=%x\n", DeviceID);

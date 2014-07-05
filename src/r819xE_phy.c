@@ -536,7 +536,7 @@ bool rtl8192_phy_checkBBAndRF(struct net_device* dev, HW90_BLOCK_E CheckBlock, R
 	for (i=0 ; i < CheckTimes ; i++)
 	{
 
-		switch(CheckBlock)
+		switch (CheckBlock)
 		{
 		case HW90_BLOCK_MAC:
 			RT_TRACE(COMP_ERR, "PHY_CheckBBRFOK(): Never Write 0x100 here!");
@@ -780,7 +780,7 @@ void rtl8192_phy_setTxPower(struct net_device* dev, u8 channel)
 		}
 	}
 #endif
-	switch(priv->rf_chip)
+	switch (priv->rf_chip)
 	{
 	case RF_8225:
 		break;
@@ -801,7 +801,7 @@ bool rtl8192_phy_RFConfig(struct net_device* dev)
 {
 	struct r8192_priv *priv = rtllib_priv(dev);
 	bool rtStatus = true;
-	switch(priv->rf_chip)
+	switch (priv->rf_chip)
 	{
 		case RF_8225:
 			break;
@@ -832,7 +832,7 @@ u8 rtl8192_phy_ConfigRFWithHeaderFile(struct net_device* dev, RF90_RADIO_PATH_E	
 	int i;
 	u8 ret = 0;
 
-	switch(eRFPath){
+	switch (eRFPath){
 		case RF90_PATH_A:
 			for (i = 0;i<RadioA_ArrayLength; i=i+2){
 
@@ -890,7 +890,7 @@ void rtl8192_SetTxPowerLevel(struct net_device *dev, u8 channel)
 	u8	powerlevel = priv->TxPowerLevelCCK[channel-1];
 	u8	powerlevelOFDM24G = priv->TxPowerLevelOFDM24G[channel-1];
 
-	switch(priv->rf_chip) {
+	switch (priv->rf_chip) {
 	case RF_8225:
 		break;
 	case RF_8256:
@@ -969,7 +969,7 @@ u8 rtl8192_phy_SwChnlStepByStep(struct net_device *dev, u8 channel, u8* stage, u
 					CmdID_End, 0, 0, 0);
 
 		RfDependCmdCnt = 0;
-		switch( priv->rf_chip )
+		switch ( priv->rf_chip )
 		{
 		case RF_8225:
 			if (!(channel >= 1 && channel <= 14))
@@ -1006,7 +1006,7 @@ u8 rtl8192_phy_SwChnlStepByStep(struct net_device *dev, u8 channel, u8* stage, u
 
 
 		do{
-			switch(*stage)
+			switch (*stage)
 			{
 			case 0:
 				CurrentCmd=&PreCommonCmd[*step];
@@ -1033,7 +1033,7 @@ u8 rtl8192_phy_SwChnlStepByStep(struct net_device *dev, u8 channel, u8* stage, u
 				}
 			}
 
-			switch(CurrentCmd->CmdID)
+			switch (CurrentCmd->CmdID)
 			{
 			case CmdID_SetTxPowerLevel:
 				if (priv->IC_Cut > (u8)VERSION_8190_BD)
@@ -1103,7 +1103,7 @@ u8 rtl8192_phy_SwChnl(struct net_device* dev, u8 channel)
 		return false;
 
 
-	switch(priv->rtllib->mode)
+	switch (priv->rtllib->mode)
 	{
 	case WIRELESS_MODE_A:
 	case WIRELESS_MODE_N_5G:
@@ -1145,7 +1145,7 @@ static void CCK_Tx_Power_Track_BW_Switch_TSSI(struct net_device *dev	)
 {
 	struct r8192_priv *priv = rtllib_priv(dev);
 
-	switch(priv->CurrentChannelBW)
+	switch (priv->CurrentChannelBW)
 	{
 		case HT_CHANNEL_WIDTH_20:
 			priv->CCKPresentAttentuation =
@@ -1225,7 +1225,7 @@ void rtl8192_SetBWModeWorkItem(struct net_device *dev)
 	}
 	regBwOpMode = read_nic_byte(dev, BW_OPMODE);
 
-	switch(priv->CurrentChannelBW)
+	switch (priv->CurrentChannelBW)
 	{
 		case HT_CHANNEL_WIDTH_20:
 			regBwOpMode |= BW_OPMODE_20MHZ;
@@ -1242,7 +1242,7 @@ void rtl8192_SetBWModeWorkItem(struct net_device *dev)
 			break;
 	}
 
-	switch(priv->CurrentChannelBW)
+	switch (priv->CurrentChannelBW)
 	{
 		case HT_CHANNEL_WIDTH_20:
 			rtl8192_setBBreg(dev, rFPGA0_RFMOD, bRFMOD, 0x0);
@@ -1294,7 +1294,7 @@ void rtl8192_SetBWModeWorkItem(struct net_device *dev)
 
 	}
 
-	switch( priv->rf_chip )
+	switch ( priv->rf_chip )
 	{
 		case RF_8225:
 			break;
@@ -1353,7 +1353,7 @@ void InitialGain819xPci(struct net_device *dev, u8 Operation)
 	u8					initial_gain;
 
 	if (priv->up) {
-		switch(Operation) {
+		switch (Operation) {
 		case IG_Backup:
 			RT_TRACE(COMP_SCAN, "IG_Backup, backup the initial gain.\n");
 			initial_gain = SCAN_RX_INITIAL_GAIN;
@@ -1430,10 +1430,10 @@ SetRFPowerState8190(
 	RT_TRACE(COMP_PS, "===========> SetRFPowerState8190()!\n");
 	priv->SetRFPowerStateInProgress = true;
 
-	switch(priv->rf_chip)
+	switch (priv->rf_chip)
 	{
 		case RF_8256:
-		switch( eRFPowerState )
+		switch ( eRFPowerState )
 		{
 			case eRfOn:
 				RT_TRACE(COMP_PS, "SetRFPowerState8190() eRfOn !\n");
@@ -1465,7 +1465,7 @@ SetRFPowerState8190(
 				{
 					for (QueueID = 0, i = 0; QueueID < MAX_TX_QUEUE; )
 					{
-						switch(QueueID) {
+						switch (QueueID) {
 							case MGNT_QUEUE:
 								tail=priv->txmapringtail;
 								head=priv->txmapringhead;
@@ -1542,10 +1542,10 @@ SetRFPowerState8190(
 	{
 		priv->rtllib->eRFPowerState = eRFPowerState;
 
-		switch(priv->rf_chip )
+		switch (priv->rf_chip )
 		{
 			case RF_8256:
-			switch(priv->rtllib->eRFPowerState)
+			switch (priv->rtllib->eRFPowerState)
 			{
 				case eRfOff:
 					if (priv->rtllib->RfOffReason==RF_CHANGE_BY_IPS )

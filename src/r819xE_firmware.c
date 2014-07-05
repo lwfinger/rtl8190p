@@ -294,7 +294,7 @@ bool init_firmware(struct net_device *dev)
 #endif
 	for (init_step = starting_state; init_step <= FW_INIT_STEP2_DATA; init_step++) {
 		if (rst_opt == OPT_SYSTEM_RESET) {
-			switch(priv->firmware_source) {
+			switch (priv->firmware_source) {
 			case FW_SOURCE_IMG_FILE: {
 #if LINUX_VERSION_CODE > KERNEL_VERSION(2,5,0) && defined(USE_FW_SOURCE_IMG_FILE)
 				const struct firmware	*fw_entry;

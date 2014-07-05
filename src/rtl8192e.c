@@ -38,7 +38,7 @@ rtl8192e_SetHwReg(struct net_device *dev,u8 variable,u8* val)
 {
 	struct r8192_priv* priv = rtllib_priv(dev);
 
-	switch(variable)
+	switch (variable)
 	{
 
 		case HW_VAR_BSSID:
@@ -54,7 +54,7 @@ rtl8192e_SetHwReg(struct net_device *dev,u8 variable,u8* val)
 
 			btMsr &= 0xfc;
 
-			switch(OpMode)
+			switch (OpMode)
 			{
 			case RT_OP_MODE_INFRASTRUCTURE:
 				btMsr |= MSR_INFRA;
@@ -153,7 +153,7 @@ static void rtl8192_read_eeprom_info(struct net_device* dev)
 		IC_Version = ((usValue&0xff00)>>8);
 
 		priv->card_8192_version = (VERSION_8190)(IC_Version);
-		switch(priv->card_8192_version) {
+		switch (priv->card_8192_version) {
 			case VERSION_8190_BD:
 			case VERSION_8190_BE:
 				break;
@@ -465,7 +465,7 @@ static void rtl8192_read_eeprom_info(struct net_device* dev)
 		priv->CustomerID =  RT_CID_DLINK;
 	}
 
-	switch(priv->eeprom_CustomerID)
+	switch (priv->eeprom_CustomerID)
 	{
 		case EEPROM_CID_DEFAULT:
 			priv->CustomerID = RT_CID_DEFAULT;
@@ -562,7 +562,7 @@ static void rtl8192_hwconfig(struct net_device* dev)
 
 // Set RRSR, RATR, and BW_OPMODE registers
 	//
-	switch(priv->rtllib->mode)
+	switch (priv->rtllib->mode)
 	{
 	case WIRELESS_MODE_B:
 		regBwOpMode = BW_OPMODE_20MHZ;
@@ -1029,7 +1029,7 @@ static u8 MRateToHwRate8190Pci(u8 rate)
 {
 	u8  ret = DESC90_RATE1M;
 
-	switch(rate) {
+	switch (rate) {
 		case MGN_1M:	ret = DESC90_RATE1M;		break;
 		case MGN_2M:	ret = DESC90_RATE2M;		break;
 		case MGN_5_5M:	ret = DESC90_RATE5_5M;	break;
@@ -1210,7 +1210,7 @@ u8 HwRateToMRate90(bool bIsHT, u8 rate)
 	u8  ret_rate = 0x02;
 
 	if (!bIsHT) {
-		switch(rate) {
+		switch (rate) {
 			case DESC90_RATE1M:   ret_rate = MGN_1M;         break;
 			case DESC90_RATE2M:   ret_rate = MGN_2M;         break;
 			case DESC90_RATE5_5M: ret_rate = MGN_5_5M;       break;
@@ -1230,7 +1230,7 @@ u8 HwRateToMRate90(bool bIsHT, u8 rate)
 		}
 
 	} else {
-		switch(rate) {
+		switch (rate) {
 			case DESC90_RATEMCS0:   ret_rate = MGN_MCS0;    break;
 			case DESC90_RATEMCS1:   ret_rate = MGN_MCS1;    break;
 			case DESC90_RATEMCS2:   ret_rate = MGN_MCS2;    break;
