@@ -1005,9 +1005,8 @@ u8 rtl8192_phy_SwChnlStepByStep(struct net_device *dev, u8 channel, u8* stage, u
 		}
 
 
-		do{
-			switch (*stage)
-			{
+		do {
+			switch (*stage) {
 			case 0:
 				CurrentCmd=&PreCommonCmd[*step];
 				break;
@@ -1019,22 +1018,17 @@ u8 rtl8192_phy_SwChnlStepByStep(struct net_device *dev, u8 channel, u8* stage, u
 				break;
 			}
 
-			if (CurrentCmd->CmdID==CmdID_End)
-			{
-				if ((*stage)==2)
-				{
+			if (CurrentCmd->CmdID==CmdID_End) {
+				if ((*stage)==2) {
 					return true;
-				}
-				else
-				{
+				} else {
 					(*stage)++;
 					(*step)=0;
 					continue;
 				}
 			}
 
-			switch (CurrentCmd->CmdID)
-			{
+			switch (CurrentCmd->CmdID) {
 			case CmdID_SetTxPowerLevel:
 				if (priv->IC_Cut > (u8)VERSION_8190_BD)
 					rtl8192_SetTxPowerLevel(dev,channel);
@@ -1058,7 +1052,7 @@ u8 rtl8192_phy_SwChnlStepByStep(struct net_device *dev, u8 channel, u8* stage, u
 
 			break;
 		}while(true);
-	}/*for (Number of RF paths)*/
+	} /*for (Number of RF paths)*/
 
 	(*delay)=CurrentCmd->msDelay;
 	(*step)++;

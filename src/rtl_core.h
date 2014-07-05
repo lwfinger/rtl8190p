@@ -114,15 +114,15 @@ do { if (rt_global_debug_component & component) \
 //wb added to debug out data buf
 //if you want print DATA buffer related BA, please set rtllib_debug_level to DATA|BA
 #define RT_DEBUG_DATA(level, data, datalen)      \
-        do{ if ((rt_global_debug_component & (level)) == (level))   \
-                {       \
+        do {							\
+		if ((rt_global_debug_component & (level)) == (level)) {   \
                         int _i;                                  \
-                        u8* _pdata = (u8*) data;                 \
-                        printk(KERN_DEBUG DRV_NAME ": %s()\n", __FUNCTION__);   \
-                        for (_i=0; _i<(int)(datalen); _i++)                 \
-                        {                                               \
+                        u8 *_pdata = (u8 *)data;                 \
+                        printk(KERN_DEBUG DRV_NAME ": %s()\n", __func__);   \
+                        for (_i = 0; _i < (int)(datalen); _i++) {                 \
                                 printk("%2x ", _pdata[_i]);               \
-                                if ((_i+1)%16 == 0) printk("\n");        \
+                                if ((_i+1)%16 == 0)			\
+					 printk("\n");        \
                         }                               \
                         printk("\n");                   \
                 }                                       \

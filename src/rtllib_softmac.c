@@ -555,7 +555,7 @@ void rtllib_softmac_scan_wq(void *data)
 	if (ieee->be_scan_inprogress)
 		return;
 	down(&ieee->scan_sem);
-	do{
+	do {
 		ieee->current_network.channel =
 			(ieee->current_network.channel + 1) % MAX_CHANNEL_NUMBER;
 		if (ieee->scan_watch_dog++ > MAX_CHANNEL_NUMBER)
@@ -3068,7 +3068,7 @@ void rtllib_start_protocol(struct rtllib_device *ieee)
 	ieee->proto_started = 1;
 
 	if (ieee->current_network.channel == 0){
-		do{
+		do {
 			ch++;
 			if (ch > MAX_CHANNEL_NUMBER)
 				return; /* no channel found */

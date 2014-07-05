@@ -825,15 +825,15 @@ extern u32 rtllib_debug_level;
 do { if (rtllib_debug_level & (level)) \
   printk(KERN_DEBUG "rtllib: " fmt, ## args); } while (0)
 #define RTLLIB_DEBUG_DATA(level, data, datalen)	\
-	do{ if ((rtllib_debug_level & (level)) == (level))	\
-		{	\
+	do {						\
+		 if ((rtllib_debug_level & (level)) == (level))	{ \
 			int i;					\
-			u8* pdata = (u8*) data;			\
-			printk(KERN_DEBUG "rtllib: %s()\n", __FUNCTION__);	\
-			for (i=0; i<(int)(datalen); i++)			\
-			{						\
+			u8 *pdata = (u8 *)data;			\
+			printk(KERN_DEBUG "rtllib: %s()\n", __func__);	\
+			for (i=0; i < (int)(datalen); i++) {			\
 				printk("%2x ", pdata[i]);		\
-				if ((i+1)%16 == 0) printk("\n");	\
+				if ((i+1)%16 == 0)			\
+					 printk("\n");	\
 			}				\
 			printk("\n");			\
 		}					\
