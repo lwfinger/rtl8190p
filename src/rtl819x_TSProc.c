@@ -53,7 +53,7 @@ void RxPktPendingTimeout(unsigned long data)
 	RTLLIB_DEBUG(RTLLIB_DL_REORDER,"==================>%s()\n",__FUNCTION__);
 	if (pRxTs->RxTimeoutIndicateSeq != 0xffff)
 	{
-		while(!list_empty(&pRxTs->RxPendingPktList))
+		while (!list_empty(&pRxTs->RxPendingPktList))
 		{
 			pReorderEntry = (PRX_REORDER_ENTRY)list_entry(pRxTs->RxPendingPktList.prev,RX_REORDER_ENTRY,List);
 			if (index == 0)
@@ -470,7 +470,7 @@ void RemoveTsEntry(
 		if (timer_pending(&pRxTS->RxPktPendingTimer))
 			del_timer_sync(&pRxTS->RxPktPendingTimer);
 
-                while(!list_empty(&pRxTS->RxPendingPktList))
+                while (!list_empty(&pRxTS->RxPendingPktList))
                 {
                         spin_lock_irqsave(&(ieee->reorder_spinlock), flags);
 			pRxReorderEntry = (PRX_REORDER_ENTRY)list_entry(pRxTS->RxPendingPktList.prev,RX_REORDER_ENTRY,List);

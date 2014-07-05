@@ -94,7 +94,7 @@
 		code_virtual_address += frag_length;
 		frag_offset += frag_length;
 
-        }while(frag_offset < buffer_len);
+        } while (frag_offset < buffer_len);
 Failed:
 	return rt_status;
 }	/* CMPK_Message_Handle_Tx */

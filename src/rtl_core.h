@@ -102,7 +102,7 @@ extern u32 rt_global_debug_component;
 do { if (rt_global_debug_component & component) \
 	printk(KERN_DEBUG DRV_NAME ":" x "\n" , \
 	       ##args);\
-}while(0);
+} while (0);
 
 #define RTL819x_DEBUG
 #ifdef RTL819x_DEBUG
@@ -129,7 +129,7 @@ do { if (rt_global_debug_component & component) \
         } while (0)
 #else
 #define assert(expr) do {} while (0)
-#define RT_DEBUG_DATA(level, data, datalen) do {} while(0)
+#define RT_DEBUG_DATA(level, data, datalen) do {} while (0)
 #endif // RTL8169_DEBUG */
 
 #define IS_UNDER_11N_AES_MODE(_rtllib)  ((_rtllib->pHTInfo->bCurrentHTSupport == true) &&\

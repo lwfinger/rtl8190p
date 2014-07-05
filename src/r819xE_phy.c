@@ -1051,7 +1051,7 @@ u8 rtl8192_phy_SwChnlStepByStep(struct net_device *dev, u8 channel, u8* stage, u
 			}
 
 			break;
-		}while(true);
+		} while (true);
 	} /*for (Number of RF paths)*/
 
 	(*delay)=CurrentCmd->msDelay;
@@ -1064,7 +1064,7 @@ void rtl8192_phy_FinishSwChnlNow(struct net_device *dev, u8 channel)
 	struct r8192_priv *priv = rtllib_priv(dev);
 	u32	delay = 0;
 
-	while(!rtl8192_phy_SwChnlStepByStep(dev,channel,&priv->SwChnlStage,&priv->SwChnlStep,&delay)) {
+	while (!rtl8192_phy_SwChnlStepByStep(dev,channel,&priv->SwChnlStage,&priv->SwChnlStep,&delay)) {
 		if (delay>0)
 			msleep(delay);
 		if (!priv->up)

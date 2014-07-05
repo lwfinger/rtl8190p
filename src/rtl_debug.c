@@ -842,7 +842,7 @@ static int proc_get_cam_register(char *page, char **start,
 			target_command= target_command | BIT31;
 
 			//Check polling bit is clear
-			while((i--)>=0)
+			while ((i--)>=0)
 			{
 				ulStatus = read_nic_dword(dev, RWCAM);
 				if (ulStatus & BIT31){

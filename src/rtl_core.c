@@ -628,7 +628,7 @@ MgntActSet_RF_State(
 	//1//
 	// Only one thread can change the RF state at one time, and others should wait to be executed. By Bruce, 2007-11-28.
 
-	while(true)
+	while (true)
 	{
 		spin_lock_irqsave(&priv->rf_ps_lock,flag);
 		if (priv->RFChangeInProgress)
@@ -637,7 +637,7 @@ MgntActSet_RF_State(
 			RT_TRACE((COMP_PS | COMP_RF), "MgntActSet_RF_State(): RF Change in progress! Wait to set..StateToSet(%d).\n", StateToSet);
 			printk("MgntActSet_RF_State(): RF Change in progress! Wait to set..StateToSet(%d).\n", StateToSet);
 			// Set RF after the previous action is done.
-			while(priv->RFChangeInProgress)
+			while (priv->RFChangeInProgress)
 			{
 				RFWaitCounter ++;
 				RT_TRACE((COMP_PS | COMP_RF), "MgntActSet_RF_State(): Wait 1 ms (%d times)...\n", RFWaitCounter);
@@ -3706,7 +3706,7 @@ void rtl8192_tx_resume(struct net_device *dev)
 
 	for (queue_index = BK_QUEUE; queue_index < TXCMD_QUEUE;queue_index++) {
 		//printk("===>queue:%d, %d, %d\n", queue_index, skb_queue_empty(&ieee->skb_aggQ[queue_index]),  priv->rtllib->check_nic_enough_desc(dev,queue_index));
-		while((!skb_queue_empty(&ieee->skb_waitQ[queue_index]))&&
+		while ((!skb_queue_empty(&ieee->skb_waitQ[queue_index]))&&
 				(priv->rtllib->check_nic_enough_desc(dev,queue_index) > 0)) {
 			// 1. dequeue the packet from the wait queue */
 			skb = skb_dequeue(&ieee->skb_waitQ[queue_index]);
@@ -3934,7 +3934,7 @@ int rtl8192_down(struct net_device *dev, bool shutdownrf)
 	rtllib_softmac_stop_protocol(priv->rtllib,true);
 	//added by amy 090420
 	spin_lock_irqsave(&priv->rf_ps_lock,flags);
-	while(priv->RFChangeInProgress)
+	while (priv->RFChangeInProgress)
 	{
 		spin_unlock_irqrestore(&priv->rf_ps_lock,flags);
 		if (RFInProgressTimeOut > 100)

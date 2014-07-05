@@ -196,7 +196,7 @@ void CAM_read_entry(struct net_device *dev, u32 iIndex)
 
 		//Check polling bit is clear
 		//	mdelay(1);
-		while((i--)>=0)
+		while ((i--)>=0)
 		{
 			ulStatus = read_nic_dword(dev, RWCAM);
 			if (ulStatus & BIT31){

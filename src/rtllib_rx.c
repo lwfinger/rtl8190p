@@ -464,7 +464,7 @@ AddReorderEntry(
 {
 	struct list_head *pList = &pTS->RxPendingPktList;
 #if  1
-	while(pList->next != &pTS->RxPendingPktList)
+	while (pList->next != &pTS->RxPendingPktList)
 	{
 		if ( SN_LESS(pReorderEntry->SeqNum, ((PRX_REORDER_ENTRY)list_entry(pList->next,RX_REORDER_ENTRY,List))->SeqNum) )
 		{
@@ -657,7 +657,7 @@ void RxReorderIndicatePacket( struct rtllib_device *ieee,
 	}
 
 	/* Check if there is any packet need indicate.*/
-	while(!list_empty(&pTS->RxPendingPktList)) {
+	while (!list_empty(&pTS->RxPendingPktList)) {
 		RTLLIB_DEBUG(RTLLIB_DL_REORDER,"%s(): start RREORDER indicate\n",__FUNCTION__);
 		pReorderEntry = (PRX_REORDER_ENTRY)list_entry(pTS->RxPendingPktList.prev,RX_REORDER_ENTRY,List);
 		if ( SN_LESS(pReorderEntry->SeqNum, pTS->RxIndicateSeq) ||
@@ -764,7 +764,7 @@ u8 parse_subframe(struct rtllib_device* ieee,struct sk_buff *skb,
 		rxb->nr_subframes = 0;
 		memcpy(rxb->src,src,ETH_ALEN);
 		memcpy(rxb->dst,dst,ETH_ALEN);
-		while(skb->len > ETHERNET_HEADER_SIZE) {
+		while (skb->len > ETHERNET_HEADER_SIZE) {
 			/* Offset 12 denote 2 mac address */
 			nSubframe_Length = *((u16*)(skb->data + 12));
 			nSubframe_Length = (nSubframe_Length>>8) + (nSubframe_Length<<8);

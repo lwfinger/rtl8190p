@@ -89,7 +89,7 @@ bool fw_download_code(struct net_device *dev, u8 *code_virtual_address, u32 buff
 		code_virtual_address += frag_length;
 		frag_offset += frag_length;
 
-	}while(frag_offset < buffer_len);
+	} while (frag_offset < buffer_len);
 
 	return rt_status;
 }

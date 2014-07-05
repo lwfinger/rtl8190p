@@ -840,7 +840,7 @@ do { if (rtllib_debug_level & (level)) \
 	} while (0)
 #else
 #define RTLLIB_DEBUG(level, fmt, args...) do {} while (0)
-#define RTLLIB_DEBUG_DATA(level, data, datalen) do {} while(0)
+#define RTLLIB_DEBUG_DATA(level, data, datalen) do {} while (0)
 #endif	/* CONFIG_RTLLIB_DEBUG */
 
 /* debug macros not dependent on CONFIG_RTLLIB_DEBUG */

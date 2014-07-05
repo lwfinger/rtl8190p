@@ -471,13 +471,13 @@ void rtllib_softmac_scan_syncro(struct rtllib_device *ieee)
 	ieee->be_scan_inprogress = true;
 	down(&ieee->scan_sem);
 
-	while(1) {
+	while (1) {
 
 		do {
 			ch++;
 			if (ch > MAX_CHANNEL_NUMBER)
 				goto out; /* scan completed */
-		} while(!channel_map[ch]);
+		} while (!channel_map[ch]);
 
 		/* this fuction can be called in two situations
 		 * 1- We have switched to ad-hoc mode and we are
@@ -565,7 +565,7 @@ void rtllib_softmac_scan_wq(void *data)
 				goto out; /* no good chans */
 		}
 	}
-	while(!channel_map[ieee->current_network.channel]);
+	while (!channel_map[ieee->current_network.channel]);
 	if (ieee->scanning == 0 )
 		goto out;
 	ieee->set_chan(ieee->dev, ieee->current_network.channel);
@@ -3072,7 +3072,7 @@ void rtllib_start_protocol(struct rtllib_device *ieee)
 			ch++;
 			if (ch > MAX_CHANNEL_NUMBER)
 				return; /* no channel found */
-		}while(!GET_DOT11D_INFO(ieee)->channel_map[ch]);
+		} while (!GET_DOT11D_INFO(ieee)->channel_map[ch]);
 		ieee->current_network.channel = ch;
 	}
 
