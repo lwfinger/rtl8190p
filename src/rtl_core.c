@@ -4768,26 +4768,6 @@ static int __init rtl8192_pci_module_init(void)
 	int ret;
 	int error;
 
-#ifdef BUILT_IN_CRYPTO
-        ret = arc4_init();
-        if (ret) {
-                printk(KERN_ERR "arc4_init() failed %d\n", ret);
-                return ret;
-        }
-
-
-        ret = michael_mic_init();
-        if (ret) {
-                printk(KERN_ERR "michael_mic_init() failed %d\n", ret);
-                return ret;
-        }
-
-        ret = aes_init();
-        if (ret) {
-                printk(KERN_ERR "aes_init() failed %d\n", ret);
-                return ret;
-        }
-#endif
 #ifdef BUILT_IN_RTLLIB
 	ret = rtllib_init();
 	if (ret) {
@@ -4861,11 +4841,6 @@ static void __exit rtl8192_pci_module_exit(void)
 	rtllib_crypto_wep_exit();
 	rtllib_crypto_deinit();
 	rtllib_exit();
-#endif
-#ifdef BUILT_IN_CRYPTO
-        arc4_exit();
-        michael_mic_exit();
-        aes_fini();
 #endif
 #ifdef BUILT_IN_MSHCLASS
 	msh_exit();

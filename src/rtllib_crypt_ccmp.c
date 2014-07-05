@@ -23,7 +23,7 @@
 #include <linux/interrupt.h>
 #include "rtllib.h"
 
-#if defined(BUILT_IN_CRYPTO) || (LINUX_VERSION_CODE < KERNEL_VERSION(2, 5, 0))
+#if (LINUX_VERSION_CODE < KERNEL_VERSION(2, 5, 0))
 #include "rtl_crypto.h"
 #else
 #include <linux/crypto.h>
@@ -72,7 +72,7 @@ struct rtllib_ccmp_data {
 void rtllib_ccmp_aes_encrypt(struct crypto_tfm *tfm,
 			     const u8 pt[16], u8 ct[16])
 {
-#if ( defined(BUILT_IN_CRYPTO) || ((LINUX_VERSION_CODE < KERNEL_VERSION(2, 6, 21)) && (!OPENSUSE_SLED)) )
+#if ( ((LINUX_VERSION_CODE < KERNEL_VERSION(2, 6, 21)) && (!OPENSUSE_SLED)) )
 	struct scatterlist src, dst;
 
 #if (LINUX_VERSION_CODE < KERNEL_VERSION(2, 6, 24))
@@ -105,7 +105,7 @@ static void * rtllib_ccmp_init(int key_idx)
 	memset(priv, 0, sizeof(*priv));
 	priv->key_idx = key_idx;
 
-#if ( defined(BUILT_IN_CRYPTO) || ((LINUX_VERSION_CODE < KERNEL_VERSION(2, 6, 21)) && (!OPENSUSE_SLED)) )
+#if ( ((LINUX_VERSION_CODE < KERNEL_VERSION(2, 6, 21)) && (!OPENSUSE_SLED)) )
 	priv->tfm = crypto_alloc_tfm("aes", 0);
 	if (priv->tfm == NULL) {
 		printk(KERN_DEBUG "rtllib_crypt_ccmp: could not allocate "
@@ -126,7 +126,7 @@ static void * rtllib_ccmp_init(int key_idx)
 fail:
 	if (priv) {
 		if (priv->tfm)
-			#if defined(BUILT_IN_CRYPTO) || (LINUX_VERSION_CODE < KERNEL_VERSION(2, 6, 21))
+			#if (LINUX_VERSION_CODE < KERNEL_VERSION(2, 6, 21))
 			crypto_free_tfm(priv->tfm);
                     #else
 			crypto_free_cipher((void*)priv->tfm);
@@ -142,7 +142,7 @@ static void rtllib_ccmp_deinit(void *priv)
 {
 	struct rtllib_ccmp_data *_priv = priv;
 	if (_priv && _priv->tfm)
-#if defined(BUILT_IN_CRYPTO) || (LINUX_VERSION_CODE < KERNEL_VERSION(2, 6, 21))
+#if (LINUX_VERSION_CODE < KERNEL_VERSION(2, 6, 21))
 		crypto_free_tfm(_priv->tfm);
 #else
 		crypto_free_cipher((void*)_priv->tfm);
