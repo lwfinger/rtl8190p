@@ -3482,7 +3482,7 @@ void TranslateRxSignalStuff819xpci(struct net_device *dev,
 		       (fc & RTLLIB_FCTL_TODS)? hdr->addr1 :
 		       (fc & RTLLIB_FCTL_FROMDS )? hdr->addr2 : hdr->addr3))
             && (!pstats->bHwError) && (!pstats->bCRC)&& (!pstats->bICV));
-    bpacket_toself =  bpacket_match_bssid & (!compare_ether_addr(praddr, priv->rtllib->dev->dev_addr));
+    bpacket_toself =  bpacket_match_bssid && (!compare_ether_addr(praddr, priv->rtllib->dev->dev_addr));
     if (WLAN_FC_GET_FRAMETYPE(fc)== RTLLIB_STYPE_BEACON)
     {
         bPacketBeacon = true;
