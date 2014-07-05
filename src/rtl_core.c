@@ -59,6 +59,10 @@
 #include "rtl_pm.h"
 #endif
 
+#ifndef compare_ether_addr
+#define compare_ether_addr(_dst, _src) ether_addr_equal(_dst, _src)
+#endif
+
 int hwwep = 1; //default use hw. set 0 to use software security
 static int channels = 0x3fff;
 char* ifname = "wlan%d";
