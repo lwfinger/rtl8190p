@@ -92,8 +92,8 @@ static struct sk_buff* rtllib_ADDBA(struct rtllib_device* ieee, u8* Dst, PBA_REC
 		return NULL;
 	}
 #ifdef USB_USE_ALIGNMENT
-        u32 Tmpaddr=0;
-        int alignment=0;
+        u32 Tmpaddr = 0;
+        int alignment = 0;
         skb = dev_alloc_skb(len + sizeof( struct rtllib_hdr_3addr) + USB_512B_ALIGNMENT_SIZE);
 #else
 	skb = dev_alloc_skb(len + sizeof( struct rtllib_hdr_3addr));
@@ -109,12 +109,12 @@ static struct sk_buff* rtllib_ADDBA(struct rtllib_device* ieee, u8* Dst, PBA_REC
 #ifdef USB_USE_ALIGNMENT
         Tmpaddr = (u32)skb->data;
         alignment = Tmpaddr & 0x1ff;
-        skb_reserve(skb,(USB_512B_ALIGNMENT_SIZE - alignment));
+        skb_reserve(skb, (USB_512B_ALIGNMENT_SIZE - alignment));
 #endif
 
 	skb_reserve(skb, ieee->tx_headroom);
 
-	BAReq = ( struct rtllib_hdr_3addr *) skb_put(skb,sizeof( struct rtllib_hdr_3addr));
+	BAReq = ( struct rtllib_hdr_3addr *) skb_put(skb, sizeof( struct rtllib_hdr_3addr));
 
 	memcpy(BAReq->addr1, Dst, ETH_ALEN);
 	memcpy(BAReq->addr2, ieee->dev->dev_addr, ETH_ALEN);
@@ -144,7 +144,7 @@ static struct sk_buff* rtllib_ADDBA(struct rtllib_device* ieee, u8* Dst, PBA_REC
 
 	if (ACT_ADDBAREQ == type)
 	{
-		memcpy(tag,(u8*)&(pBA->BaStartSeqCtrl), 2);
+		memcpy(tag, (u8*)&(pBA->BaStartSeqCtrl), 2);
 		tag += 2;
 	}
 
@@ -172,12 +172,12 @@ static struct sk_buff* rtllib_DELBA(
 
 	memset(&DelbaParamSet, 0, 2);
 
-	DelbaParamSet.field.Initiator	= (TxRxSelect==TX_DIR)?1:0;
+	DelbaParamSet.field.Initiator	= (TxRxSelect == TX_DIR)?1:0;
 	DelbaParamSet.field.TID	= pBA->BaParamSet.field.TID;
 
 #ifdef USB_USE_ALIGNMENT
-        u32 Tmpaddr=0;
-        int alignment=0;
+        u32 Tmpaddr = 0;
+        int alignment = 0;
 	skb = dev_alloc_skb(len + sizeof( struct rtllib_hdr_3addr) + USB_512B_ALIGNMENT_SIZE);
 #else
 	skb = dev_alloc_skb(len + sizeof( struct rtllib_hdr_3addr));
@@ -191,11 +191,11 @@ static struct sk_buff* rtllib_DELBA(
 #ifdef USB_USE_ALIGNMENT
         Tmpaddr = (u32)skb->data;
         alignment = Tmpaddr & 0x1ff;
-        skb_reserve(skb,(USB_512B_ALIGNMENT_SIZE - alignment));
+        skb_reserve(skb, (USB_512B_ALIGNMENT_SIZE - alignment));
 #endif
 	skb_reserve(skb, ieee->tx_headroom);
 
-	Delba = ( struct rtllib_hdr_3addr *) skb_put(skb,sizeof( struct rtllib_hdr_3addr));
+	Delba = ( struct rtllib_hdr_3addr *) skb_put(skb, sizeof( struct rtllib_hdr_3addr));
 
 	memcpy(Delba->addr1, dst, ETH_ALEN);
 	memcpy(Delba->addr2, ieee->dev->dev_addr, ETH_ALEN);
@@ -282,7 +282,7 @@ int rtllib_rx_ADDBAReq( struct rtllib_device* ieee, struct sk_buff *skb)
 
 	if (skb->len < sizeof( struct rtllib_hdr_3addr) + 9)
 	{
-		RTLLIB_DEBUG(RTLLIB_DL_ERR, " Invalid skb len in BAREQ(%d / %d)\n",(int)skb->len,	(int)(sizeof( struct rtllib_hdr_3addr) + 9));
+		RTLLIB_DEBUG(RTLLIB_DL_ERR, " Invalid skb len in BAREQ(%d / %d)\n", (int)skb->len,	(int)(sizeof( struct rtllib_hdr_3addr) + 9));
 		return -1;
 	}
 
@@ -383,7 +383,7 @@ int rtllib_rx_ADDBARsp( struct rtllib_device* ieee, struct sk_buff *skb)
 		ieee->pHTInfo->bCurrentHTSupport == false ||
 		ieee->pHTInfo->bCurrentAMPDUEnable == false )
 	{
-		RTLLIB_DEBUG(RTLLIB_DL_ERR, "reject to ADDBA_RSP as some capability is not ready(%d, %d, %d)\n",ieee->current_network.qos_data.active, ieee->pHTInfo->bCurrentHTSupport, ieee->pHTInfo->bCurrentAMPDUEnable);
+		RTLLIB_DEBUG(RTLLIB_DL_ERR, "reject to ADDBA_RSP as some capability is not ready(%d, %d, %d)\n", ieee->current_network.qos_data.active, ieee->pHTInfo->bCurrentHTSupport, ieee->pHTInfo->bCurrentAMPDUEnable);
 		ReasonCode = DELBA_REASON_UNKNOWN_BA;
 		goto OnADDBARsp_Reject;
 	}
@@ -407,7 +407,7 @@ int rtllib_rx_ADDBARsp( struct rtllib_device* ieee, struct sk_buff *skb)
 	pAdmittedBA = &pTS->TxAdmittedBARecord;
 
 
-	if ((pAdmittedBA->bValid==true))
+	if ((pAdmittedBA->bValid == true))
 	{
 		RTLLIB_DEBUG(RTLLIB_DL_BA, "OnADDBARsp(): Recv ADDBA Rsp. Drop because already admit it! \n");
 		return -1;
@@ -461,7 +461,7 @@ OnADDBARsp_Reject:
 
 }
 
-int rtllib_rx_DELBA(struct rtllib_device* ieee,struct sk_buff *skb)
+int rtllib_rx_DELBA(struct rtllib_device* ieee, struct sk_buff *skb)
 {
 	 struct rtllib_hdr_3addr* delba = NULL;
 	PDELBA_PARAM_SET	pDelBaParamSet = NULL;
@@ -478,7 +478,7 @@ int rtllib_rx_DELBA(struct rtllib_device* ieee,struct sk_buff *skb)
 		ieee->current_network.qos_data.active == 0  ||
 		ieee->pHTInfo->bCurrentHTSupport == false )
 	{
-		RTLLIB_DEBUG(RTLLIB_DL_ERR, "received DELBA while QOS or HT is not supported(%d, %d)\n",ieee->current_network.qos_data.active, ieee->pHTInfo->bCurrentHTSupport);
+		RTLLIB_DEBUG(RTLLIB_DL_ERR, "received DELBA while QOS or HT is not supported(%d, %d)\n", ieee->current_network.qos_data.active, ieee->pHTInfo->bCurrentHTSupport);
 		return -1;
 	}
 
@@ -542,7 +542,7 @@ TsInitAddBA(
 {
 	PBA_RECORD			pBA = &pTS->TxPendingBARecord;
 
-	if (pBA->bValid==true && bOverwritePending==false)
+	if (pBA->bValid == true && bOverwritePending == false)
 		return;
 
 	DeActivateBAEntry(ieee, pBA);

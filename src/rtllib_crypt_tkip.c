@@ -22,12 +22,12 @@
 #include <linux/interrupt.h>
 #include "rtllib.h"
 
-#if defined(BUILT_IN_CRYPTO) || (LINUX_VERSION_CODE < KERNEL_VERSION(2,5,0))
+#if defined(BUILT_IN_CRYPTO) || (LINUX_VERSION_CODE < KERNEL_VERSION(2, 5, 0))
 #include "rtl_crypto.h"
 #else
 #include <linux/crypto.h>
 #endif
-#if LINUX_VERSION_CODE < KERNEL_VERSION(2,6,20)
+#if LINUX_VERSION_CODE < KERNEL_VERSION(2, 6, 20)
     #include <asm/scatterlist.h>
 #else
         #include <linux/scatterlist.h>
@@ -65,7 +65,7 @@ struct rtllib_tkip_data {
 	u32 dot11RSNAStatsTKIPLocalMICFailures;
 
 	int key_idx;
-#if  ( !defined(BUILT_IN_CRYPTO) && ((LINUX_VERSION_CODE >= KERNEL_VERSION(2,6,21)) || (OPENSUSE_SLED)) )
+#if  ( !defined(BUILT_IN_CRYPTO) && ((LINUX_VERSION_CODE >= KERNEL_VERSION(2, 6, 21)) || (OPENSUSE_SLED)) )
 	struct crypto_blkcipher *rx_tfm_arc4;
 	struct crypto_hash *rx_tfm_michael;
 	struct crypto_blkcipher *tx_tfm_arc4;
@@ -89,7 +89,7 @@ static void * rtllib_tkip_init(int key_idx)
 		goto fail;
 	memset(priv, 0, sizeof(*priv));
 	priv->key_idx = key_idx;
-#if ( defined(BUILT_IN_CRYPTO) || ((LINUX_VERSION_CODE < KERNEL_VERSION(2,6,21)) && (!OPENSUSE_SLED)) )
+#if ( defined(BUILT_IN_CRYPTO) || ((LINUX_VERSION_CODE < KERNEL_VERSION(2, 6, 21)) && (!OPENSUSE_SLED)) )
 	priv->tx_tfm_arc4 = crypto_alloc_tfm("arc4", 0);
 	if (priv->tx_tfm_arc4 == NULL) {
 		printk(KERN_DEBUG "rtllib_crypt_tkip: could not allocate "
@@ -158,7 +158,7 @@ static void * rtllib_tkip_init(int key_idx)
 
 fail:
 	if (priv) {
-#if ( defined(BUILT_IN_CRYPTO) || ((LINUX_VERSION_CODE < KERNEL_VERSION(2,6,21)) && (!OPENSUSE_SLED)) )
+#if ( defined(BUILT_IN_CRYPTO) || ((LINUX_VERSION_CODE < KERNEL_VERSION(2, 6, 21)) && (!OPENSUSE_SLED)) )
 		if (priv->tx_tfm_michael)
 			crypto_free_tfm(priv->tx_tfm_michael);
 		if (priv->tx_tfm_arc4)
@@ -188,7 +188,7 @@ fail:
 static void rtllib_tkip_deinit(void *priv)
 {
 	struct rtllib_tkip_data *_priv = priv;
-#if ( defined(BUILT_IN_CRYPTO) || ((LINUX_VERSION_CODE < KERNEL_VERSION(2,6,21)) && (!OPENSUSE_SLED)) )
+#if ( defined(BUILT_IN_CRYPTO) || ((LINUX_VERSION_CODE < KERNEL_VERSION(2, 6, 21)) && (!OPENSUSE_SLED)) )
 	if (_priv->tx_tfm_michael)
 		crypto_free_tfm(_priv->tx_tfm_michael);
 	if (_priv->tx_tfm_arc4)
@@ -379,7 +379,7 @@ static int rtllib_tkip_encrypt(struct sk_buff *skb, int hdr_len, void *priv)
 	struct rtllib_hdr_4addr *hdr;
 	cb_desc *tcb_desc = (cb_desc *)(skb->cb + MAX_DEV_ADDR_SIZE);
 
-	#if ( !defined(BUILT_IN_CRYPTO) && ((LINUX_VERSION_CODE >= KERNEL_VERSION(2,6,21)) || (OPENSUSE_SLED)) )
+	#if ( !defined(BUILT_IN_CRYPTO) && ((LINUX_VERSION_CODE >= KERNEL_VERSION(2, 6, 21)) || (OPENSUSE_SLED)) )
 	struct blkcipher_desc desc = {.tfm = tkey->tx_tfm_arc4};
 	int ret = 0;
 	#endif
@@ -432,7 +432,7 @@ static int rtllib_tkip_encrypt(struct sk_buff *skb, int hdr_len, void *priv)
 	if (!tcb_desc->bHwSec)
 	{
 		icv = skb_put(skb, 4);
-#if (LINUX_VERSION_CODE > KERNEL_VERSION(2,5,0))
+#if (LINUX_VERSION_CODE > KERNEL_VERSION(2, 5, 0))
 		crc = ~crc32_le(~0, pos, len);
 #else
 		crc = ~ether_crc_le(len, pos);
@@ -442,7 +442,7 @@ static int rtllib_tkip_encrypt(struct sk_buff *skb, int hdr_len, void *priv)
 		icv[2] = crc >> 16;
 		icv[3] = crc >> 24;
 
-#if (LINUX_VERSION_CODE < KERNEL_VERSION(2,6,24))
+#if (LINUX_VERSION_CODE < KERNEL_VERSION(2, 6, 24))
 		sg.page = virt_to_page(pos);
 		sg.offset = offset_in_page(pos);
 		sg.length = len + 4;
@@ -451,12 +451,12 @@ static int rtllib_tkip_encrypt(struct sk_buff *skb, int hdr_len, void *priv)
 #endif
 
 
-#if ( defined(BUILT_IN_CRYPTO) || ((LINUX_VERSION_CODE < KERNEL_VERSION(2,6,21)) && (!OPENSUSE_SLED)) )
+#if ( defined(BUILT_IN_CRYPTO) || ((LINUX_VERSION_CODE < KERNEL_VERSION(2, 6, 21)) && (!OPENSUSE_SLED)) )
 		crypto_cipher_setkey(tkey->tx_tfm_arc4, rc4key, 16);
 		crypto_cipher_encrypt(tkey->tx_tfm_arc4, &sg, &sg, len + 4);
 #else
 		crypto_blkcipher_setkey(tkey->tx_tfm_arc4, rc4key, 16);
-		ret= crypto_blkcipher_encrypt(&desc, &sg, &sg, len + 4);
+		ret = crypto_blkcipher_encrypt(&desc, &sg, &sg, len + 4);
 #endif
 
 	}
@@ -468,7 +468,7 @@ static int rtllib_tkip_encrypt(struct sk_buff *skb, int hdr_len, void *priv)
 	}
 
 	if (!tcb_desc->bHwSec)
-	#if ( defined(BUILT_IN_CRYPTO) || ((LINUX_VERSION_CODE < KERNEL_VERSION(2,6,21)) && (!OPENSUSE_SLED)) )
+	#if ( defined(BUILT_IN_CRYPTO) || ((LINUX_VERSION_CODE < KERNEL_VERSION(2, 6, 21)) && (!OPENSUSE_SLED)) )
 		return 0;
 	#else
 		return ret;
@@ -487,7 +487,7 @@ static int rtllib_tkip_decrypt(struct sk_buff *skb, int hdr_len, void *priv)
 	u16 iv16;
 	struct rtllib_hdr_4addr *hdr;
 	cb_desc *tcb_desc = (cb_desc *)(skb->cb + MAX_DEV_ADDR_SIZE);
-	#if ( !defined(BUILT_IN_CRYPTO) && ((LINUX_VERSION_CODE >= KERNEL_VERSION(2,6,21)) || (OPENSUSE_SLED)) )
+	#if ( !defined(BUILT_IN_CRYPTO) && ((LINUX_VERSION_CODE >= KERNEL_VERSION(2, 6, 21)) || (OPENSUSE_SLED)) )
 	struct blkcipher_desc desc = {.tfm = tkey->rx_tfm_arc4};
 	#endif
 	u8 rc4key[16];
@@ -510,14 +510,14 @@ static int rtllib_tkip_decrypt(struct sk_buff *skb, int hdr_len, void *priv)
 	}
 	keyidx >>= 6;
 	if (tkey->key_idx != keyidx) {
-		printk(KERN_DEBUG "TKIP: RX tkey->key_idx=%d frame "
-		       "keyidx=%d priv=%p\n", tkey->key_idx, keyidx, priv);
+		printk(KERN_DEBUG "TKIP: RX tkey->key_idx =%d frame "
+		       "keyidx =%d priv =%p\n", tkey->key_idx, keyidx, priv);
 		return -6;
 	}
 	if (!tkey->key_set) {
 		if (net_ratelimit()) {
 			printk(KERN_DEBUG "TKIP: received packet from " MAC_FMT
-			       " with keyid=%d that does not have a configured"
+			       " with keyid =%d that does not have a configured"
 			       " key\n", MAC_ARG(hdr->addr2), keyidx);
 		}
 		return -3;
@@ -531,7 +531,7 @@ static int rtllib_tkip_decrypt(struct sk_buff *skb, int hdr_len, void *priv)
 		if ((iv32 < tkey->rx_iv32 ||
 		(iv32 == tkey->rx_iv32 && iv16 <= tkey->rx_iv16))&&tkey->initialized) {
 			if (net_ratelimit()) {
-				printk(KERN_DEBUG "TKIP: replay detected: STA=" MAC_FMT
+				printk(KERN_DEBUG "TKIP: replay detected: STA =" MAC_FMT
 				" previous TSC %08x%04x received TSC "
 				"%08x%04x\n", MAC_ARG(hdr->addr2),
 				tkey->rx_iv32, tkey->rx_iv16, iv32, iv16);
@@ -549,7 +549,7 @@ static int rtllib_tkip_decrypt(struct sk_buff *skb, int hdr_len, void *priv)
 
 		plen = skb->len - hdr_len - 12;
 
-#if (LINUX_VERSION_CODE < KERNEL_VERSION(2,6,24))
+#if (LINUX_VERSION_CODE < KERNEL_VERSION(2, 6, 24))
 		sg.page = virt_to_page(pos);
 		sg.offset = offset_in_page(pos);
 		sg.length = plen + 4;
@@ -557,7 +557,7 @@ static int rtllib_tkip_decrypt(struct sk_buff *skb, int hdr_len, void *priv)
 		sg_init_one(&sg, pos, plen+4);
 #endif
 
-#if ( defined(BUILT_IN_CRYPTO) || ((LINUX_VERSION_CODE < KERNEL_VERSION(2,6,21)) && (!OPENSUSE_SLED)) )
+#if ( defined(BUILT_IN_CRYPTO) || ((LINUX_VERSION_CODE < KERNEL_VERSION(2, 6, 21)) && (!OPENSUSE_SLED)) )
 		crypto_cipher_setkey(tkey->rx_tfm_arc4, rc4key, 16);
 		crypto_cipher_decrypt(tkey->rx_tfm_arc4, &sg, &sg, plen + 4);
 #else
@@ -572,7 +572,7 @@ static int rtllib_tkip_decrypt(struct sk_buff *skb, int hdr_len, void *priv)
 		}
 #endif
 
-	#if (LINUX_VERSION_CODE > KERNEL_VERSION(2,5,0))
+	#if (LINUX_VERSION_CODE > KERNEL_VERSION(2, 5, 0))
 		crc = ~crc32_le(~0, pos, plen);
 	#else
 		crc = ~ether_crc_le(plen, pos);
@@ -589,7 +589,7 @@ static int rtllib_tkip_decrypt(struct sk_buff *skb, int hdr_len, void *priv)
 				tkey->rx_phase1_done = 0;
 			}
 			if (net_ratelimit()) {
-				printk(KERN_DEBUG "TKIP: ICV error detected: STA="
+				printk(KERN_DEBUG "TKIP: ICV error detected: STA ="
 				MAC_FMT "\n", MAC_ARG(hdr->addr2));
 			}
 			tkey->dot11RSNAStatsTKIPICVErrors++;
@@ -612,8 +612,8 @@ static int rtllib_tkip_decrypt(struct sk_buff *skb, int hdr_len, void *priv)
 if ( ((u16*)skb->data)[0] & 0x4000){
         printk("@@ rx decrypted skb->data");
         int i;
-        for (i=0;i<skb->len;i++){
-                if ( (i%24)==0 ) printk("\n");
+        for (i = 0;i<skb->len;i++){
+                if ( (i%24) == 0 ) printk("\n");
                 printk("%2x ", ((u8*)skb->data)[i]);
         }
         printk("\n");
@@ -623,12 +623,12 @@ if ( ((u16*)skb->data)[0] & 0x4000){
 }
 
 
-#if ( defined(BUILT_IN_CRYPTO) || ((LINUX_VERSION_CODE < KERNEL_VERSION(2,6,21)) && (!OPENSUSE_SLED)) )
+#if ( defined(BUILT_IN_CRYPTO) || ((LINUX_VERSION_CODE < KERNEL_VERSION(2, 6, 21)) && (!OPENSUSE_SLED)) )
 static int michael_mic(struct crypto_tfm * tfm_michael, u8 *key, u8 *hdr,
 		       u8 *data, size_t data_len, u8 *mic)
 {
 	struct scatterlist sg[2];
-#if ( !defined(BUILT_IN_CRYPTO) && LINUX_VERSION_CODE >= KERNEL_VERSION(2,6,20) )
+#if ( !defined(BUILT_IN_CRYPTO) && LINUX_VERSION_CODE >= KERNEL_VERSION(2, 6, 20) )
         struct hash_desc desc;
         int ret = 0;
 #endif
@@ -637,7 +637,7 @@ static int michael_mic(struct crypto_tfm * tfm_michael, u8 *key, u8 *hdr,
 		printk(KERN_WARNING "michael_mic: tfm_michael == NULL\n");
 		return -1;
 	}
-#if LINUX_VERSION_CODE < KERNEL_VERSION(2,6,24)
+#if LINUX_VERSION_CODE < KERNEL_VERSION(2, 6, 24)
 	sg[0].page = virt_to_page(hdr);
 	sg[0].offset = offset_in_page(hdr);
 	sg[0].length = 16;
@@ -651,7 +651,7 @@ static int michael_mic(struct crypto_tfm * tfm_michael, u8 *key, u8 *hdr,
 	sg_set_buf(&sg[1], data, data_len);
 #endif
 
-#if ( defined(BUILT_IN_CRYPTO) || LINUX_VERSION_CODE < KERNEL_VERSION(2,6,20) )
+#if ( defined(BUILT_IN_CRYPTO) || LINUX_VERSION_CODE < KERNEL_VERSION(2, 6, 20) )
 	crypto_digest_init(tfm_michael);
         crypto_digest_setkey(tfm_michael, key, 8);
         crypto_digest_update(tfm_michael, sg, 2);
@@ -678,7 +678,7 @@ static int michael_mic(struct crypto_hash *tfm_michael, u8 * key, u8 * hdr,
                 printk(KERN_WARNING "michael_mic: tfm_michael == NULL\n");
                 return -1;
         }
-#if LINUX_VERSION_CODE < KERNEL_VERSION(2,6,24)
+#if LINUX_VERSION_CODE < KERNEL_VERSION(2, 6, 24)
         sg[0].page = virt_to_page(hdr);
         sg[0].offset = offset_in_page(hdr);
         sg[0].length = 16;
@@ -744,7 +744,7 @@ static int rtllib_michael_mic_add(struct sk_buff *skb, int hdr_len, void *priv)
 
 	if (skb_tailroom(skb) < 8 || skb->len < hdr_len) {
 		printk(KERN_DEBUG "Invalid packet for Michael MIC add "
-		       "(tailroom=%d hdr_len=%d skb->len=%d)\n",
+		       "(tailroom =%d hdr_len =%d skb->len =%d)\n",
 		       skb_tailroom(skb), hdr_len, skb->len);
 		return -1;
 	}
@@ -755,7 +755,7 @@ static int rtllib_michael_mic_add(struct sk_buff *skb, int hdr_len, void *priv)
 		tkey->tx_hdr[12] = *(skb->data + hdr_len - 2) & 0x07;
 	}
 	pos = skb_put(skb, 8);
-#if ( defined(BUILT_IN_CRYPTO) || ((LINUX_VERSION_CODE < KERNEL_VERSION(2,6,21)) && (!OPENSUSE_SLED)) )
+#if ( defined(BUILT_IN_CRYPTO) || ((LINUX_VERSION_CODE < KERNEL_VERSION(2, 6, 21)) && (!OPENSUSE_SLED)) )
 	if (michael_mic(tkey->tx_tfm_michael, &tkey->key[16], tkey->tx_hdr,
 				skb->data + hdr_len, skb->len - 8 - hdr_len, pos))
 #else
@@ -798,7 +798,7 @@ static void rtllib_michael_mic_failure(struct net_device *dev,
 	char buf[128];
 
 	/* TODO: needed parameters: count, keyid, key type, TSC */
-	sprintf(buf, "MLME-MICHAELMICFAILURE.indication(keyid=%d %scast addr="
+	sprintf(buf, "MLME-MICHAELMICFAILURE.indication(keyid =%d %scast addr ="
 		MAC_FMT ")", keyidx, hdr->addr1[0] & 0x01 ? "broad" : "uni",
 		MAC_ARG(hdr->addr2));
 	memset(&wrqu, 0, sizeof(wrqu));
@@ -830,7 +830,7 @@ static int rtllib_michael_mic_verify(struct sk_buff *skb, int keyidx,
 		tkey->rx_hdr[12] = *(skb->data + hdr_len - 2) & 0x07;
 	}
 
-#if ( defined(BUILT_IN_CRYPTO) || ((LINUX_VERSION_CODE < KERNEL_VERSION(2,6,21)) && (!OPENSUSE_SLED)) )
+#if ( defined(BUILT_IN_CRYPTO) || ((LINUX_VERSION_CODE < KERNEL_VERSION(2, 6, 21)) && (!OPENSUSE_SLED)) )
 	if (michael_mic(tkey->rx_tfm_michael, &tkey->key[24], tkey->rx_hdr,
 				skb->data + hdr_len, skb->len - 8 - hdr_len, mic))
 #else
@@ -843,7 +843,7 @@ static int rtllib_michael_mic_verify(struct sk_buff *skb, int keyidx,
 		struct rtllib_hdr_4addr *hdr;
 		hdr = (struct rtllib_hdr_4addr *) skb->data;
 		printk(KERN_DEBUG "%s: Michael MIC verification failed for "
-		       "MSDU from " MAC_FMT " keyidx=%d\n",
+		       "MSDU from " MAC_FMT " keyidx =%d\n",
 		       skb->dev ? skb->dev->name : "N/A", MAC_ARG(hdr->addr2),
 		       keyidx);
                 printk("%d, force_mic_error = %d\n", (memcmp(mic, skb->data + skb->len - 8, 8) != 0),\
@@ -872,7 +872,7 @@ static int rtllib_tkip_set_key(void *key, int len, u8 *seq, void *priv)
 {
 	struct rtllib_tkip_data *tkey = priv;
 	int keyidx;
-#if ( defined(BUILT_IN_CRYPTO) || ((LINUX_VERSION_CODE < KERNEL_VERSION(2,6,21)) && (!OPENSUSE_SLED)) )
+#if ( defined(BUILT_IN_CRYPTO) || ((LINUX_VERSION_CODE < KERNEL_VERSION(2, 6, 21)) && (!OPENSUSE_SLED)) )
 	struct crypto_tfm *tfm = tkey->tx_tfm_michael;
 	struct crypto_tfm *tfm2 = tkey->tx_tfm_arc4;
 	struct crypto_tfm *tfm3 = tkey->rx_tfm_michael;
@@ -887,7 +887,7 @@ static int rtllib_tkip_set_key(void *key, int len, u8 *seq, void *priv)
 	keyidx = tkey->key_idx;
 	memset(tkey, 0, sizeof(*tkey));
 	tkey->key_idx = keyidx;
-#if ( defined(BUILT_IN_CRYPTO) || ((LINUX_VERSION_CODE < KERNEL_VERSION(2,6,21)) && (!OPENSUSE_SLED)) )
+#if ( defined(BUILT_IN_CRYPTO) || ((LINUX_VERSION_CODE < KERNEL_VERSION(2, 6, 21)) && (!OPENSUSE_SLED)) )
 	tkey->tx_tfm_michael = tfm;
 	tkey->tx_tfm_arc4 = tfm2;
 	tkey->rx_tfm_michael = tfm3;
@@ -950,10 +950,10 @@ static int rtllib_tkip_get_key(void *key, int len, u8 *seq, void *priv)
 static char * rtllib_tkip_print_stats(char *p, void *priv)
 {
 	struct rtllib_tkip_data *tkip = priv;
-	p += sprintf(p, "key[%d] alg=TKIP key_set=%d "
-		     "tx_pn=%02x%02x%02x%02x%02x%02x "
-		     "rx_pn=%02x%02x%02x%02x%02x%02x "
-		     "replays=%d icv_errors=%d local_mic_failures=%d\n",
+	p += sprintf(p, "key[%d] alg = TKIP key_set =%d "
+		     "tx_pn =%02x%02x%02x%02x%02x%02x "
+		     "rx_pn =%02x%02x%02x%02x%02x%02x "
+		     "replays =%d icv_errors =%d local_mic_failures =%d\n",
 		     tkip->key_idx, tkip->key_set,
 		     (tkip->tx_iv32 >> 24) & 0xff,
 		     (tkip->tx_iv32 >> 16) & 0xff,

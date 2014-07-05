@@ -29,7 +29,7 @@
 	u32	temp[10];\
 	\
 	memcpy(temp, Address, 40);\
-	for (i = 0; i <40; i+=4)\
+	for (i = 0; i <40; i+= 4)\
 		printk("\r\n %08x", temp[i]);\
 }\
 
@@ -53,7 +53,7 @@
 
 	PTX_FWINFO_8190PCI      pTxFwInfo = NULL;
 
-	RT_TRACE(COMP_CMDPKT,"%s(),buffer_len is %d\n",__FUNCTION__,buffer_len);
+	RT_TRACE(COMP_CMDPKT,"%s(), buffer_len is %d\n", __FUNCTION__, buffer_len);
 	firmware_init_param(dev);
 	frag_threshold = pfirmware->cmdpacket_frag_thresold;
 
@@ -63,7 +63,7 @@
 			bLastIniPkt = 0;
 
 		} else {
-			frag_length =(u16)(buffer_len - frag_offset);
+			frag_length = (u16)(buffer_len - frag_offset);
 			bLastIniPkt = 1;
 		}
 
@@ -74,7 +74,7 @@
 			goto Failed;
 		}
 
-		memcpy((unsigned char *)(skb->cb),&dev,sizeof(dev));
+		memcpy((unsigned char *)(skb->cb),&dev, sizeof(dev));
 		tcb_desc = (cb_desc*)(skb->cb + MAX_DEV_ADDR_SIZE);
 		tcb_desc->queue_index = TXCMD_QUEUE;
 		tcb_desc->bCmdOrInit = DESC_PACKET_TYPE_NORMAL;
@@ -83,13 +83,13 @@
 
 		seg_ptr = skb_put(skb, priv->rtllib->tx_headroom);
 		pTxFwInfo = (PTX_FWINFO_8190PCI)seg_ptr;
-		memset(pTxFwInfo,0,sizeof(TX_FWINFO_8190PCI));
-		memset(pTxFwInfo,0x12,8);
+		memset(pTxFwInfo, 0, sizeof(TX_FWINFO_8190PCI));
+		memset(pTxFwInfo, 0x12, 8);
 
 		seg_ptr = skb_put(skb, frag_length);
 		memcpy(seg_ptr, code_virtual_address, (u32)frag_length);
 
-		priv->rtllib->softmac_hard_start_xmit(skb,dev);
+		priv->rtllib->softmac_hard_start_xmit(skb, dev);
 
 		code_virtual_address += frag_length;
 		frag_offset += frag_length;
@@ -200,7 +200,7 @@ cmdpkt_beacontimerinterrupt_819xusb(
 		}
 		else
 		{
-			tx_rate =10;
+			tx_rate = 10;
 			DMESG("send beacon frame  tx rate is 1Mbpm\n");
 		}
 
@@ -404,7 +404,7 @@ cmpk_message_handle_rx(
 
         RT_TRACE(COMP_CMDPKT, "---->cmpk_message_handle_rx()\n");
 
-	if (/*(prfd->queue_id != CMPK_RX_QUEUE_ID) || */(pstats== NULL))
+	if (/*(prfd->queue_id != CMPK_RX_QUEUE_ID) || */(pstats == NULL))
 	{
 		/* Print error message. */
 		/*RT_TRACE(COMP_SEND, DebugLevel,

@@ -58,7 +58,7 @@ void rtllib_crypt_deinit_entries(struct rtllib_device *ieee,
 		if (entry->ops) {
 			entry->ops->deinit(entry->priv);
 #ifndef BUILT_IN_RTLLIB
-#if LINUX_VERSION_CODE >= KERNEL_VERSION(2,5,0)
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(2, 5, 0)
 			module_put(entry->ops->owner);
 #else
 			__MOD_DEC_USE_COUNT(entry->ops->owner);

@@ -131,8 +131,8 @@ IPSLeave(struct net_device *dev)
 //added by amy 090331
 void IPSLeave_wq(void *data)
 {
-#if (LINUX_VERSION_CODE >= KERNEL_VERSION(2,6,20))
-	struct rtllib_device *ieee = container_of_work_rsl(data,struct rtllib_device,ips_leave_wq);
+#if (LINUX_VERSION_CODE >= KERNEL_VERSION(2, 6, 20))
+	struct rtllib_device *ieee = container_of_work_rsl(data, struct rtllib_device, ips_leave_wq);
 	struct net_device *dev = ieee->dev;
 #else
 	struct net_device *dev = (struct net_device *)data;
@@ -152,11 +152,11 @@ void rtllib_ips_leave_wq(struct net_device *dev)
 		if (rtState == eRfOff){
 			if (priv->rtllib->RfOffReason > RF_CHANGE_BY_IPS)
 			{
-				RT_TRACE(COMP_ERR, "%s(): RF is OFF.\n",__FUNCTION__);
+				RT_TRACE(COMP_ERR, "%s(): RF is OFF.\n", __FUNCTION__);
 				return;
 			}
 			else {
-				printk("=========>%s(): IPSLeave\n",__FUNCTION__);
+				printk("=========>%s(): IPSLeave\n", __FUNCTION__);
 				queue_work_rsl(priv->rtllib->wq,&priv->rtllib->ips_leave_wq);
 			}
 		}
@@ -197,7 +197,7 @@ bool MgntActSet_802_11_PowerSaveMode(struct net_device *dev,	u8 rtPsMode)
 //	Adapter->HalFunc.SetPSModeHandler( Adapter, rtPsMode );
 
 	// Update power save mode configured.
-	RT_TRACE(COMP_LPS,"%s(): set ieee->ps = %x\n",__FUNCTION__,rtPsMode);
+	RT_TRACE(COMP_LPS,"%s(): set ieee->ps = %x\n", __FUNCTION__, rtPsMode);
 	if (!priv->ps_force) {
 		priv->rtllib->ps = rtPsMode;
 	}
@@ -234,8 +234,8 @@ void LeisurePSEnter(struct net_device *dev)
 	PRT_POWER_SAVE_CONTROL pPSC = (PRT_POWER_SAVE_CONTROL)(&(priv->rtllib->PowerSaveControl));
 
 	RT_TRACE(COMP_PS, "LeisurePSEnter()...\n");
-	RT_TRACE(COMP_PS, "pPSC->bLeisurePs = %d, ieee->ps = %d,pPSC->LpsIdleCount is %d,RT_CHECK_FOR_HANG_PERIOD is %d\n",
-		pPSC->bLeisurePs, priv->rtllib->ps,pPSC->LpsIdleCount,RT_CHECK_FOR_HANG_PERIOD);
+	RT_TRACE(COMP_PS, "pPSC->bLeisurePs = %d, ieee->ps = %d, pPSC->LpsIdleCount is %d, RT_CHECK_FOR_HANG_PERIOD is %d\n",
+		pPSC->bLeisurePs, priv->rtllib->ps, pPSC->LpsIdleCount, RT_CHECK_FOR_HANG_PERIOD);
 
 	if (!((priv->rtllib->iw_mode == IW_MODE_INFRA) &&
 	    (priv->rtllib->state == RTLLIB_LINKED)) ||

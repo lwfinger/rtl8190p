@@ -21,7 +21,7 @@
 #include <linux/etherdevice.h>
 #include "rtl819x_TS.h"
 extern void _setup_timer( struct timer_list*, void*, unsigned long);
-#if LINUX_VERSION_CODE < KERNEL_VERSION(2,5,0)
+#if LINUX_VERSION_CODE < KERNEL_VERSION(2, 5, 0)
 #define list_for_each_entry_safe(pos, n, head, member) \
 	for (pos = list_entry((head)->next, typeof(*pos), member), \
 		n = list_entry(pos->member.next, typeof(*pos), member); \
@@ -50,12 +50,12 @@ void RxPktPendingTimeout(unsigned long data)
 
 
 	spin_lock_irqsave(&(ieee->reorder_spinlock), flags);
-	RTLLIB_DEBUG(RTLLIB_DL_REORDER,"==================>%s()\n",__FUNCTION__);
+	RTLLIB_DEBUG(RTLLIB_DL_REORDER,"==================>%s()\n", __FUNCTION__);
 	if (pRxTs->RxTimeoutIndicateSeq != 0xffff)
 	{
 		while (!list_empty(&pRxTs->RxPendingPktList))
 		{
-			pReorderEntry = (PRX_REORDER_ENTRY)list_entry(pRxTs->RxPendingPktList.prev,RX_REORDER_ENTRY,List);
+			pReorderEntry = (PRX_REORDER_ENTRY)list_entry(pRxTs->RxPendingPktList.prev, RX_REORDER_ENTRY, List);
 			if (index == 0)
 				pRxTs->RxIndicateSeq = pReorderEntry->SeqNum;
 
@@ -95,7 +95,7 @@ void RxPktPendingTimeout(unsigned long data)
 
 	}
 
-	if (bPktInBuf && (pRxTs->RxTimeoutIndicateSeq==0xffff))
+	if (bPktInBuf && (pRxTs->RxTimeoutIndicateSeq == 0xffff))
 	{
 		pRxTs->RxTimeoutIndicateSeq = pRxTs->RxIndicateSeq;
 		mod_timer(&pRxTs->RxPktPendingTimer,  jiffies + MSECS(ieee->pHTInfo->RxReorderPendingTime));
@@ -227,7 +227,7 @@ void AdmitTS(struct rtllib_device *ieee, PTS_COMMON_INFO pTsCommonInfo, u32 Inac
 	del_timer_sync(&pTsCommonInfo->SetupTimer);
 	del_timer_sync(&pTsCommonInfo->InactTimer);
 
-	if (InactTime!=0)
+	if (InactTime!= 0)
 		mod_timer(&pTsCommonInfo->InactTimer, jiffies + MSECS(InactTime));
 }
 
@@ -281,7 +281,7 @@ PTS_COMMON_INFO SearchAdmitTRStream(struct rtllib_device *ieee, u8*	Addr, u8 TID
 
 	for (dir = 0; dir <= DIR_BI_DIR; dir++)
 	{
-		if (search_dir[dir] ==false )
+		if (search_dir[dir] == false )
 			continue;
 		list_for_each_entry(pRet, psearch_list, List){
 			if (memcmp(pRet->Addr, Addr, 6) == 0)
@@ -409,14 +409,14 @@ bool GetTs(
 								(&ieee->Rx_TS_Admit_List);
 
 			DIRECTION_VALUE		Dir =		(ieee->iw_mode == IW_MODE_MASTER)?
-								((TxRxSelect==TX_DIR)?DIR_DOWN:DIR_UP):
-								((TxRxSelect==TX_DIR)?DIR_UP:DIR_DOWN);
+								((TxRxSelect == TX_DIR)?DIR_DOWN:DIR_UP):
+								((TxRxSelect == TX_DIR)?DIR_UP:DIR_DOWN);
 			RTLLIB_DEBUG(RTLLIB_DL_TS, "to add Ts\n");
 			if (!list_empty(pUnusedList))
 			{
 				(*ppTS) = list_entry(pUnusedList->next, TS_COMMON_INFO, List);
 				list_del_init(&(*ppTS)->List);
-				if (TxRxSelect==TX_DIR)
+				if (TxRxSelect == TX_DIR)
 				{
 					PTX_TS_RECORD tmp = container_of(*ppTS, TX_TS_RECORD, TsCommonInfo);
 					ResetTxTsEntry(tmp);
@@ -445,7 +445,7 @@ bool GetTs(
 			}
 			else
 			{
-				RTLLIB_DEBUG(RTLLIB_DL_ERR, "ERR!!in function %s() There is not enough dir=%d(0=up down=1) TS record to be used!!", __FUNCTION__,Dir);
+				RTLLIB_DEBUG(RTLLIB_DL_ERR, "ERR!!in function %s() There is not enough dir =%d(0 = up down = 1) TS record to be used!!", __FUNCTION__, Dir);
 				return false;
 			}
 		}
@@ -473,7 +473,7 @@ void RemoveTsEntry(
                 while (!list_empty(&pRxTS->RxPendingPktList))
                 {
                         spin_lock_irqsave(&(ieee->reorder_spinlock), flags);
-			pRxReorderEntry = (PRX_REORDER_ENTRY)list_entry(pRxTS->RxPendingPktList.prev,RX_REORDER_ENTRY,List);
+			pRxReorderEntry = (PRX_REORDER_ENTRY)list_entry(pRxTS->RxPendingPktList.prev, RX_REORDER_ENTRY, List);
                         list_del_init(&pRxReorderEntry->List);
                         {
                                 int i = 0;
@@ -483,7 +483,7 @@ void RemoveTsEntry(
 					spin_unlock_irqrestore(&(ieee->reorder_spinlock), flags);
 					return;
 				}
-                                for (i =0; i < prxb->nr_subframes; i++) {
+                                for (i = 0; i < prxb->nr_subframes; i++) {
                                         dev_kfree_skb(prxb->subframes[i]);
                                 }
                                 kfree(prxb);
@@ -589,7 +589,7 @@ void TsStartAddBaProcess(struct rtllib_device* ieee, PTX_TS_RECORD	pTxTS)
 		}
 	}
 	else
-		RTLLIB_DEBUG(RTLLIB_DL_ERR, "%s()==>BA timer is already added\n", __FUNCTION__);
+		RTLLIB_DEBUG(RTLLIB_DL_ERR, "%s() ==>BA timer is already added\n", __FUNCTION__);
 }
 #ifndef BUILT_IN_RTLLIB
 EXPORT_SYMBOL_RSL(RemovePeerTS);

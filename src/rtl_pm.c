@@ -66,7 +66,7 @@ int rtl8192E_suspend (struct pci_dev *pdev, pm_message_t state)
 		MgntActSet_RF_State(dev, eRfOff, RF_CHANGE_BY_INIT);
 		// 2006.11.30. System reset bit
 		ulRegRead = read_nic_dword(dev, CPU_GEN);
-		ulRegRead|=CPU_GEN_SYSTEM_RESET;
+		ulRegRead|= CPU_GEN_SYSTEM_RESET;
 		write_nic_dword(dev, CPU_GEN, ulRegRead);
 	} else {
 		//2008.06.03 for WOL
@@ -90,9 +90,9 @@ out_pci_suspend:
 	}
 	pci_save_state(pdev);
 	pci_disable_device(pdev);
-	pci_enable_wake(pdev, pci_choose_state(pdev,state),\
+	pci_enable_wake(pdev, pci_choose_state(pdev, state),\
 			priv->rtllib->bSupportRemoteWakeUp?1:0);
-	pci_set_power_state(pdev,pci_choose_state(pdev,state));
+	pci_set_power_state(pdev, pci_choose_state(pdev, state));
 
         //lzm 090331 for no UI hibernate crash issue
         mdelay(20);
@@ -153,7 +153,7 @@ int rtl8192E_resume (struct pci_dev *pdev)
     dev->open(dev);
 #endif
 out:
-    RT_TRACE(COMP_POWER, "<================r8192E resume call.\n");
+    RT_TRACE(COMP_POWER, "<================ r8192E resume call.\n");
     return 0;
 }
 

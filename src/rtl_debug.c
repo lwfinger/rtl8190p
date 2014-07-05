@@ -33,17 +33,17 @@
 void print_buffer(u32 *buffer, int len)
 {
 	int i;
-	u8 *buf =(u8*)buffer;
+	u8 *buf = (u8*)buffer;
 
-	printk("ASCII BUFFER DUMP (len: %x):\n",len);
+	printk("ASCII BUFFER DUMP (len: %x):\n", len);
 
-	for (i=0;i<len;i++)
-		printk("%c",buf[i]);
+	for (i = 0;i<len;i++)
+		printk("%c", buf[i]);
 
-	printk("\nBINARY BUFFER DUMP (len: %x):\n",len);
+	printk("\nBINARY BUFFER DUMP (len: %x):\n", len);
 
-	for (i=0;i<len;i++)
-		printk("%x",buf[i]);
+	for (i = 0;i<len;i++)
+		printk("%x", buf[i]);
 
 	printk("\n");
 }
@@ -54,7 +54,7 @@ void dump_eprom(struct net_device *dev)
 	int i;
 
 	for (i = 0; i < 0xff; i++) {
-		RT_TRACE(COMP_INIT, "EEPROM addr %x : %x", i, eprom_read(dev,i));
+		RT_TRACE(COMP_INIT, "EEPROM addr %x : %x", i, eprom_read(dev, i));
 	}
 }
 
@@ -155,7 +155,7 @@ static ssize_t rtl_dbgfs_register_read(struct file *file,
 	struct net_device *dev = priv->rtllib->dev;
 	ssize_t ret = 0;
 	char buf[2048];
-	int n,i;
+	int n, i;
 	u32 len = 0;
 	u32 max = 0xff;
 	u32 page_no, path;
@@ -165,24 +165,24 @@ static ssize_t rtl_dbgfs_register_read(struct file *file,
 
 	if (!priv->debug->hw_type) {
 		page_no = (priv->debug->hw_offset > 0x0f)? 0x0f: priv->debug->hw_offset;
-		len += snprintf(buf + len,count - len,
+		len += snprintf(buf + len, count - len,
 				"\n#################### MAC page- %x##################\n ", page_no);
-		for (n=0;n<=max;) {
-			len += snprintf(buf + len, count - len, "\nD:  %2x > ",n);
-			for (i=0;i<16 && n<=max;i++,n++)
+		for (n = 0;n<= max;) {
+			len += snprintf(buf + len, count - len, "\nD:  %2x > ", n);
+			for (i = 0;i<16 && n<= max;i++, n++)
 				len += snprintf(buf + len, count - len,
-						"%2.2x ",read_nic_byte(dev,((page_no<<8)|n)));
+						"%2.2x ", read_nic_byte(dev, ((page_no<<8)|n)));
 		}
 	} else {
 		path = (priv->debug->hw_offset < RF90_PATH_MAX)? priv->debug->hw_offset:(RF90_PATH_MAX - 1);
 		//RF path
 		len += snprintf(buf + len, count - len,
 				"\n#################### RF-PATH-%x ##################\n ", 0x0a+path);
-		for (n=0;n<=max;) {
-			len += snprintf(buf+ len, count - len, "\nD:  %2x > ",n);
-			for (i=0;i<4 && n<=max;n+=4,i++)
+		for (n = 0;n<= max;) {
+			len += snprintf(buf+ len, count - len, "\nD:  %2x > ", n);
+			for (i = 0;i<4 && n<= max;n+= 4, i++)
 				len += snprintf(buf + len, count - len,
-					"%8.8x ",rtl8192_phy_QueryRFReg(dev, (RF90_RADIO_PATH_E)path,\
+					"%8.8x ", rtl8192_phy_QueryRFReg(dev, (RF90_RADIO_PATH_E)path,\
 						n, bMaskDWord));
 		}
 	}
@@ -209,11 +209,11 @@ int rtl_debug_module_init(struct r8192_priv *priv, const char *name)
 	if (!rtl_debugfs_root)
 		return -ENOENT;
 
-#if (LINUX_VERSION_CODE > KERNEL_VERSION(2,6,13))
+#if (LINUX_VERSION_CODE > KERNEL_VERSION(2, 6, 13))
 	debug = kzalloc(sizeof(rtl_fs_debug), GFP_KERNEL);
 #else
 	rtl_fs_debug = kmalloc(sizeof(*rtl_fs_debug), GFP_KERNEL);
-	memset(rtl_fs_debug,0,sizeof(*rtl_fs_debug));
+	memset(rtl_fs_debug, 0, sizeof(*rtl_fs_debug));
 #endif
 	if (!debug) {
 		ret = -ENOMEM;
@@ -313,18 +313,18 @@ static int proc_get_registers_0(char *page, char **start,
 	struct net_device *dev = data;
 
 	int len = 0;
-	int i,n,page0;
+	int i, n, page0;
 
-	int max=0xff;
+	int max = 0xff;
 	page0 = 0x000;
 
 	len += snprintf(page + len, count - len,
 			"\n####################page %x##################\n ", (page0>>8));
-	for (n=0;n<=max;) {
-		len += snprintf(page + len, count - len, "\nD:  %2x > ",n);
-		for (i=0;i<16 && n<=max;n++,i++)
+	for (n = 0;n<= max;) {
+		len += snprintf(page + len, count - len, "\nD:  %2x > ", n);
+		for (i = 0;i<16 && n<= max;n++, i++)
 			len += snprintf(page + len, count - len,
-					"%2.2x ",read_nic_byte(dev,(page0|n)));
+					"%2.2x ", read_nic_byte(dev, (page0|n)));
 	}
 	len += snprintf(page + len, count - len,"\n");
 	*eof = 1;
@@ -338,21 +338,21 @@ static int proc_get_registers_1(char *page, char **start,
 	struct net_device *dev = data;
 
 	int len = 0;
-	int i,n,page0;
+	int i, n, page0;
 
-	int max=0xff;
+	int max = 0xff;
 	page0 = 0x100;
 
 	/* This dump the current register page */
 	len += snprintf(page + len, count - len,
 			"\n####################page %x##################\n ", (page0>>8));
-	for (n=0;n<=max;)
+	for (n = 0;n<= max;)
 	{
 		len += snprintf(page + len, count - len,
-				"\nD:  %2x > ",n);
-		for (i=0;i<16 && n<=max;i++,n++)
+				"\nD:  %2x > ", n);
+		for (i = 0;i<16 && n<= max;i++, n++)
 			len += snprintf(page + len, count - len,
-					"%2.2x ",read_nic_byte(dev,(page0|n)));
+					"%2.2x ", read_nic_byte(dev, (page0|n)));
 	}
 	len += snprintf(page + len, count - len,"\n");
 	*eof = 1;
@@ -366,21 +366,21 @@ static int proc_get_registers_2(char *page, char **start,
 	struct net_device *dev = data;
 
 	int len = 0;
-	int i,n,page0;
+	int i, n, page0;
 
-	int max=0xff;
+	int max = 0xff;
 	page0 = 0x200;
 
 	/* This dump the current register page */
 	len += snprintf(page + len, count - len,
 			"\n####################page %x##################\n ", (page0>>8));
-	for (n=0;n<=max;)
+	for (n = 0;n<= max;)
 	{
 		len += snprintf(page + len, count - len,
-				"\nD:  %2x > ",n);
-		for (i=0;i<16 && n<=max;i++,n++)
+				"\nD:  %2x > ", n);
+		for (i = 0;i<16 && n<= max;i++, n++)
 			len += snprintf(page + len, count - len,
-					"%2.2x ",read_nic_byte(dev,(page0|n)));
+					"%2.2x ", read_nic_byte(dev, (page0|n)));
 	}
 	len += snprintf(page + len, count - len,"\n");
 	*eof = 1;
@@ -394,21 +394,21 @@ static int proc_get_registers_3(char *page, char **start,
 	struct net_device *dev = data;
 
 	int len = 0;
-	int i,n,page0;
+	int i, n, page0;
 
-	int max=0xff;
+	int max = 0xff;
 	page0 = 0x300;
 
 	/* This dump the current register page */
 	len += snprintf(page + len, count - len,
 			"\n####################page %x##################\n ", (page0>>8));
-	for (n=0;n<=max;)
+	for (n = 0;n<= max;)
 	{
 		len += snprintf(page + len, count - len,
-				"\nD:  %2x > ",n);
-		for (i=0;i<16 && n<=max;i++,n++)
+				"\nD:  %2x > ", n);
+		for (i = 0;i<16 && n<= max;i++, n++)
 			len += snprintf(page + len, count - len,
-					"%2.2x ",read_nic_byte(dev,(page0|n)));
+					"%2.2x ", read_nic_byte(dev, (page0|n)));
 	}
 	len += snprintf(page + len, count - len,"\n");
 	*eof = 1;
@@ -422,21 +422,21 @@ static int proc_get_registers_4(char *page, char **start,
 	struct net_device *dev = data;
 
 	int len = 0;
-	int i,n,page0;
+	int i, n, page0;
 
-	int max=0xff;
+	int max = 0xff;
 	page0 = 0x400;
 
 	/* This dump the current register page */
 	len += snprintf(page + len, count - len,
 			"\n####################page %x##################\n ", (page0>>8));
-	for (n=0;n<=max;)
+	for (n = 0;n<= max;)
 	{
 		len += snprintf(page + len, count - len,
-				"\nD:  %2x > ",n);
-		for (i=0;i<16 && n<=max;i++,n++)
+				"\nD:  %2x > ", n);
+		for (i = 0;i<16 && n<= max;i++, n++)
 			len += snprintf(page + len, count - len,
-					"%2.2x ",read_nic_byte(dev,(page0|n)));
+					"%2.2x ", read_nic_byte(dev, (page0|n)));
 	}
 	len += snprintf(page + len, count - len,"\n");
 	*eof = 1;
@@ -450,21 +450,21 @@ static int proc_get_registers_5(char *page, char **start,
         struct net_device *dev = data;
 
         int len = 0;
-        int i,n,page0;
+        int i, n, page0;
 
-        int max=0xff;
+        int max = 0xff;
         page0 = 0x500;
 
         /* This dump the current register page */
         len += snprintf(page + len, count - len,
                         "\n####################page %x##################\n ", (page0>>8));
-        for (n=0;n<=max;)
+        for (n = 0;n<= max;)
         {
                 len += snprintf(page + len, count - len,
-                                "\nD:  %2x > ",n);
-                for (i=0;i<16 && n<=max;i++,n++)
+                                "\nD:  %2x > ", n);
+                for (i = 0;i<16 && n<= max;i++, n++)
                         len += snprintf(page + len, count - len,
-                                        "%2.2x ",read_nic_byte(dev,(page0|n)));
+                                        "%2.2x ", read_nic_byte(dev, (page0|n)));
         }
         len += snprintf(page + len, count - len,"\n");
         *eof = 1;
@@ -478,21 +478,21 @@ static int proc_get_registers_6(char *page, char **start,
         struct net_device *dev = data;
 
         int len = 0;
-        int i,n,page0;
+        int i, n, page0;
 
-        int max=0xff;
+        int max = 0xff;
         page0 = 0x600;
 
         /* This dump the current register page */
         len += snprintf(page + len, count - len,
                         "\n####################page %x##################\n ", (page0>>8));
-        for (n=0;n<=max;)
+        for (n = 0;n<= max;)
         {
                 len += snprintf(page + len, count - len,
-                                "\nD:  %2x > ",n);
-                for (i=0;i<16 && n<=max;i++,n++)
+                                "\nD:  %2x > ", n);
+                for (i = 0;i<16 && n<= max;i++, n++)
                         len += snprintf(page + len, count - len,
-                                        "%2.2x ",read_nic_byte(dev,(page0|n)));
+                                        "%2.2x ", read_nic_byte(dev, (page0|n)));
         }
         len += snprintf(page + len, count - len,"\n");
         *eof = 1;
@@ -506,21 +506,21 @@ static int proc_get_registers_7(char *page, char **start,
         struct net_device *dev = data;
 
         int len = 0;
-        int i,n,page0;
+        int i, n, page0;
 
-        int max=0xff;
+        int max = 0xff;
         page0 = 0x700;
 
         /* This dump the current register page */
         len += snprintf(page + len, count - len,
                         "\n####################page %x##################\n ", (page0>>8));
-        for (n=0;n<=max;)
+        for (n = 0;n<= max;)
         {
                 len += snprintf(page + len, count - len,
-                                "\nD:  %2x > ",n);
-                for (i=0;i<16 && n<=max;i++,n++)
+                                "\nD:  %2x > ", n);
+                for (i = 0;i<16 && n<= max;i++, n++)
                         len += snprintf(page + len, count - len,
-                                        "%2.2x ",read_nic_byte(dev,(page0|n)));
+                                        "%2.2x ", read_nic_byte(dev, (page0|n)));
         }
         len += snprintf(page + len, count - len,"\n");
         *eof = 1;
@@ -534,20 +534,20 @@ static int proc_get_registers_8(char *page, char **start,
 	struct net_device *dev = data;
 
 	int len = 0;
-	int i,n,page0;
+	int i, n, page0;
 
-	int max=0xff;
+	int max = 0xff;
 	page0 = 0x800;
 
 	/* This dump the current register page */
 	len += snprintf(page + len, count - len,
 			"\n####################page %x##################\n ", (page0>>8));
-	for (n=0;n<=max;)
+	for (n = 0;n<= max;)
 	{
-		len += snprintf(page + len, count - len, "\nD:  %2x > ",n);
-		for (i=0;i<4 && n<=max;n+=4,i++)
+		len += snprintf(page + len, count - len, "\nD:  %2x > ", n);
+		for (i = 0;i<4 && n<= max;n+= 4, i++)
 			len += snprintf(page + len, count - len,
-					"%8.8x ",rtl8192_QueryBBReg(dev,(page0|n), bMaskDWord));
+					"%8.8x ", rtl8192_QueryBBReg(dev, (page0|n), bMaskDWord));
 	}
 	len += snprintf(page + len, count - len,"\n");
 	*eof = 1;
@@ -561,20 +561,20 @@ static int proc_get_registers_9(char *page, char **start,
 	struct net_device *dev = data;
 
 	int len = 0;
-	int i,n,page0;
+	int i, n, page0;
 
-	int max=0xff;
+	int max = 0xff;
 	page0 = 0x900;
 
 	/* This dump the current register page */
 	len += snprintf(page + len, count - len,
 			"\n####################page %x##################\n ", (page0>>8));
-	for (n=0;n<=max;)
+	for (n = 0;n<= max;)
 	{
-		len += snprintf(page + len, count - len, "\nD:  %2x > ",n);
-		for (i=0;i<4 && n<=max;n+=4,i++)
+		len += snprintf(page + len, count - len, "\nD:  %2x > ", n);
+		for (i = 0;i<4 && n<= max;n+= 4, i++)
 			len += snprintf(page + len, count - len,
-					"%8.8x ",rtl8192_QueryBBReg(dev,(page0|n), bMaskDWord));
+					"%8.8x ", rtl8192_QueryBBReg(dev, (page0|n), bMaskDWord));
 	}
 	len += snprintf(page + len, count - len,"\n");
 	*eof = 1;
@@ -587,20 +587,20 @@ static int proc_get_registers_a(char *page, char **start,
 	struct net_device *dev = data;
 
 	int len = 0;
-	int i,n,page0;
+	int i, n, page0;
 
-	int max=0xff;
+	int max = 0xff;
 	page0 = 0xa00;
 
 	/* This dump the current register page */
 	len += snprintf(page + len, count - len,
 			"\n####################page %x##################\n ", (page0>>8));
-	for (n=0;n<=max;)
+	for (n = 0;n<= max;)
 	{
-		len += snprintf(page + len, count - len, "\nD:  %2x > ",n);
-		for (i=0;i<4 && n<=max;n+=4,i++)
+		len += snprintf(page + len, count - len, "\nD:  %2x > ", n);
+		for (i = 0;i<4 && n<= max;n+= 4, i++)
 			len += snprintf(page + len, count - len,
-					"%8.8x ",rtl8192_QueryBBReg(dev,(page0|n), bMaskDWord));
+					"%8.8x ", rtl8192_QueryBBReg(dev, (page0|n), bMaskDWord));
 	}
 	len += snprintf(page + len, count - len,"\n");
 	*eof = 1;
@@ -613,20 +613,20 @@ static int proc_get_registers_b(char *page, char **start,
 	struct net_device *dev = data;
 
 	int len = 0;
-	int i,n,page0;
+	int i, n, page0;
 
-	int max=0xff;
+	int max = 0xff;
 	page0 = 0xb00;
 
 	/* This dump the current register page */
 	len += snprintf(page + len, count - len,
 			"\n####################page %x##################\n ", (page0>>8));
-	for (n=0;n<=max;)
+	for (n = 0;n<= max;)
 	{
-		len += snprintf(page + len, count - len, "\nD:  %2x > ",n);
-		for (i=0;i<4 && n<=max;n+=4,i++)
+		len += snprintf(page + len, count - len, "\nD:  %2x > ", n);
+		for (i = 0;i<4 && n<= max;n+= 4, i++)
 			len += snprintf(page + len, count - len,
-					"%8.8x ",rtl8192_QueryBBReg(dev,(page0|n), bMaskDWord));
+					"%8.8x ", rtl8192_QueryBBReg(dev, (page0|n), bMaskDWord));
 	}
 	len += snprintf(page + len, count - len,"\n");
 	*eof = 1;
@@ -639,20 +639,20 @@ static int proc_get_registers_c(char *page, char **start,
 	struct net_device *dev = data;
 
 	int len = 0;
-	int i,n,page0;
+	int i, n, page0;
 
-	int max=0xff;
+	int max = 0xff;
 	page0 = 0xc00;
 
 	/* This dump the current register page */
 	len += snprintf(page + len, count - len,
 			"\n####################page %x##################\n ", (page0>>8));
-	for (n=0;n<=max;)
+	for (n = 0;n<= max;)
 	{
-		len += snprintf(page + len, count - len, "\nD:  %2x > ",n);
-		for (i=0;i<4 && n<=max;n+=4,i++)
+		len += snprintf(page + len, count - len, "\nD:  %2x > ", n);
+		for (i = 0;i<4 && n<= max;n+= 4, i++)
 			len += snprintf(page + len, count - len,
-					"%8.8x ",rtl8192_QueryBBReg(dev,(page0|n), bMaskDWord));
+					"%8.8x ", rtl8192_QueryBBReg(dev, (page0|n), bMaskDWord));
 	}
 	len += snprintf(page + len, count - len,"\n");
 	*eof = 1;
@@ -665,20 +665,20 @@ static int proc_get_registers_d(char *page, char **start,
 	struct net_device *dev = data;
 
 	int len = 0;
-	int i,n,page0;
+	int i, n, page0;
 
-	int max=0xff;
+	int max = 0xff;
 	page0 = 0xd00;
 
 	/* This dump the current register page */
 	len += snprintf(page + len, count - len,
 			"\n####################page %x##################\n ", (page0>>8));
-	for (n=0;n<=max;)
+	for (n = 0;n<= max;)
 	{
-		len += snprintf(page + len, count - len, "\nD:  %2x > ",n);
-		for (i=0;i<4 && n<=max;n+=4,i++)
+		len += snprintf(page + len, count - len, "\nD:  %2x > ", n);
+		for (i = 0;i<4 && n<= max;n+= 4, i++)
 			len += snprintf(page + len, count - len,
-					"%8.8x ",rtl8192_QueryBBReg(dev,(page0|n), bMaskDWord));
+					"%8.8x ", rtl8192_QueryBBReg(dev, (page0|n), bMaskDWord));
 	}
 	len += snprintf(page + len, count - len,"\n");
 	*eof = 1;
@@ -691,20 +691,20 @@ static int proc_get_registers_e(char *page, char **start,
 	struct net_device *dev = data;
 
 	int len = 0;
-	int i,n,page0;
+	int i, n, page0;
 
-	int max=0xff;
+	int max = 0xff;
 	page0 = 0xe00;
 
 	/* This dump the current register page */
 	len += snprintf(page + len, count - len,
 			"\n####################page %x##################\n ", (page0>>8));
-	for (n=0;n<=max;)
+	for (n = 0;n<= max;)
 	{
-		len += snprintf(page + len, count - len, "\nD:  %2x > ",n);
-		for (i=0;i<4 && n<=max;n+=4,i++)
+		len += snprintf(page + len, count - len, "\nD:  %2x > ", n);
+		for (i = 0;i<4 && n<= max;n+= 4, i++)
 			len += snprintf(page + len, count - len,
-					"%8.8x ",rtl8192_QueryBBReg(dev,(page0|n), bMaskDWord));
+					"%8.8x ", rtl8192_QueryBBReg(dev, (page0|n), bMaskDWord));
 	}
 	len += snprintf(page + len, count - len,"\n");
 	*eof = 1;
@@ -718,19 +718,19 @@ static int proc_get_reg_rf_a(char *page, char **start,
 	struct net_device *dev = data;
 
 	int len = 0;
-	int i,n;
+	int i, n;
 
-	int max=0xff;
+	int max = 0xff;
 
 	/* This dump the current register page */
 	len += snprintf(page + len, count - len,
 			"\n#################### RF-A ##################\n ");
-	for (n=0;n<=max;)
+	for (n = 0;n<= max;)
 	{
-		len += snprintf(page + len, count - len, "\nD:  %2x > ",n);
-		for (i=0;i<4 && n<=max;n+=4,i++)
+		len += snprintf(page + len, count - len, "\nD:  %2x > ", n);
+		for (i = 0;i<4 && n<= max;n+= 4, i++)
 			len += snprintf(page + len, count - len,
-					"%8.8x ",rtl8192_phy_QueryRFReg(dev, (RF90_RADIO_PATH_E)RF90_PATH_A,n, bMaskDWord));
+					"%8.8x ", rtl8192_phy_QueryRFReg(dev, (RF90_RADIO_PATH_E)RF90_PATH_A, n, bMaskDWord));
 	}
 	len += snprintf(page + len, count - len,"\n");
 	*eof = 1;
@@ -744,19 +744,19 @@ static int proc_get_reg_rf_b(char *page, char **start,
 	struct net_device *dev = data;
 
 	int len = 0;
-	int i,n;
+	int i, n;
 
-	int max=0xff;
+	int max = 0xff;
 
 	/* This dump the current register page */
 	len += snprintf(page + len, count - len,
 			"\n#################### RF-B ##################\n ");
-	for (n=0;n<=max;)
+	for (n = 0;n<= max;)
 	{
-		len += snprintf(page + len, count - len, "\nD:  %2x > ",n);
-		for (i=0;i<4 && n<=max;n+=4,i++)
+		len += snprintf(page + len, count - len, "\nD:  %2x > ", n);
+		for (i = 0;i<4 && n<= max;n+= 4, i++)
 			len += snprintf(page + len, count - len,
-					"%8.8x ",rtl8192_phy_QueryRFReg(dev, (RF90_RADIO_PATH_E)RF90_PATH_B, n, bMaskDWord));
+					"%8.8x ", rtl8192_phy_QueryRFReg(dev, (RF90_RADIO_PATH_E)RF90_PATH_B, n, bMaskDWord));
 	}
 	len += snprintf(page + len, count - len,"\n");
 	*eof = 1;
@@ -770,19 +770,19 @@ static int proc_get_reg_rf_c(char *page, char **start,
 	struct net_device *dev = data;
 
 	int len = 0;
-	int i,n;
+	int i, n;
 
-	int max=0xff;
+	int max = 0xff;
 
 	/* This dump the current register page */
 	len += snprintf(page + len, count - len,
 			"\n#################### RF-C ##################\n ");
-	for (n=0;n<=max;)
+	for (n = 0;n<= max;)
 	{
-		len += snprintf(page + len, count - len, "\nD:  %2x > ",n);
-		for (i=0;i<4 && n<=max;n+=4,i++)
+		len += snprintf(page + len, count - len, "\nD:  %2x > ", n);
+		for (i = 0;i<4 && n<= max;n+= 4, i++)
 			len += snprintf(page + len, count - len,
-					"%8.8x ",rtl8192_phy_QueryRFReg(dev, (RF90_RADIO_PATH_E)RF90_PATH_C, n, bMaskDWord));
+					"%8.8x ", rtl8192_phy_QueryRFReg(dev, (RF90_RADIO_PATH_E)RF90_PATH_C, n, bMaskDWord));
 	}
 	len += snprintf(page + len, count - len,"\n");
 	*eof = 1;
@@ -796,19 +796,19 @@ static int proc_get_reg_rf_d(char *page, char **start,
 	struct net_device *dev = data;
 
 	int len = 0;
-	int i,n;
+	int i, n;
 
-	int max=0xff;
+	int max = 0xff;
 
 	/* This dump the current register page */
 	len += snprintf(page + len, count - len,
 			"\n#################### RF-D ##################\n ");
-	for (n=0;n<=max;)
+	for (n = 0;n<= max;)
 	{
-		len += snprintf(page + len, count - len, "\nD:  %2x > ",n);
-		for (i=0;i<4 && n<=max;n+=4,i++)
+		len += snprintf(page + len, count - len, "\nD:  %2x > ", n);
+		for (i = 0;i<4 && n<= max;n+= 4, i++)
 			len += snprintf(page + len, count - len,
-					"%8.8x ",rtl8192_phy_QueryRFReg(dev, (RF90_RADIO_PATH_E)RF90_PATH_D, n, bMaskDWord));
+					"%8.8x ", rtl8192_phy_QueryRFReg(dev, (RF90_RADIO_PATH_E)RF90_PATH_D, n, bMaskDWord));
 	}
 	len += snprintf(page + len, count - len,"\n");
 	*eof = 1;
@@ -820,29 +820,29 @@ static int proc_get_cam_register(char *page, char **start,
 			  int *eof, void *data)
 {
 	struct net_device *dev = data;
-	u32 target_command=0;
-	u32 target_content=0;
-	u8 entry_i=0;
+	u32 target_command = 0;
+	u32 target_content = 0;
+	u8 entry_i = 0;
 	u32 ulStatus;
 	int len = 0;
-	int i=100, j = 0;
+	int i = 100, j = 0;
 
 	/* This dump the current register page */
 	len += snprintf(page + len, count - len,
 				"\n#################### SECURITY CAM ##################\n ");
-	for (j=0; j<TOTAL_CAM_ENTRY; j++)
+	for (j = 0; j<TOTAL_CAM_ENTRY; j++)
 	{
 		if ((j>6) && (j<31))
 			continue;
-		len += snprintf(page + len, count - len, "\nD:  %2x > ",j);
-		for (entry_i=0;entry_i<CAM_CONTENT_COUNT;entry_i++)
+		len += snprintf(page + len, count - len, "\nD:  %2x > ", j);
+		for (entry_i = 0;entry_i<CAM_CONTENT_COUNT;entry_i++)
 		{
 			// polling bit, and No Write enable, and address
-			target_command= entry_i+CAM_CONTENT_COUNT*j;
-			target_command= target_command | BIT31;
+			target_command = entry_i+CAM_CONTENT_COUNT*j;
+			target_command = target_command | BIT31;
 
 			//Check polling bit is clear
-			while ((i--)>=0)
+			while ((i--)>= 0)
 			{
 				ulStatus = read_nic_dword(dev, RWCAM);
 				if (ulStatus & BIT31){
@@ -854,7 +854,7 @@ static int proc_get_cam_register(char *page, char **start,
 			}
 			write_nic_dword(dev, RWCAM, target_command);
 			target_content = read_nic_dword(dev, RCAMO);
-			len += snprintf(page + len, count - len,"%8.8x ",target_content);
+			len += snprintf(page + len, count - len,"%8.8x ", target_content);
 		}
 	}
 

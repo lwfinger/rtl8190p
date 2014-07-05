@@ -29,7 +29,7 @@
 
 #include "rtl_core.h"
 
-#if LINUX_VERSION_CODE > KERNEL_VERSION(2,5,0)
+#if LINUX_VERSION_CODE > KERNEL_VERSION(2, 5, 0)
 static void rtl819x_ethtool_get_drvinfo(struct net_device *dev,
 		struct ethtool_drvinfo *info)
 {

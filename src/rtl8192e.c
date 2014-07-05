@@ -34,7 +34,7 @@
 extern int WDCAPARA_ADD[];
 
 void
-rtl8192e_SetHwReg(struct net_device *dev,u8 variable,u8* val)
+rtl8192e_SetHwReg(struct net_device *dev, u8 variable, u8* val)
 {
 	struct r8192_priv* priv = rtllib_priv(dev);
 
@@ -88,7 +88,7 @@ rtl8192e_SetHwReg(struct net_device *dev,u8 variable,u8* val)
 
 			Type = ((u8*)(val))[0];
 			//priv->rtllib->GetHwRegHandler(dev, HW_VAR_RCR, (u8*)(&RegRCR));
-			RegRCR = read_nic_dword(dev,RCR);
+			RegRCR = read_nic_dword(dev, RCR);
 			priv->ReceiveConfig = RegRCR;
 
 			if (Type == true)
@@ -97,7 +97,7 @@ rtl8192e_SetHwReg(struct net_device *dev,u8 variable,u8* val)
 				RegRCR &= (~RCR_CBSSID);
 
 			//priv->rtllib->SetHwRegHandler( dev, HW_VAR_RCR, (u8*)(&RegRCR) );
-			write_nic_dword(dev, RCR,RegRCR);
+			write_nic_dword(dev, RCR, RegRCR);
 			priv->ReceiveConfig = RegRCR;
 
 		}
@@ -114,7 +114,7 @@ static void rtl8192_read_eeprom_info(struct net_device* dev)
 	struct r8192_priv *priv = rtllib_priv(dev);
 
 	u8			tempval;
-	u16			i,usValue, IC_Version;
+	u16			i, usValue, IC_Version;
 	u16			EEPROMId;
 	u8			offset;//, tmpAFR;
 	u8			EepromTxPower[100];
@@ -129,11 +129,11 @@ static void rtl8192_read_eeprom_info(struct net_device* dev)
 	if ( EEPROMId != RTL8190_EEPROM_ID )
 	{
 		RT_TRACE(COMP_ERR, "EEPROM ID is invalid:%x, %x\n", EEPROMId, RTL8190_EEPROM_ID);
-		priv->AutoloadFailFlag=true;
+		priv->AutoloadFailFlag = true;
 	}
 	else
 	{
-		priv->AutoloadFailFlag=false;
+		priv->AutoloadFailFlag = false;
 	}
 
 	//
@@ -203,7 +203,7 @@ static void rtl8192_read_eeprom_info(struct net_device* dev)
 		priv->bTXPowerDataReadFromEEPORM = false;
 	}
 
-	// 2007/11/15 MH 8190PCI Default=2T4R, 8192PCIE dafault=1T2R
+	// 2007/11/15 MH 8190PCI Default = 2T4R, 8192PCIE dafault = 1T2R
 	priv->rf_type = RTL819X_DEFAULT_RF_TYPE;
 
 	if (priv->card_8192_version > VERSION_8190_BD)
@@ -259,7 +259,7 @@ static void rtl8192_read_eeprom_info(struct net_device* dev)
 		//
 		// Get per-channel Tx Power Level
 		//
-		for (i=0; i<14; i+=2)
+		for (i = 0; i<14; i+= 2)
 		{
 			if (!priv->AutoloadFailFlag)
 			{
@@ -273,7 +273,7 @@ static void rtl8192_read_eeprom_info(struct net_device* dev)
 			RT_TRACE(COMP_INIT,"CCK Tx Power Level, Index %d = 0x%02x\n", i, priv->EEPROMTxPowerLevelCCK[i]);
 			RT_TRACE(COMP_INIT, "CCK Tx Power Level, Index %d = 0x%02x\n", i+1, priv->EEPROMTxPowerLevelCCK[i+1]);
 		}
-		for (i=0; i<14; i+=2)
+		for (i = 0; i<14; i+= 2)
 		{
 			if (!priv->AutoloadFailFlag)
 			{
@@ -288,7 +288,7 @@ static void rtl8192_read_eeprom_info(struct net_device* dev)
 			RT_TRACE(COMP_INIT, "OFDM 2.4G Tx Power Level, Index %d = 0x%02x\n", i+1, priv->EEPROMTxPowerLevelOFDM24G[i+1]);
 		}
 		}
-		else if (priv->epromtype== EEPROM_93C56)
+		else if (priv->epromtype == EEPROM_93C56)
 		{
 			// Read CrystalCap from EEPROM
 			if (!priv->AutoloadFailFlag)
@@ -308,7 +308,7 @@ static void rtl8192_read_eeprom_info(struct net_device* dev)
 			if (!priv->AutoloadFailFlag)
 			{
 				// Read Tx power of Channel 1 ~ 14 from EEPROM.
-				for (i = 0; i < 12; i+=2)
+				for (i = 0; i < 12; i+= 2)
 				{
 					if (i <6)
 						offset = EEPROM_C56_RfA_CCK_Chnl1_TxPwIndex + i;
@@ -322,9 +322,9 @@ static void rtl8192_read_eeprom_info(struct net_device* dev)
 				{
 					if (i <= 2)
 						priv->EEPROMRfACCKChnl1TxPwLevel[i] = EepromTxPower[i];
-					else if ((i >=3 )&&(i <= 5))
+					else if ((i >= 3 )&&(i <= 5))
 						priv->EEPROMRfAOfdmChnlTxPwLevel[i-3] = EepromTxPower[i];
-					else if ((i >=6 )&&(i <= 8))
+					else if ((i >= 6 )&&(i <= 8))
 						priv->EEPROMRfCCCKChnl1TxPwLevel[i-6] = EepromTxPower[i];
 					else
 						priv->EEPROMRfCOfdmChnlTxPwLevel[i-9] = EepromTxPower[i];
@@ -367,7 +367,7 @@ static void rtl8192_read_eeprom_info(struct net_device* dev)
 		//
 		if (priv->epromtype == EEPROM_93C46)
 		{
-			for (i=0; i<14; i++)
+			for (i = 0; i<14; i++)
 			{
 				priv->TxPowerLevelCCK[i] = priv->EEPROMTxPowerLevelCCK[i];
 				priv->TxPowerLevelOFDM24G[i] = priv->EEPROMTxPowerLevelOFDM24G[i];
@@ -387,38 +387,38 @@ static void rtl8192_read_eeprom_info(struct net_device* dev)
 		}
 		else if (priv->epromtype == EEPROM_93C56)
 		{
-			//char	cck_pwr_diff_a=0, cck_pwr_diff_c=0;
+			//char	cck_pwr_diff_a = 0, cck_pwr_diff_c = 0;
 
 			//cck_pwr_diff_a = pHalData->EEPROMRfACCKChnl7TxPwLevel - pHalData->EEPROMRfAOfdmChnlTxPwLevel[1];
 			//cck_pwr_diff_c = pHalData->EEPROMRfCCCKChnl7TxPwLevel - pHalData->EEPROMRfCOfdmChnlTxPwLevel[1];
-			for (i=0; i<3; i++)	// channel 1~3 use the same Tx Power Level.
+			for (i = 0; i<3; i++)	// channel 1~3 use the same Tx Power Level.
 			{
 				priv->TxPowerLevelCCK_A[i]  = priv->EEPROMRfACCKChnl1TxPwLevel[0];
 				priv->TxPowerLevelOFDM24G_A[i] = priv->EEPROMRfAOfdmChnlTxPwLevel[0];
 				priv->TxPowerLevelCCK_C[i] =  priv->EEPROMRfCCCKChnl1TxPwLevel[0];
 				priv->TxPowerLevelOFDM24G_C[i] = priv->EEPROMRfCOfdmChnlTxPwLevel[0];
 			}
-			for (i=3; i<9; i++)	// channel 4~9 use the same Tx Power Level
+			for (i = 3; i<9; i++)	// channel 4~9 use the same Tx Power Level
 			{
 				priv->TxPowerLevelCCK_A[i]  = priv->EEPROMRfACCKChnl1TxPwLevel[1];
 				priv->TxPowerLevelOFDM24G_A[i] = priv->EEPROMRfAOfdmChnlTxPwLevel[1];
 				priv->TxPowerLevelCCK_C[i] =  priv->EEPROMRfCCCKChnl1TxPwLevel[1];
 				priv->TxPowerLevelOFDM24G_C[i] = priv->EEPROMRfCOfdmChnlTxPwLevel[1];
 			}
-			for (i=9; i<14; i++)	// channel 10~14 use the same Tx Power Level
+			for (i = 9; i<14; i++)	// channel 10~14 use the same Tx Power Level
 			{
 				priv->TxPowerLevelCCK_A[i]  = priv->EEPROMRfACCKChnl1TxPwLevel[2];
 				priv->TxPowerLevelOFDM24G_A[i] = priv->EEPROMRfAOfdmChnlTxPwLevel[2];
 				priv->TxPowerLevelCCK_C[i] =  priv->EEPROMRfCCCKChnl1TxPwLevel[2];
 				priv->TxPowerLevelOFDM24G_C[i] = priv->EEPROMRfCOfdmChnlTxPwLevel[2];
 			}
-			for (i=0; i<14; i++)
+			for (i = 0; i<14; i++)
 				RT_TRACE(COMP_INIT, "priv->TxPowerLevelCCK_A[%d] = 0x%x\n", i, priv->TxPowerLevelCCK_A[i]);
-			for (i=0; i<14; i++)
+			for (i = 0; i<14; i++)
 				RT_TRACE(COMP_INIT,"priv->TxPowerLevelOFDM24G_A[%d] = 0x%x\n", i, priv->TxPowerLevelOFDM24G_A[i]);
-			for (i=0; i<14; i++)
+			for (i = 0; i<14; i++)
 				RT_TRACE(COMP_INIT, "priv->TxPowerLevelCCK_C[%d] = 0x%x\n", i, priv->TxPowerLevelCCK_C[i]);
-			for (i=0; i<14; i++)
+			for (i = 0; i<14; i++)
 				RT_TRACE(COMP_INIT, "priv->TxPowerLevelOFDM24G_C[%d] = 0x%x\n", i, priv->TxPowerLevelOFDM24G_C[i]);
 			priv->LegacyHTTxPowerDiff = priv->EEPROMLegacyHTTxPowerDiff;
 			priv->AntennaTxPwDiff[0] = 0;
@@ -446,7 +446,7 @@ static void rtl8192_read_eeprom_info(struct net_device* dev)
 
 	//1 Make a copy for following variables and we can change them if we want
 
-	priv->rf_chip= RF_8256;
+	priv->rf_chip = RF_8256;
 
 	if (priv->RegChannelPlan == 0xf)
 	{
@@ -725,9 +725,9 @@ start:
 	}
 	//3Set Hardware(Do nothing now)
 	rtl8192_hwconfig(dev);
-	//2=======================================================
+	//2 =======================================================
 	// Common Setting for all of the FPGA platform. (part 1)
-	//2=======================================================
+	//2 =======================================================
 	// If there is changes, please make sure it applies to all of the FPGA version
 	//3 Turn on Tx/Rx
 	write_nic_byte(dev, CMDR, CR_RE|CR_TE);
@@ -765,7 +765,7 @@ start:
 	// TODO: (it value is only for FPGA version). need to be changed!!2006.12.18, by Emily
 	write_nic_byte(dev, ACK_TIMEOUT, 0x30);
 
-	//rtl8192_actset_wirelessmode(dev,priv->RegWirelessMode);
+	//rtl8192_actset_wirelessmode(dev, priv->RegWirelessMode);
 	if (priv->ResetProgress == RESET_TYPE_NORESET)
 	rtl8192_SetWirelessMode(dev, priv->rtllib->mode);
 	//-----------------------------------------------------------------------------
@@ -786,7 +786,7 @@ start:
 	write_nic_word(dev, BCN_INTERVAL, 100);
 	{
 		int i;
-		for (i=0; i<QOS_QUEUE_NUM; i++)
+		for (i = 0; i<QOS_QUEUE_NUM; i++)
 		write_nic_dword(dev, WDCAPARA_ADD[i], 0x005e4332);
 	}
 	//
@@ -796,9 +796,9 @@ start:
 	//
 	write_nic_byte(dev, 0xbe, 0xc0);
 
-	//2=======================================================
+	//2 =======================================================
 	// Set PHY related configuration defined in MAC register bank
-	//2=======================================================
+	//2 =======================================================
 	rtl8192_phy_configmac(dev);
 
 	if (priv->card_8192_version > (u8) VERSION_8190_BD) {
@@ -808,14 +808,14 @@ start:
 
 	//if D or C cut
 	tmpvalue = read_nic_byte(dev, IC_VERRSION);
-	priv->IC_Cut= tmpvalue;
-	RT_TRACE(COMP_INIT, "priv->IC_Cut= 0x%x\n", priv->IC_Cut);
+	priv->IC_Cut = tmpvalue;
+	RT_TRACE(COMP_INIT, "priv->IC_Cut = 0x%x\n", priv->IC_Cut);
 	if (priv->IC_Cut>= IC_VersionCut_D)
 	{
 		//pHalData->bDcut = true;
-		if (priv->IC_Cut== IC_VersionCut_D) {
+		if (priv->IC_Cut == IC_VersionCut_D) {
 			RT_TRACE(COMP_INIT, "D-cut\n");
-		} else if (priv->IC_Cut== IC_VersionCut_E) {
+		} else if (priv->IC_Cut == IC_VersionCut_E) {
 			RT_TRACE(COMP_INIT, "E-cut\n");
 			// HW SD suggest that we should not wirte this register too often, so driver
 			// should readback this register. This register will be modified only when
@@ -864,28 +864,28 @@ start:
 	ucRegRead &= ~BIT0;
 	write_nic_byte(dev, GPO, ucRegRead);
 
-	//2=======================================================
+	//2 =======================================================
 	// RF Power Save
-	//2=======================================================
+	//2 =======================================================
 #ifdef ENABLE_IPS
 	if (priv->RegRfOff == true)
 	{ // User disable RF via registry.
-		RT_TRACE((COMP_INIT|COMP_RF|COMP_POWER), "%s(): Turn off RF for RegRfOff ----------\n",__FUNCTION__);
+		RT_TRACE((COMP_INIT|COMP_RF|COMP_POWER), "%s(): Turn off RF for RegRfOff ----------\n", __FUNCTION__);
 		MgntActSet_RF_State(dev, eRfOff, RF_CHANGE_BY_SW);
 	}
 	else if (priv->rtllib->RfOffReason > RF_CHANGE_BY_PS)
 	{ // H/W or S/W RF OFF before sleep.
-		RT_TRACE((COMP_INIT|COMP_RF|COMP_POWER), "%s(): Turn off RF for RfOffReason(%d) ----------\n", __FUNCTION__,priv->rtllib->RfOffReason);
+		RT_TRACE((COMP_INIT|COMP_RF|COMP_POWER), "%s(): Turn off RF for RfOffReason(%d) ----------\n", __FUNCTION__, priv->rtllib->RfOffReason);
 		MgntActSet_RF_State(dev, eRfOff, priv->rtllib->RfOffReason);
 	}
 	else if (priv->rtllib->RfOffReason >= RF_CHANGE_BY_IPS)
 	{ // H/W or S/W RF OFF before sleep.
-		RT_TRACE((COMP_INIT|COMP_RF|COMP_POWER), "%s(): Turn off RF for RfOffReason(%d) ----------\n", __FUNCTION__,priv->rtllib->RfOffReason);
+		RT_TRACE((COMP_INIT|COMP_RF|COMP_POWER), "%s(): Turn off RF for RfOffReason(%d) ----------\n", __FUNCTION__, priv->rtllib->RfOffReason);
 		MgntActSet_RF_State(dev, eRfOff, priv->rtllib->RfOffReason);
 	}
 	else
 	{
-		RT_TRACE((COMP_INIT|COMP_RF|COMP_POWER), "%s(): RF-ON \n",__FUNCTION__);
+		RT_TRACE((COMP_INIT|COMP_RF|COMP_POWER), "%s(): RF-ON \n", __FUNCTION__);
 		priv->rtllib->eRFPowerState = eRfOn;
 		priv->rtllib->RfOffReason = 0;
 		//DrvIFIndicateCurrentPhyStatus(dev);
@@ -908,14 +908,14 @@ start:
 	if (priv->ResetProgress == RESET_TYPE_NORESET) {
 		dm_initialize_txpower_tracking(dev);
 
-		tmpRegA= rtl8192_QueryBBReg(dev,rOFDM0_XATxIQImbalance,bMaskDWord);
-		tmpRegC= rtl8192_QueryBBReg(dev,rOFDM0_XCTxIQImbalance,bMaskDWord);
+		tmpRegA = rtl8192_QueryBBReg(dev, rOFDM0_XATxIQImbalance, bMaskDWord);
+		tmpRegC = rtl8192_QueryBBReg(dev, rOFDM0_XCTxIQImbalance, bMaskDWord);
 
 		if (priv->rf_type == RF_2T4R){
 			for (i = 0; i<TxBBGainTableLength; i++) {
 				if (tmpRegA == priv->txbbgain_table[i].txbbgain_value) {
-					priv->rfa_txpowertrackingindex= (u8)i;
-					priv->rfa_txpowertrackingindex_real= (u8)i;
+					priv->rfa_txpowertrackingindex = (u8)i;
+					priv->rfa_txpowertrackingindex_real = (u8)i;
 					priv->rfa_txpowertracking_default = priv->rfa_txpowertrackingindex;
 					break;
 				}
@@ -924,8 +924,8 @@ start:
 		for (i = 0; i<TxBBGainTableLength; i++) {
 			if (tmpRegC == priv->txbbgain_table[i].txbbgain_value)
 			{
-				priv->rfc_txpowertrackingindex= (u8)i;
-				priv->rfc_txpowertrackingindex_real= (u8)i;
+				priv->rfc_txpowertrackingindex = (u8)i;
+				priv->rfc_txpowertrackingindex_real = (u8)i;
 				priv->rfc_txpowertracking_default = priv->rfc_txpowertrackingindex;
 				break;
 			}
@@ -934,7 +934,7 @@ start:
 
 		for (i = 0 ; i < CCKTxBBGainTableLength ; i++) {
 			if (TempCCk == priv->cck_txbbgain_table[i].ccktxbb_valuearray[0]) {
-				priv->CCKPresentAttentuation_20Mdefault =(u8) i;
+				priv->CCKPresentAttentuation_20Mdefault = (u8) i;
 				break;
 			}
 		}
@@ -971,8 +971,8 @@ void rtl8192_net_update(struct net_device *dev)
 	// We do not use other rates.
 	 priv->basic_rate = rate_config &= 0x15f;
 	//BSSID
-	write_nic_dword(dev,BSSIDR,((u32*)net->bssid)[0]);
-	write_nic_word(dev,BSSIDR+4,((u16*)net->bssid)[2]);
+	write_nic_dword(dev, BSSIDR, ((u32*)net->bssid)[0]);
+	write_nic_word(dev, BSSIDR+4, ((u16*)net->bssid)[2]);
 
 //	rtl8192_update_cap(dev, net->capability);
 	if (priv->rtllib->iw_mode == IW_MODE_ADHOC)
@@ -1074,7 +1074,7 @@ void  rtl8192_tx_fill_desc(struct net_device* dev, tx_desc * pdesc, cb_desc * cb
     TX_FWINFO_8190PCI *pTxFwInfo = NULL;
 	 // fill tx firmware */
     pTxFwInfo = (PTX_FWINFO_8190PCI)skb->data;
-    memset(pTxFwInfo,0,sizeof(TX_FWINFO_8190PCI));
+    memset(pTxFwInfo, 0, sizeof(TX_FWINFO_8190PCI));
     pTxFwInfo->TxHT = (cb_desc->data_rate&0x80)?1:0;
     pTxFwInfo->TxRate = MRateToHwRate8190Pci((u8)cb_desc->data_rate);
     pTxFwInfo->EnableCPUDur = cb_desc->bTxEnableFwCalcDur;
@@ -1097,11 +1097,11 @@ void  rtl8192_tx_fill_desc(struct net_device* dev, tx_desc * pdesc, cb_desc * cb
     pTxFwInfo->RtsEnable =	(cb_desc->bRTSEnable)?1:0;
     pTxFwInfo->CtsEnable =	(cb_desc->bCTSEnable)?1:0;
     pTxFwInfo->RtsSTBC =	(cb_desc->bRTSSTBC)?1:0;
-    pTxFwInfo->RtsHT=		(cb_desc->rts_rate&0x80)?1:0;
+    pTxFwInfo->RtsHT =		(cb_desc->rts_rate&0x80)?1:0;
     pTxFwInfo->RtsRate =		MRateToHwRate8190Pci((u8)cb_desc->rts_rate);
     pTxFwInfo->RtsBandwidth = 0;
     pTxFwInfo->RtsSubcarrier = cb_desc->RTSSC;
-    pTxFwInfo->RtsShort =	(pTxFwInfo->RtsHT==0)?(cb_desc->bRTSUseShortPreamble?1:0):(cb_desc->bRTSUseShortGI?1:0);
+    pTxFwInfo->RtsShort =	(pTxFwInfo->RtsHT == 0)?(cb_desc->bRTSUseShortPreamble?1:0):(cb_desc->bRTSUseShortGI?1:0);
     //
     // Set Bandwidth and sub-channel settings.
     //
@@ -1120,7 +1120,7 @@ void  rtl8192_tx_fill_desc(struct net_device* dev, tx_desc * pdesc, cb_desc * cb
     }
 
     // fill tx descriptor */
-    memset((u8*)pdesc,0,12);
+    memset((u8*)pdesc, 0, 12);
     //DWORD 0*/
     pdesc->LINIP = 0;
     pdesc->CmdInit = 1;
@@ -1128,16 +1128,16 @@ void  rtl8192_tx_fill_desc(struct net_device* dev, tx_desc * pdesc, cb_desc * cb
     pdesc->PktSize = (u16)skb->len-sizeof(TX_FWINFO_8190PCI);
 
     //DWORD 1*/
-    pdesc->SecCAMID= 0;
+    pdesc->SecCAMID = 0;
     pdesc->RATid = cb_desc->RATRIndex;
 
 
     pdesc->NoEnc = 1;
     pdesc->SecType = 0x0;
     if (cb_desc->bHwSec) {
-        static u8 tmp =0;
+        static u8 tmp = 0;
         if (!tmp) {
-            printk("==>================hw sec\n");
+            printk("==>================ hw sec\n");
             tmp = 1;
         }
         switch (priv->rtllib->pairwise_key_type) {
@@ -1172,7 +1172,7 @@ void  rtl8192_tx_fill_desc(struct net_device* dev, tx_desc * pdesc, cb_desc * cb
     pdesc->DISFB = cb_desc->bTxDisableRateFallBack;
     pdesc->USERATE = cb_desc->bTxUseDriverAssingedRate;
 
-    pdesc->FirstSeg =1;
+    pdesc->FirstSeg = 1;
     pdesc->LastSeg = 1;
     pdesc->TxBufferSize = skb->len;
 
@@ -1185,7 +1185,7 @@ void  rtl8192_tx_fill_cmd_desc(struct net_device* dev, tx_desc_cmd * entry,
     struct r8192_priv *priv = rtllib_priv(dev);
     dma_addr_t mapping = pci_map_single(priv->pdev, skb->data, skb->len, PCI_DMA_TODEVICE);
 
-    memset(entry,0,12);
+    memset(entry, 0, 12);
     entry->LINIP = cb_desc->bLastIniPkt;
     entry->FirstSeg = 1;//first segment
     entry->LastSeg = 1; //last segment
@@ -1250,7 +1250,7 @@ u8 HwRateToMRate90(bool bIsHT, u8 rate)
 			case DESC90_RATEMCS32:  ret_rate = (0x80|0x20); break;
 
 			default:
-						RT_TRACE(COMP_RECV, "HwRateToMRate90(): Non supported Rate [%x], bIsHT = %d!!!\n",rate, bIsHT);
+						RT_TRACE(COMP_RECV, "HwRateToMRate90(): Non supported Rate [%x], bIsHT = %d!!!\n", rate, bIsHT);
 						break;
 		}
 	}
@@ -1299,8 +1299,8 @@ bool rtl8192_rx_query_status_desc(struct net_device* dev, struct rtllib_rx_stats
 		//
 		UpdateReceivedRateHistogramStatistics8190(dev, stats);
 
-		stats->bIsAMPDU = (pDrvInfo->PartAggr==1);
-		stats->bFirstMPDU = (pDrvInfo->PartAggr==1) && (pDrvInfo->FirstAGGR==1);
+		stats->bIsAMPDU = (pDrvInfo->PartAggr == 1);
+		stats->bFirstMPDU = (pDrvInfo->PartAggr == 1) && (pDrvInfo->FirstAGGR == 1);
 
 		stats->TimeStampLow = pDrvInfo->TSFL;
 		stats->TimeStampHigh = read_nic_dword(dev, TSFR+4);
@@ -1315,10 +1315,10 @@ bool rtl8192_rx_query_status_desc(struct net_device* dev, struct rtllib_rx_stats
 
 		stats->RxIs40MHzPacket = pDrvInfo->BW;
 
-		TranslateRxSignalStuff819xpci(dev,skb, stats, pdesc, pDrvInfo);
+		TranslateRxSignalStuff819xpci(dev, skb, stats, pdesc, pDrvInfo);
 
 		// Rx A-MPDU */
-		if (pDrvInfo->FirstAGGR==1 || pDrvInfo->PartAggr == 1)
+		if (pDrvInfo->FirstAGGR == 1 || pDrvInfo->PartAggr == 1)
 			RT_TRACE(COMP_RXDESC, "pDrvInfo->FirstAGGR = %d, pDrvInfo->PartAggr = %d\n",
 					pDrvInfo->FirstAGGR, pDrvInfo->PartAggr);
 		skb_trim(skb, skb->len - 4/*sCrcLng*/);
@@ -1338,7 +1338,7 @@ void rtl8192_halt_adapter(struct net_device *dev, bool reset)
 	struct r8192_priv *priv = rtllib_priv(dev);
 	int i;
 
-	cmd=read_nic_byte(dev,CMDR);
+	cmd = read_nic_byte(dev, CMDR);
 	write_nic_byte(dev, CMDR, cmd &~ \
 			(CR_TE|CR_RE));
 	mdelay(30);

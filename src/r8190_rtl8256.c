@@ -60,7 +60,7 @@ void PHY_SetRF8256Bandwidth(struct net_device* dev , HT_CHANNEL_WIDTH Bandwidth)
 
 				break;
 			default:
-				RT_TRACE(COMP_ERR, "PHY_SetRF8256Bandwidth(): unknown Bandwidth: %#X\n",Bandwidth );
+				RT_TRACE(COMP_ERR, "PHY_SetRF8256Bandwidth(): unknown Bandwidth: %#X\n", Bandwidth );
 				break;
 
 		}
@@ -129,36 +129,36 @@ bool phy_RF8256_Config_ParaFile(struct net_device* dev)
 		switch (eRFPath)
 		{
 		case RF90_PATH_A:
-			while (RF3_Final_Value!=RegValueToBeCheck && RetryTimes!=0)
+			while (RF3_Final_Value!= RegValueToBeCheck && RetryTimes!= 0)
 			{
-				ret = rtl8192_phy_ConfigRFWithHeaderFile(dev,(RF90_RADIO_PATH_E)eRFPath);
+				ret = rtl8192_phy_ConfigRFWithHeaderFile(dev, (RF90_RADIO_PATH_E)eRFPath);
 				RF3_Final_Value = rtl8192_phy_QueryRFReg(dev, (RF90_RADIO_PATH_E)eRFPath, RegOffSetToBeCheck, bMask12Bits);
 				RT_TRACE(COMP_RF, "RF %d %d register final value: %x\n", eRFPath, RegOffSetToBeCheck, RF3_Final_Value);
 				RetryTimes--;
 			}
 			break;
 		case RF90_PATH_B:
-			while (RF3_Final_Value!=RegValueToBeCheck && RetryTimes!=0)
+			while (RF3_Final_Value!= RegValueToBeCheck && RetryTimes!= 0)
 			{
-				ret = rtl8192_phy_ConfigRFWithHeaderFile(dev,(RF90_RADIO_PATH_E)eRFPath);
+				ret = rtl8192_phy_ConfigRFWithHeaderFile(dev, (RF90_RADIO_PATH_E)eRFPath);
 				RF3_Final_Value = rtl8192_phy_QueryRFReg(dev, (RF90_RADIO_PATH_E)eRFPath, RegOffSetToBeCheck, bMask12Bits);
 				RT_TRACE(COMP_RF, "RF %d %d register final value: %x\n", eRFPath, RegOffSetToBeCheck, RF3_Final_Value);
 				RetryTimes--;
 			}
 			break;
 		case RF90_PATH_C:
-			while (RF3_Final_Value!=RegValueToBeCheck && RetryTimes!=0)
+			while (RF3_Final_Value!= RegValueToBeCheck && RetryTimes!= 0)
 			{
-				ret = rtl8192_phy_ConfigRFWithHeaderFile(dev,(RF90_RADIO_PATH_E)eRFPath);
+				ret = rtl8192_phy_ConfigRFWithHeaderFile(dev, (RF90_RADIO_PATH_E)eRFPath);
 				RF3_Final_Value = rtl8192_phy_QueryRFReg(dev, (RF90_RADIO_PATH_E)eRFPath, RegOffSetToBeCheck, bMask12Bits);
 				RT_TRACE(COMP_RF, "RF %d %d register final value: %x\n", eRFPath, RegOffSetToBeCheck, RF3_Final_Value);
 				RetryTimes--;
 			}
 			break;
 		case RF90_PATH_D:
-			while (RF3_Final_Value!=RegValueToBeCheck && RetryTimes!=0)
+			while (RF3_Final_Value!= RegValueToBeCheck && RetryTimes!= 0)
 			{
-				ret = rtl8192_phy_ConfigRFWithHeaderFile(dev,(RF90_RADIO_PATH_E)eRFPath);
+				ret = rtl8192_phy_ConfigRFWithHeaderFile(dev, (RF90_RADIO_PATH_E)eRFPath);
 				RF3_Final_Value = rtl8192_phy_QueryRFReg(dev, (RF90_RADIO_PATH_E)eRFPath, RegOffSetToBeCheck, bMask12Bits);
 				RT_TRACE(COMP_RF, "RF %d %d register final value: %x\n", eRFPath, RegOffSetToBeCheck, RF3_Final_Value);
 				RetryTimes--;
@@ -195,7 +195,7 @@ phy_RF8256_Config_ParaFile_Fail:
 
 void PHY_SetRF8256CCKTxPower(struct net_device*	dev, u8	powerlevel)
 {
-	u32	TxAGC=0;
+	u32	TxAGC = 0;
 	struct r8192_priv *priv = rtllib_priv(dev);
 	u8				byte0, byte1;
 
@@ -231,7 +231,7 @@ void PHY_SetRF8256CCKTxPower(struct net_device*	dev, u8	powerlevel)
 void PHY_SetRF8256OFDMTxPower(struct net_device* dev, u8 powerlevel)
 {
 	struct r8192_priv *priv = rtllib_priv(dev);
-	u32				TxAGC1=0, TxAGC2=0, TxAGC2_tmp = 0;
+	u32				TxAGC1 = 0, TxAGC2 = 0, TxAGC2_tmp = 0;
 	u8				i, byteVal1[4], byteVal2[4], byteVal3[4];
 
 	if (priv->bDynamicTxHighPower == true)
@@ -240,7 +240,7 @@ void PHY_SetRF8256OFDMTxPower(struct net_device* dev, u8 powerlevel)
 		TxAGC2_tmp = TxAGC1;
 
 		TxAGC1 += priv->MCSTxPowerLevelOriginalOffset[0];
-		TxAGC2 =0x03030303;
+		TxAGC2 = 0x03030303;
 
 		TxAGC2_tmp += priv->MCSTxPowerLevelOriginalOffset[1];
 	}
@@ -255,7 +255,7 @@ void PHY_SetRF8256OFDMTxPower(struct net_device* dev, u8 powerlevel)
 		TxAGC2_tmp = TxAGC2;
 
 	}
-	for (i=0; i<4; i++)
+	for (i = 0; i<4; i++)
 	{
 		byteVal1[i] = (u8)(  (TxAGC1 & (0xff<<(i*8))) >>(i*8) );
 		if (byteVal1[i] > 0x24)
@@ -273,7 +273,7 @@ void PHY_SetRF8256OFDMTxPower(struct net_device* dev, u8 powerlevel)
 	{
 		if (priv->RF_C_TxPwDiff > 0)
 		{
-			for (i=0; i<4; i++)
+			for (i = 0; i<4; i++)
 			{
 				if ( (byteVal1[i] + (u8)priv->RF_C_TxPwDiff) > 0x24)
 					byteVal1[i] = 0x24 - priv->RF_C_TxPwDiff;

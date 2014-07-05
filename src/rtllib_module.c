@@ -158,7 +158,7 @@ struct net_device *alloc_rtllib(int sizeof_priv)
 {
 	struct rtllib_device *ieee = NULL;
 	struct net_device *dev;
-	int i,err;
+	int i, err;
 
 	RTLLIB_DEBUG_INFO("Initializing...\n");
 
@@ -217,14 +217,14 @@ struct net_device *alloc_rtllib(int sizeof_priv)
 	ieee->raw_tx = 0;
 	ieee->hwsec_active = 0;
 
-	memset(ieee->swcamtable,0,sizeof(SW_CAM_TABLE)*32);
+	memset(ieee->swcamtable, 0, sizeof(SW_CAM_TABLE)*32);
 	rtllib_softmac_init(ieee);
 
-#if (LINUX_VERSION_CODE > KERNEL_VERSION(2,6,13))
+#if (LINUX_VERSION_CODE > KERNEL_VERSION(2, 6, 13))
 	ieee->pHTInfo = (RT_HIGH_THROUGHPUT*)kzalloc(sizeof(RT_HIGH_THROUGHPUT), GFP_KERNEL);
 #else
 	ieee->pHTInfo = (RT_HIGH_THROUGHPUT*)kmalloc(sizeof(RT_HIGH_THROUGHPUT), GFP_KERNEL);
-	memset(ieee->pHTInfo,0,sizeof(RT_HIGH_THROUGHPUT));
+	memset(ieee->pHTInfo, 0, sizeof(RT_HIGH_THROUGHPUT));
 #endif
 	if (ieee->pHTInfo == NULL)
 	{
@@ -251,7 +251,7 @@ struct net_device *alloc_rtllib(int sizeof_priv)
 
  failed:
 	if (dev)
-#if (LINUX_VERSION_CODE >= KERNEL_VERSION(2,5,0))
+#if (LINUX_VERSION_CODE >= KERNEL_VERSION(2, 5, 0))
 		free_netdev(dev);
 #else
 		kfree(dev);
@@ -279,7 +279,7 @@ void free_rtllib(struct net_device *dev)
 			if (crypt->ops) {
 				crypt->ops->deinit(crypt->priv);
 #ifndef BUILT_IN_RTLLIB
-#if LINUX_VERSION_CODE >= KERNEL_VERSION(2,5,0)
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(2, 5, 0)
 				module_put(crypt->ops->owner);
 #else
 				__MOD_DEC_USE_COUNT(crypt->ops->owner);
@@ -292,7 +292,7 @@ void free_rtllib(struct net_device *dev)
 	}
 
 	rtllib_networks_free(ieee);
-#if (LINUX_VERSION_CODE >= KERNEL_VERSION(2,5,0))
+#if (LINUX_VERSION_CODE >= KERNEL_VERSION(2, 5, 0))
 #ifdef CONFIG_CRDA
 	wiphy_unregister(ieee->wdev.wiphy);
 	kfree(ieee->bg_band.channels);
@@ -323,7 +323,7 @@ void __exit rtllib_exit(void)
 }
 
 #ifndef BUILT_IN_RTLLIB
-#if (LINUX_VERSION_CODE > KERNEL_VERSION(2,5,0))
+#if (LINUX_VERSION_CODE > KERNEL_VERSION(2, 5, 0))
 #include <linux/moduleparam.h>
 module_param(debug, int, 0444);
 MODULE_PARM_DESC(debug, "debug output mask");

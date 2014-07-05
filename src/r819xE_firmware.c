@@ -21,7 +21,7 @@
 #include "r8192E_hw.h"
 #include "r8190P_hwimg.h"
 #include "r819xE_firmware.h"
-#if LINUX_VERSION_CODE > KERNEL_VERSION(2,5,0)
+#if LINUX_VERSION_CODE > KERNEL_VERSION(2, 5, 0)
 #include <linux/firmware.h>
 #endif
 
@@ -61,29 +61,29 @@ bool fw_download_code(struct net_device *dev, u8 *code_virtual_address, u32 buff
 		}
 
 		skb  = dev_alloc_skb(frag_length + 4);
-		memcpy((unsigned char *)(skb->cb),&dev,sizeof(dev));
+		memcpy((unsigned char *)(skb->cb),&dev, sizeof(dev));
 		tcb_desc = (cb_desc*)(skb->cb + MAX_DEV_ADDR_SIZE);
 		tcb_desc->queue_index = TXCMD_QUEUE;
 		tcb_desc->bCmdOrInit = DESC_PACKET_TYPE_INIT;
 		tcb_desc->bLastIniPkt = bLastIniPkt;
 
 		seg_ptr = skb->data;
-		for (i=0 ; i < frag_length; i+=4) {
+		for (i = 0 ; i < frag_length; i+= 4) {
 			*seg_ptr++ = ((i+0)<frag_length)?code_virtual_address[i+3]:0;
 			*seg_ptr++ = ((i+1)<frag_length)?code_virtual_address[i+2]:0;
 			*seg_ptr++ = ((i+2)<frag_length)?code_virtual_address[i+1]:0;
 			*seg_ptr++ = ((i+3)<frag_length)?code_virtual_address[i+0]:0;
 		}
-		tcb_desc->txbuf_size= (u16)i;
+		tcb_desc->txbuf_size = (u16)i;
 		skb_put(skb, i);
 
-		if (!priv->rtllib->check_nic_enough_desc(dev,tcb_desc->queue_index)||
+		if (!priv->rtllib->check_nic_enough_desc(dev, tcb_desc->queue_index)||
 			(!skb_queue_empty(&priv->rtllib->skb_waitQ[tcb_desc->queue_index]))||\
 			(priv->rtllib->queue_stop) ) {
 			RT_TRACE(COMP_FIRMWARE, "===================> tx full!\n");
 			skb_queue_tail(&priv->rtllib->skb_waitQ[tcb_desc->queue_index], skb);
 		} else {
-		priv->rtllib->softmac_hard_start_xmit(skb,dev);
+		priv->rtllib->softmac_hard_start_xmit(skb, dev);
 		}
 
 		code_virtual_address += frag_length;
@@ -109,22 +109,22 @@ fwSendNullPacket(
 
 
 	skb  = dev_alloc_skb(Length+ 4);
-	memcpy((unsigned char *)(skb->cb),&dev,sizeof(dev));
+	memcpy((unsigned char *)(skb->cb),&dev, sizeof(dev));
 	tcb_desc = (cb_desc*)(skb->cb + MAX_DEV_ADDR_SIZE);
 	tcb_desc->queue_index = TXCMD_QUEUE;
 	tcb_desc->bCmdOrInit = DESC_PACKET_TYPE_INIT;
 	tcb_desc->bLastIniPkt = bLastInitPacket;
 	ptr_buf = skb_put(skb, Length);
-	memset(ptr_buf,0,Length);
-	tcb_desc->txbuf_size= (u16)Length;
+	memset(ptr_buf, 0, Length);
+	tcb_desc->txbuf_size = (u16)Length;
 
-	if (!priv->rtllib->check_nic_enough_desc(dev,tcb_desc->queue_index)||
+	if (!priv->rtllib->check_nic_enough_desc(dev, tcb_desc->queue_index)||
 			(!skb_queue_empty(&priv->rtllib->skb_waitQ[tcb_desc->queue_index]))||\
 			(priv->rtllib->queue_stop) ) {
-			RT_TRACE(COMP_FIRMWARE,"===================NULL packet================> tx full!\n");
+			RT_TRACE(COMP_FIRMWARE,"=================== NULL packet ================> tx full!\n");
 			skb_queue_tail(&priv->rtllib->skb_waitQ[tcb_desc->queue_index], skb);
 		} else {
-			priv->rtllib->softmac_hard_start_xmit(skb,dev);
+			priv->rtllib->softmac_hard_start_xmit(skb, dev);
 		}
 
 	return rtStatus;
@@ -241,7 +241,7 @@ inline static bool firmware_check_ready(struct net_device *dev, u8 load_fw_statu
 		if (rt_status) {
 			pfirmware->firmware_status = FW_STATUS_5_READY;
 		} else {
-			RT_TRACE(COMP_FIRMWARE, "CPUcheck_firmware_ready fail(%d)!\n",rt_status);
+			RT_TRACE(COMP_FIRMWARE, "CPUcheck_firmware_ready fail(%d)!\n", rt_status);
 		}
 
 		break;
@@ -274,7 +274,7 @@ bool init_firmware(struct net_device *dev)
 
 	rt_firmware		*pfirmware = priv->pFirmware;
 
-	RT_TRACE(COMP_FIRMWARE, " PlatformInitFirmware()==>\n");
+	RT_TRACE(COMP_FIRMWARE, " PlatformInitFirmware() ==>\n");
 
 	if (pfirmware->firmware_status == FW_STATUS_0_INIT ) {
 		rst_opt = OPT_SYSTEM_RESET;
@@ -287,7 +287,7 @@ bool init_firmware(struct net_device *dev)
 		 RT_TRACE(COMP_FIRMWARE, "PlatformInitFirmware: undefined firmware state\n");
 	}
 
-#if LINUX_VERSION_CODE > KERNEL_VERSION(2,5,0) && defined(USE_FW_SOURCE_IMG_FILE)
+#if LINUX_VERSION_CODE > KERNEL_VERSION(2, 5, 0) && defined(USE_FW_SOURCE_IMG_FILE)
 	priv->firmware_source = FW_SOURCE_IMG_FILE;
 #else
 	priv->firmware_source = FW_SOURCE_HEADER_FILE;
@@ -296,7 +296,7 @@ bool init_firmware(struct net_device *dev)
 		if (rst_opt == OPT_SYSTEM_RESET) {
 			switch (priv->firmware_source) {
 			case FW_SOURCE_IMG_FILE: {
-#if LINUX_VERSION_CODE > KERNEL_VERSION(2,5,0) && defined(USE_FW_SOURCE_IMG_FILE)
+#if LINUX_VERSION_CODE > KERNEL_VERSION(2, 5, 0) && defined(USE_FW_SOURCE_IMG_FILE)
 				const struct firmware	*fw_entry;
 				int rc;
 				if (pfirmware->firmware_buf_size[init_step] == 0) {
@@ -315,16 +315,16 @@ bool init_firmware(struct net_device *dev)
 					}
 
 					if (init_step != FW_INIT_STEP1_MAIN) {
-						memcpy(pfirmware->firmware_buf[init_step],fw_entry->data,fw_entry->size);
+						memcpy(pfirmware->firmware_buf[init_step], fw_entry->data, fw_entry->size);
 						pfirmware->firmware_buf_size[init_step] = fw_entry->size;
 
 					} else {
-						memcpy(pfirmware->firmware_buf[init_step],fw_entry->data,fw_entry->size);
+						memcpy(pfirmware->firmware_buf[init_step], fw_entry->data, fw_entry->size);
 						pfirmware->firmware_buf_size[init_step] = fw_entry->size;
 
 					}
 
-#if LINUX_VERSION_CODE > KERNEL_VERSION(2,5,0)
+#if LINUX_VERSION_CODE > KERNEL_VERSION(2, 5, 0)
 						if (rst_opt == OPT_SYSTEM_RESET) {
 							release_firmware(fw_entry);
 						}
@@ -354,7 +354,7 @@ bool init_firmware(struct net_device *dev)
 			file_length = pfirmware->firmware_buf_size[init_step];
 		}
 
-		rt_status = fw_download_code(dev,mapped_file,file_length);
+		rt_status = fw_download_code(dev, mapped_file, file_length);
 		if (rt_status != true) {
 			goto download_firmware_fail;
 		}

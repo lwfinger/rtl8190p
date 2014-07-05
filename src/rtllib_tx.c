@@ -72,7 +72,7 @@ bits | 0  |  1  |  2  |  3  |  4  |  5  |  6  |  7  |  8  |  9  |  a  |  b  |  c
 val  | 0  |  0  |  0  |  1  |  x  |  0  |  0  |  0  |  1  |  0  |  x  |  x  |  x  |  x  |  x   |
      |----|-----|-----|-----|-----|-----|-----|-----|-----|-----|-----|-----|-----|-----|------|
 desc | ^-ver-^  |  ^type-^  |  ^-----subtype-----^  | to  |from |more |retry| pwr |more |wep   |
-     |          |           | x=0 data,x=1 data+ack | DS  | DS  |frag |     | mgm |data |      |
+     |          |           | x = 0 data, x = 1 data+ack | DS  | DS  |frag |     | mgm |data |      |
      '-----------------------------------------------------------------------------------------'
 		                                    /\
                                                     |
@@ -137,7 +137,7 @@ payload of each frame is reduced to 492 bytes.
 * |
 * |    ETHERNET HEADER        ,-<-- PAYLOAD
 * |                           |     14 bytes from skb->data
-* |  2 bytes for Type --> ,T. |     (sizeof ethhdr)
+* |  2 bytes for Type --> , T. |     (sizeof ethhdr)
 * |                       | | |
 * |,-Dest.--. ,--Src.---. | | |
 * |  6 bytes| | 6 bytes | | | |
@@ -225,7 +225,7 @@ int rtllib_encrypt_fragment(
 
 	atomic_dec(&crypt->refcnt);
 	if (res < 0) {
-		printk(KERN_INFO "%s: Encryption failed: len=%d.\n",
+		printk(KERN_INFO "%s: Encryption failed: len =%d.\n",
 		       ieee->dev->name, frag->len);
 		ieee->ieee_stats.tx_discards++;
 		return -1;
@@ -243,8 +243,8 @@ struct rtllib_txb *rtllib_alloc_txb(int nr_frags, int txb_size,
 					  int gfp_mask)
 {
 #ifdef USB_USE_ALIGNMENT
-	u32 Tmpaddr=0;
-	int alignment=0;
+	u32 Tmpaddr = 0;
+	int alignment = 0;
 #endif
 	struct rtllib_txb *txb;
 	int i;
@@ -271,7 +271,7 @@ struct rtllib_txb *rtllib_alloc_txb(int nr_frags, int txb_size,
 #ifdef USB_USE_ALIGNMENT
 		Tmpaddr = (u32)(txb->fragments[i]->data);
 		alignment = Tmpaddr & 0x1ff;
-		skb_reserve(txb->fragments[i],(USB_512B_ALIGNMENT_SIZE - alignment));
+		skb_reserve(txb->fragments[i], (USB_512B_ALIGNMENT_SIZE - alignment));
 #endif
 		memset(txb->fragments[i]->cb, 0, sizeof(txb->fragments[i]->cb));
 	}
@@ -295,7 +295,7 @@ rtllib_classify(struct sk_buff *skb, u8 bIsAmsdu)
 		return 0;
 
 	RTLLIB_DEBUG_DATA(RTLLIB_DL_DATA, skb->data, skb->len);
-#if (LINUX_VERSION_CODE >= KERNEL_VERSION(2,6,22))
+#if (LINUX_VERSION_CODE >= KERNEL_VERSION(2, 6, 22))
 	ip = ip_hdr(skb);
 #else
 	ip = (struct iphdr*)(skb->data + sizeof(struct ether_header));
@@ -320,7 +320,7 @@ rtllib_classify(struct sk_buff *skb, u8 bIsAmsdu)
 	}
 }
 
-#define SN_LESS(a, b)		(((a-b)&0x800)!=0)
+#define SN_LESS(a, b)		(((a-b)&0x800)!= 0)
 void rtllib_tx_query_agg_cap(struct rtllib_device* ieee, struct sk_buff* skb, cb_desc* tcb_desc)
 {
 	PRT_HIGH_THROUGHPUT	pHTInfo = ieee->pHTInfo;
@@ -425,9 +425,9 @@ rtllib_query_HTCapShortGI(struct rtllib_device *ieee, cb_desc *tcb_desc)
 		return;
 	}
 
-	if ((pHTInfo->bCurBW40MHz==true) && pHTInfo->bCurShortGI40MHz)
+	if ((pHTInfo->bCurBW40MHz == true) && pHTInfo->bCurShortGI40MHz)
 		tcb_desc->bUseShortGI = true;
-	else if ((pHTInfo->bCurBW40MHz==false) && pHTInfo->bCurShortGI20MHz)
+	else if ((pHTInfo->bCurBW40MHz == false) && pHTInfo->bCurShortGI20MHz)
 		tcb_desc->bUseShortGI = true;
 }
 
@@ -443,7 +443,7 @@ void rtllib_query_BandwidthMode(struct rtllib_device* ieee, cb_desc *tcb_desc)
 	if (tcb_desc->bMulticast || tcb_desc->bBroadcast)
 		return;
 
-	if ((tcb_desc->data_rate & 0x80)==0)
+	if ((tcb_desc->data_rate & 0x80) == 0)
 		return;
 	if (pHTInfo->bCurBW40MHz && pHTInfo->bCurTxBW40MHz && !ieee->bandwidth_auto_switch.bforced_tx20Mhz)
 		tcb_desc->bPacketBW = true;
@@ -605,7 +605,7 @@ int rtllib_xmit_inter(struct sk_buff *skb, struct net_device *dev)
 	cb_desc *tcb_desc;
 	u8 bIsMulticast = false;
 	u8 IsAmsdu = false;
-	bool	bdhcp =false;
+	bool	bdhcp = false;
 	spin_lock_irqsave(&ieee->lock, flags);
 
 	/* If there is no driver handler to take the TXB, dont' bother
@@ -638,7 +638,7 @@ int rtllib_xmit_inter(struct sk_buff *skb, struct net_device *dev)
 					struct udphdr *udp = (struct udphdr *)((u8 *)ip + (ip->ihl << 2));
 					if (((((u8 *)udp)[1] == 68) && (((u8 *)udp)[3] == 67)) ||
 					    ((((u8 *)udp)[1] == 67) && (((u8 *)udp)[3] == 68))) {
-						printk("===>DHCP Protocol start tx DHCP pkt src port:%d, dest port:%d!!\n", ((u8 *)udp)[1],((u8 *)udp)[3]);
+						printk("===>DHCP Protocol start tx DHCP pkt src port:%d, dest port:%d!!\n", ((u8 *)udp)[1], ((u8 *)udp)[3]);
 
 						bdhcp = true;
 						ieee->LPSDelayCnt = 100;
@@ -874,7 +874,7 @@ int rtllib_xmit_inter(struct sk_buff *skb, struct net_device *dev)
 
 		txb->encrypted = 0;
 		txb->payload_size = skb->len;
-		memcpy(skb_put(txb->fragments[0],skb->len), skb->data, skb->len);
+		memcpy(skb_put(txb->fragments[0], skb->len), skb->data, skb->len);
 	}
 
  success:

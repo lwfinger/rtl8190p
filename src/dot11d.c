@@ -26,19 +26,19 @@ typedef struct _CHANNEL_LIST
 }CHANNEL_LIST, *PCHANNEL_LIST;
 
 static CHANNEL_LIST ChannelPlan[] = {
-	{{1,2,3,4,5,6,7,8,9,10,11,36,40,44,48,52,56,60,64,149,153,157,161,165},24},
-	{{1,2,3,4,5,6,7,8,9,10,11},11},
-	{{1,2,3,4,5,6,7,8,9,10,11,12,13,36,40,44,48,52,56,60,64},21},
-	{{1,2,3,4,5,6,7,8,9,10,11,12,13},13},
-	{{1,2,3,4,5,6,7,8,9,10,11,12,13},13},
-	{{1,2,3,4,5,6,7,8,9,10,11,12,13,14,36,40,44,48,52,56,60,64},22},
-	{{1,2,3,4,5,6,7,8,9,10,11,12,13,14,36,40,44,48,52,56,60,64},22},
-	{{1,2,3,4,5,6,7,8,9,10,11,12,13},13},
-	{{1,2,3,4,5,6,7,8,9,10,11,12,13,14,36,40,44,48,52,56,60,64},22},
-	{{1,2,3,4,5,6,7,8,9,10,11,12,13,14,36,40,44,48,52,56,60,64},22},
-	{{1,2,3,4,5,6,7,8,9,10,11,12,13,14},14},
-	{{1,2,3,4,5,6,7,8,9,10,11,12,13},13},
-	{{1,2,3,4,5,6,7,8,9,10,11,12,13,36,40,44,48,52,56,60,64},21}
+	{{1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 36, 40, 44, 48, 52, 56, 60, 64, 149, 153, 157, 161, 165}, 24},
+	{{1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11}, 11},
+	{{1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 36, 40, 44, 48, 52, 56, 60, 64}, 21},
+	{{1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13}, 13},
+	{{1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13}, 13},
+	{{1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 36, 40, 44, 48, 52, 56, 60, 64}, 22},
+	{{1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 36, 40, 44, 48, 52, 56, 60, 64}, 22},
+	{{1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13}, 13},
+	{{1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 36, 40, 44, 48, 52, 56, 60, 64}, 22},
+	{{1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 36, 40, 44, 48, 52, 56, 60, 64}, 22},
+	{{1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14}, 14},
+	{{1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13}, 13},
+	{{1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 36, 40, 44, 48, 52, 56, 60, 64}, 21}
 };
 
 void Dot11d_Init(struct rtllib_device *ieee)
@@ -78,7 +78,7 @@ void Dot11d_Channelmap(u8 channel_plan, struct rtllib_device* ieee)
 			for (i = 12; i <= 14; i++) {
 				GET_DOT11D_INFO(ieee)->channel_map[i] = 2;
 			}
-			ieee->IbssStartChnl= 10;
+			ieee->IbssStartChnl = 10;
 			ieee->ibss_maxjoin_chal = 11;
 			break;
 
@@ -105,10 +105,10 @@ void Dot11d_Reset(struct rtllib_device *ieee)
 
 	memset(pDot11dInfo->channel_map, 0, MAX_CHANNEL_NUMBER+1);
 	memset(pDot11dInfo->MaxTxPwrDbmList, 0xFF, MAX_CHANNEL_NUMBER+1);
-	for (i=1; i<=11; i++) {
+	for (i = 1; i<= 11; i++) {
 		(pDot11dInfo->channel_map)[i] = 1;
 	}
-	for (i=12; i<=14; i++) {
+	for (i = 12; i<= 14; i++) {
 		(pDot11dInfo->channel_map)[i] = 2;
 	}
 
@@ -153,7 +153,7 @@ void Dot11d_UpdateCountryIe(struct rtllib_device *dev, u8 *pTaddr,
 		pTriple = (PCHNL_TXPOWER_TRIPLE)((u8*)pTriple + 3);
 	}
 	printk("Channel List:");
-	for (i=1; i<= MAX_CHANNEL_NUMBER; i++)
+	for (i = 1; i<= MAX_CHANNEL_NUMBER; i++)
 		if (pDot11dInfo->channel_map[i] > 0)
 			printk(" %d", i);
 	printk("\n");
@@ -161,7 +161,7 @@ void Dot11d_UpdateCountryIe(struct rtllib_device *dev, u8 *pTaddr,
 	UPDATE_CIE_SRC(dev, pTaddr);
 
 	pDot11dInfo->CountryIeLen = CoutryIeLen;
-	memcpy(pDot11dInfo->CountryIeBuf, pCoutryIe,CoutryIeLen);
+	memcpy(pDot11dInfo->CountryIeBuf, pCoutryIe, CoutryIeLen);
 	pDot11dInfo->State = DOT11D_STATE_LEARNED;
 }
 
@@ -224,7 +224,7 @@ int ToLegalChannel( struct rtllib_device * dev, u8 channel)
 	u8 default_chn = 0;
 	u32 i = 0;
 
-	for (i=1; i<= MAX_CHANNEL_NUMBER; i++)
+	for (i = 1; i<= MAX_CHANNEL_NUMBER; i++)
 	{
 		if (pDot11dInfo->channel_map[i] > 0)
 		{

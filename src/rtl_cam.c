@@ -72,7 +72,7 @@ void EnableHWSecurityConfig8192(struct net_device *dev)
 
 
 	//add HWSec active enable here.
-	//default using hwsec. when peer AP is in N mode only and pairwise_key_type is none_aes(which HT_IOT_ACT_PURE_N_MODE indicates it), use software security. when peer AP is in b,g,n mode mixed and pairwise_key_type is none_aes, use g mode hw security. WB on 2008.7.4
+	//default using hwsec. when peer AP is in N mode only and pairwise_key_type is none_aes(which HT_IOT_ACT_PURE_N_MODE indicates it), use software security. when peer AP is in b, g, n mode mixed and pairwise_key_type is none_aes, use g mode hw security. WB on 2008.7.4
 	ieee->hwsec_active = 1;
 	if ((ieee->pHTInfo->IOTAction&HT_IOT_ACT_PURE_N_MODE) || !hwwep)//!ieee->hwsec_support) //add hwsec_support flag to totol control hw_sec on/off
 	{
@@ -96,12 +96,12 @@ void set_swcam(struct net_device *dev,
 	struct r8192_priv *priv = rtllib_priv(dev);
 	struct rtllib_device *ieee = priv->rtllib;
 
-	ieee->swcamtable[EntryNo].bused=true;
-	ieee->swcamtable[EntryNo].key_index=KeyIndex;
-	ieee->swcamtable[EntryNo].key_type=KeyType;
-	memcpy(ieee->swcamtable[EntryNo].macaddr,MacAddr,6);
-	ieee->swcamtable[EntryNo].useDK=DefaultKey;
-	memcpy(ieee->swcamtable[EntryNo].key_buf,(u8*)KeyContent,16);
+	ieee->swcamtable[EntryNo].bused = true;
+	ieee->swcamtable[EntryNo].key_index = KeyIndex;
+	ieee->swcamtable[EntryNo].key_type = KeyType;
+	memcpy(ieee->swcamtable[EntryNo].macaddr, MacAddr, 6);
+	ieee->swcamtable[EntryNo].useDK = DefaultKey;
+	memcpy(ieee->swcamtable[EntryNo].key_buf, (u8*)KeyContent, 16);
 }
 
 void setKey(struct net_device *dev,
@@ -124,7 +124,7 @@ void setKey(struct net_device *dev,
 		if (rtState == eRfOff){
 			if (priv->rtllib->RfOffReason > RF_CHANGE_BY_IPS)
 			{
-				RT_TRACE(COMP_ERR, "%s(): RF is OFF.\n",__FUNCTION__);
+				RT_TRACE(COMP_ERR, "%s(): RF is OFF.\n", __FUNCTION__);
 				return ;
 			}
 			else {
@@ -138,7 +138,7 @@ void setKey(struct net_device *dev,
 	if (EntryNo >= TOTAL_CAM_ENTRY)
 		RT_TRACE(COMP_ERR, "cam entry exceeds in setKey()\n");
 
-	RT_TRACE(COMP_SEC, "====>to setKey(), dev:%p, EntryNo:%d, KeyIndex:%d, KeyType:%d, MacAddr"MAC_FMT"\n", dev,EntryNo, KeyIndex, KeyType, MAC_ARG(MacAddr));
+	RT_TRACE(COMP_SEC, "====>to setKey(), dev:%p, EntryNo:%d, KeyIndex:%d, KeyType:%d, MacAddr"MAC_FMT"\n", dev, EntryNo, KeyIndex, KeyType, MAC_ARG(MacAddr));
 
 	if (DefaultKey)
 		usConfig |= BIT15 | (KeyType<<2);
@@ -147,11 +147,11 @@ void setKey(struct net_device *dev,
 	//	usConfig |= BIT15 | (KeyType<<2) | (DefaultKey<<5) | KeyIndex;
 
 
-	for (i=0 ; i<CAM_CONTENT_COUNT; i++){
+	for (i = 0 ; i<CAM_CONTENT_COUNT; i++){
 		TargetCommand  = i+CAM_CONTENT_COUNT*EntryNo;
 		TargetCommand |= BIT31|BIT16;
 
-		if (i==0){//MAC|Config
+		if (i == 0){//MAC|Config
 			TargetContent = (u32)(*(MacAddr+0)) << 16|
 				(u32)(*(MacAddr+1)) << 24|
 				(u32)usConfig;
@@ -160,7 +160,7 @@ void setKey(struct net_device *dev,
 			write_nic_dword(dev, RWCAM, TargetCommand);
 			//		printk("setkey cam =%8x\n", read_cam(dev, i+6*EntryNo));
 		}
-		else if (i==1){//MAC
+		else if (i == 1){//MAC
 			TargetContent = (u32)(*(MacAddr+2))	 |
 				(u32)(*(MacAddr+3)) <<  8|
 				(u32)(*(MacAddr+4)) << 16|
@@ -182,21 +182,21 @@ void setKey(struct net_device *dev,
 
 void CAM_read_entry(struct net_device *dev, u32 iIndex)
 {
-	u32 target_command=0;
-	u32 target_content=0;
-	u8 entry_i=0;
+	u32 target_command = 0;
+	u32 target_content = 0;
+	u8 entry_i = 0;
 	u32 ulStatus;
-	s32 i=100;
+	s32 i = 100;
 	//	printk("=======>start read CAM\n");
-	for (entry_i=0;entry_i<CAM_CONTENT_COUNT;entry_i++)
+	for (entry_i = 0;entry_i<CAM_CONTENT_COUNT;entry_i++)
 	{
 		// polling bit, and No Write enable, and address
-		target_command= entry_i+CAM_CONTENT_COUNT*iIndex;
-		target_command= target_command | BIT31;
+		target_command = entry_i+CAM_CONTENT_COUNT*iIndex;
+		target_command = target_command | BIT31;
 
 		//Check polling bit is clear
 		//	mdelay(1);
-		while ((i--)>=0)
+		while ((i--)>= 0)
 		{
 			ulStatus = read_nic_dword(dev, RWCAM);
 			if (ulStatus & BIT31){
@@ -207,11 +207,11 @@ void CAM_read_entry(struct net_device *dev, u32 iIndex)
 			}
 		}
 		write_nic_dword(dev, RWCAM, target_command);
-		RT_TRACE(COMP_SEC,"CAM_read_entry(): WRITE A0: %x \n",target_command);
-		//	printk("CAM_read_entry(): WRITE A0: %lx \n",target_command);
+		RT_TRACE(COMP_SEC,"CAM_read_entry(): WRITE A0: %x \n", target_command);
+		//	printk("CAM_read_entry(): WRITE A0: %lx \n", target_command);
 		target_content = read_nic_dword(dev, RCAMO);
-		RT_TRACE(COMP_SEC, "CAM_read_entry(): WRITE A8: %x \n",target_content);
-		//	printk("CAM_read_entry(): WRITE A8: %lx \n",target_content);
+		RT_TRACE(COMP_SEC, "CAM_read_entry(): WRITE A8: %x \n", target_content);
+		//	printk("CAM_read_entry(): WRITE A8: %lx \n", target_content);
 	}
 	printk("\n");
 }
@@ -237,7 +237,7 @@ void CamRestoreAllEntry(	struct net_device *dev)
 			(priv->rtllib->pairwise_key_type == KEY_TYPE_WEP104))
 	{
 
-		for (EntryId=0; EntryId<4; EntryId++)
+		for (EntryId = 0; EntryId<4; EntryId++)
 		{
 			{
 				MacAddr = CAM_CONST_ADDR[EntryId];
@@ -319,7 +319,7 @@ void CamRestoreAllEntry(	struct net_device *dev)
 	if (priv->rtllib->group_key_type == KEY_TYPE_TKIP)
 	{
 		MacAddr = CAM_CONST_BROAD;
-		for (EntryId=1 ; EntryId<4 ; EntryId++)
+		for (EntryId = 1 ; EntryId<4 ; EntryId++)
 		{
 			if (priv->rtllib->swcamtable[EntryId].bused )
 			{
@@ -347,13 +347,13 @@ void CamRestoreAllEntry(	struct net_device *dev)
 			}
 			else
 			{
-				RT_TRACE(COMP_ERR,"===>%s():ERR!! ADHOC TKIP ,but 0 entry is have no data\n",__FUNCTION__);
+				RT_TRACE(COMP_ERR,"===>%s():ERR!! ADHOC TKIP , but 0 entry is have no data\n", __FUNCTION__);
 				return;
 			}
 		}
 	} else if (priv->rtllib->group_key_type == KEY_TYPE_CCMP) {
 		MacAddr = CAM_CONST_BROAD;
-		for (EntryId=1; EntryId<4 ; EntryId++)
+		for (EntryId = 1; EntryId<4 ; EntryId++)
 		{
 			if (priv->rtllib->swcamtable[EntryId].bused )
 			{
@@ -377,7 +377,7 @@ void CamRestoreAllEntry(	struct net_device *dev)
 					0,
 					(u32*)(&priv->rtllib->swcamtable[0].key_buf[0]));
 			} else {
-				RT_TRACE(COMP_ERR,"===>%s():ERR!! ADHOC CCMP ,but 0 entry is have no data\n",
+				RT_TRACE(COMP_ERR,"===>%s():ERR!! ADHOC CCMP , but 0 entry is have no data\n",
 						__FUNCTION__);
 				return;
 			}

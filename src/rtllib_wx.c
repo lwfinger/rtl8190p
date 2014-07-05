@@ -42,12 +42,12 @@ struct modes_unit {
 	int mode_size;
 };
 static struct modes_unit rtllib_modes[] = {
-	{"a",1},
-	{"b",1},
-	{"g",1},
-	{"?",1},
-	{"N-24G",5},
-	{"N-5G",4},
+	{"a", 1},
+	{"b", 1},
+	{"g", 1},
+	{"?", 1},
+	{"N-24G", 5},
+	{"N-5G", 4},
 };
 
 #define MAX_CUSTOM_LEN 64
@@ -87,10 +87,10 @@ static inline char *rtl819x_translate_scan(struct rtllib_device *ieee,
 	}
 	/* Add the protocol name */
 	iwe.cmd = SIOCGIWNAME;
-	for (i=0; i<(sizeof(rtllib_modes)/sizeof(rtllib_modes[0])); i++) {
+	for (i = 0; i<(sizeof(rtllib_modes)/sizeof(rtllib_modes[0])); i++) {
 		if (network->mode&(1<<i)) {
-			sprintf(pname,rtllib_modes[i].mode_string,rtllib_modes[i].mode_size);
-			pname +=rtllib_modes[i].mode_size;
+			sprintf(pname, rtllib_modes[i].mode_string, rtllib_modes[i].mode_size);
+			pname += rtllib_modes[i].mode_size;
 		}
 	}
 	*pname = '\0';
@@ -201,7 +201,7 @@ static inline char *rtl819x_translate_scan(struct rtllib_device *ieee,
 	if (ieee->wpa_enabled && network->wpa_ie_len){
 		char buf[MAX_WPA_IE_LEN * 2 + 30];
 		u8 *p = buf;
-		p += sprintf(p, "wpa_ie=");
+		p += sprintf(p, "wpa_ie =");
 		for (i = 0; i < network->wpa_ie_len; i++) {
 			p += sprintf(p, "%02x", network->wpa_ie[i]);
 		}
@@ -216,7 +216,7 @@ static inline char *rtl819x_translate_scan(struct rtllib_device *ieee,
 		char buf[MAX_WPA_IE_LEN * 2 + 30];
 
 		u8 *p = buf;
-		p += sprintf(p, "rsn_ie=");
+		p += sprintf(p, "rsn_ie =");
 		for (i = 0; i < network->rsn_ie_len; i++) {
 			p += sprintf(p, "%02x", network->rsn_ie[i]);
 		}
@@ -246,7 +246,7 @@ static inline char *rtl819x_translate_scan(struct rtllib_device *ieee,
 		start = iwe_stream_add_point_rsl(info, start, stop, &iwe, buf);
         }
 
-#if LINUX_VERSION_CODE > KERNEL_VERSION(2,5,0)
+#if LINUX_VERSION_CODE > KERNEL_VERSION(2, 5, 0)
 #ifndef CUSTOMER_ID_INTEL_CMPC
 	/* add info for WZC */
 	memset(&iwe, 0, sizeof(iwe));
@@ -405,7 +405,7 @@ int rtllib_wx_set_encode(struct rtllib_device *ieee,
 #ifdef BUILT_IN_RTLLIB
 		if (new_crypt->ops)
 #else
-#if LINUX_VERSION_CODE >= KERNEL_VERSION(2,5,0)
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(2, 5, 0)
 		if (new_crypt->ops && try_module_get(new_crypt->ops->owner))
 #else
 		if (new_crypt->ops && try_inc_mod_count(new_crypt->ops->owner))
@@ -621,7 +621,7 @@ int rtllib_wx_set_encode_ext(struct rtllib_device *ieee,
                 ret = -EINVAL;
                 goto done;
         }
-	printk("alg name:%s\n",alg);
+	printk("alg name:%s\n", alg);
 
 	 ops = rtllib_get_crypto_ops(alg);
         if (ops == NULL) {
@@ -629,7 +629,7 @@ int rtllib_wx_set_encode_ext(struct rtllib_device *ieee,
 
                 memset( tempbuf, 0x00, 100 );
                 sprintf( tempbuf, "%s", module);
-                request_module("%s",tempbuf);
+                request_module("%s", tempbuf);
                 ops = rtllib_get_crypto_ops(alg);
         }
         if (ops == NULL) {
@@ -645,11 +645,11 @@ int rtllib_wx_set_encode_ext(struct rtllib_device *ieee,
 
                 rtllib_crypt_delayed_deinit(ieee, crypt);
 
-#if (LINUX_VERSION_CODE > KERNEL_VERSION(2,6,13))
+#if (LINUX_VERSION_CODE > KERNEL_VERSION(2, 6, 13))
                 new_crypt = kzalloc(sizeof(*new_crypt), GFP_KERNEL);
 #else
                 new_crypt = kmalloc(sizeof(*new_crypt), GFP_KERNEL);
-		memset(new_crypt,0,sizeof(*new_crypt));
+		memset(new_crypt, 0, sizeof(*new_crypt));
 #endif
                 if (new_crypt == NULL) {
                         ret = -ENOMEM;
@@ -777,7 +777,7 @@ int rtllib_wx_set_mlme(struct rtllib_device *ieee,
                                struct iw_request_info *info,
                                union iwreq_data *wrqu, char *extra)
 {
-#if LINUX_VERSION_CODE > KERNEL_VERSION(2,5,0)
+#if LINUX_VERSION_CODE > KERNEL_VERSION(2, 5, 0)
 	bool deauth = false;
 	struct iw_mlme *mlme = (struct iw_mlme *) extra;
 
@@ -797,7 +797,7 @@ int rtllib_wx_set_mlme(struct rtllib_device *ieee,
 			} else {
 				printk("dis associate packet!\n");
 			}
-			SendDisassociation(ieee,deauth,mlme->reason_code);
+			SendDisassociation(ieee, deauth, mlme->reason_code);
 			rtllib_disassociate(ieee);
 			break;
 		default:
@@ -815,7 +815,7 @@ int rtllib_wx_set_auth(struct rtllib_device *ieee,
                                struct iw_request_info *info,
                                struct iw_param *data, char *extra)
 {
-#if LINUX_VERSION_CODE > KERNEL_VERSION(2,5,0)
+#if LINUX_VERSION_CODE > KERNEL_VERSION(2, 5, 0)
 	switch (data->flags & IW_AUTH_INDEX) {
         case IW_AUTH_WPA_VERSION:
 		break;
@@ -873,7 +873,7 @@ int rtllib_wx_set_gen_ie(struct rtllib_device *ieee, u8 *ie, size_t len)
 {
 #if (WIRELESS_EXT >= 18 )
 	u8 *buf;
-	u8 eid, wps_oui[4]={0x0,0x50,0xf2,0x04};
+	u8 eid, wps_oui[4]={0x0, 0x50, 0xf2, 0x04};
 
 	if (len > MAX_WPA_IE_LEN || (len && ie == NULL)) {
 		return -EINVAL;

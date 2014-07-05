@@ -23,13 +23,13 @@
 #include <linux/interrupt.h>
 #include "rtllib.h"
 
-#if defined(BUILT_IN_CRYPTO) || (LINUX_VERSION_CODE < KERNEL_VERSION(2,5,0))
+#if defined(BUILT_IN_CRYPTO) || (LINUX_VERSION_CODE < KERNEL_VERSION(2, 5, 0))
 #include "rtl_crypto.h"
 #else
 #include <linux/crypto.h>
 #endif
 
-#if LINUX_VERSION_CODE < KERNEL_VERSION(2,6,20)
+#if LINUX_VERSION_CODE < KERNEL_VERSION(2, 6, 20)
     #include <asm/scatterlist.h>
 #else
     #include <linux/scatterlist.h>
@@ -72,10 +72,10 @@ struct rtllib_ccmp_data {
 void rtllib_ccmp_aes_encrypt(struct crypto_tfm *tfm,
 			     const u8 pt[16], u8 ct[16])
 {
-#if ( defined(BUILT_IN_CRYPTO) || ((LINUX_VERSION_CODE < KERNEL_VERSION(2,6,21)) && (!OPENSUSE_SLED)) )
+#if ( defined(BUILT_IN_CRYPTO) || ((LINUX_VERSION_CODE < KERNEL_VERSION(2, 6, 21)) && (!OPENSUSE_SLED)) )
 	struct scatterlist src, dst;
 
-#if (LINUX_VERSION_CODE < KERNEL_VERSION(2,6,24))
+#if (LINUX_VERSION_CODE < KERNEL_VERSION(2, 6, 24))
 	src.page = virt_to_page(pt);
 	src.offset = offset_in_page(pt);
 	src.length = AES_BLOCK_LEN;
@@ -105,7 +105,7 @@ static void * rtllib_ccmp_init(int key_idx)
 	memset(priv, 0, sizeof(*priv));
 	priv->key_idx = key_idx;
 
-#if ( defined(BUILT_IN_CRYPTO) || ((LINUX_VERSION_CODE < KERNEL_VERSION(2,6,21)) && (!OPENSUSE_SLED)) )
+#if ( defined(BUILT_IN_CRYPTO) || ((LINUX_VERSION_CODE < KERNEL_VERSION(2, 6, 21)) && (!OPENSUSE_SLED)) )
 	priv->tfm = crypto_alloc_tfm("aes", 0);
 	if (priv->tfm == NULL) {
 		printk(KERN_DEBUG "rtllib_crypt_ccmp: could not allocate "
@@ -126,7 +126,7 @@ static void * rtllib_ccmp_init(int key_idx)
 fail:
 	if (priv) {
 		if (priv->tfm)
-			#if defined(BUILT_IN_CRYPTO) || (LINUX_VERSION_CODE < KERNEL_VERSION(2,6,21))
+			#if defined(BUILT_IN_CRYPTO) || (LINUX_VERSION_CODE < KERNEL_VERSION(2, 6, 21))
 			crypto_free_tfm(priv->tfm);
                     #else
 			crypto_free_cipher((void*)priv->tfm);
@@ -142,7 +142,7 @@ static void rtllib_ccmp_deinit(void *priv)
 {
 	struct rtllib_ccmp_data *_priv = priv;
 	if (_priv && _priv->tfm)
-#if defined(BUILT_IN_CRYPTO) || (LINUX_VERSION_CODE < KERNEL_VERSION(2,6,21))
+#if defined(BUILT_IN_CRYPTO) || (LINUX_VERSION_CODE < KERNEL_VERSION(2, 6, 21))
 		crypto_free_tfm(_priv->tfm);
 #else
 		crypto_free_cipher((void*)_priv->tfm);
@@ -191,8 +191,8 @@ static void ccmp_init_blocks(struct crypto_tfm *tfm,
 		aad_len += 2;
 	}
 	/* CCM Initial Block:
-	 * Flag (Include authentication header, M=3 (8-octet MIC),
-	 *       L=1 (2-octet Dlen))
+	 * Flag (Include authentication header, M = 3 (8-octet MIC),
+	 *       L = 1 (2-octet Dlen))
 	 * Nonce: 0x00 | A2 | PN
 	 * Dlen */
 	b0[0] = 0x59;
@@ -337,14 +337,14 @@ static int rtllib_ccmp_decrypt(struct sk_buff *skb, int hdr_len, void *priv)
 	}
 	keyidx >>= 6;
 	if (key->key_idx != keyidx) {
-		printk(KERN_DEBUG "CCMP: RX tkey->key_idx=%d frame "
-		       "keyidx=%d priv=%p\n", key->key_idx, keyidx, priv);
+		printk(KERN_DEBUG "CCMP: RX tkey->key_idx =%d frame "
+		       "keyidx =%d priv =%p\n", key->key_idx, keyidx, priv);
 		return -6;
 	}
 	if (!key->key_set) {
 		if (net_ratelimit()) {
 			printk(KERN_DEBUG "CCMP: received packet from " MAC_FMT
-			       " with keyid=%d that does not have a configured"
+			       " with keyid =%d that does not have a configured"
 			       " key\n", MAC_ARG(hdr->addr2), keyidx);
 		}
 		return -3;
@@ -359,7 +359,7 @@ static int rtllib_ccmp_decrypt(struct sk_buff *skb, int hdr_len, void *priv)
 	pos += 8;
 	if (memcmp(pn, key->rx_pn, CCMP_PN_LEN) <= 0) {
 		if (net_ratelimit()) {
-			printk(KERN_DEBUG "CCMP: replay detected: STA=" MAC_FMT
+			printk(KERN_DEBUG "CCMP: replay detected: STA =" MAC_FMT
 			       " previous PN %02x%02x%02x%02x%02x%02x "
 			       "received PN %02x%02x%02x%02x%02x%02x\n",
 			       MAC_ARG(hdr->addr2), MAC_ARG(key->rx_pn),
@@ -398,7 +398,7 @@ static int rtllib_ccmp_decrypt(struct sk_buff *skb, int hdr_len, void *priv)
 
 		if (memcmp(mic, a, CCMP_MIC_LEN) != 0) {
 			if (net_ratelimit()) {
-				printk(KERN_DEBUG "CCMP: decrypt failed: STA="
+				printk(KERN_DEBUG "CCMP: decrypt failed: STA ="
 				MAC_FMT "\n", MAC_ARG(hdr->addr2));
 			}
 			key->dot11RSNAStatsCCMPDecryptErrors++;
@@ -474,10 +474,10 @@ static int rtllib_ccmp_get_key(void *key, int len, u8 *seq, void *priv)
 static char * rtllib_ccmp_print_stats(char *p, void *priv)
 {
 	struct rtllib_ccmp_data *ccmp = priv;
-	p += sprintf(p, "key[%d] alg=CCMP key_set=%d "
-		     "tx_pn=%02x%02x%02x%02x%02x%02x "
-		     "rx_pn=%02x%02x%02x%02x%02x%02x "
-		     "format_errors=%d replays=%d decrypt_errors=%d\n",
+	p += sprintf(p, "key[%d] alg = CCMP key_set =%d "
+		     "tx_pn =%02x%02x%02x%02x%02x%02x "
+		     "rx_pn =%02x%02x%02x%02x%02x%02x "
+		     "format_errors =%d replays =%d decrypt_errors =%d\n",
 		     ccmp->key_idx, ccmp->key_set,
 		     MAC_ARG(ccmp->tx_pn), MAC_ARG(ccmp->rx_pn),
 		     ccmp->dot11RSNAStatsCCMPFormatErrors,
