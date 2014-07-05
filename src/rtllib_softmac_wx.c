@@ -623,24 +623,3 @@ exit:
 	return ret;
 
 }
-
-#ifndef BUILT_IN_RTLLIB
-EXPORT_SYMBOL_RSL(rtllib_wx_get_essid);
-EXPORT_SYMBOL_RSL(rtllib_wx_set_essid);
-EXPORT_SYMBOL_RSL(rtllib_wx_set_rate);
-EXPORT_SYMBOL_RSL(rtllib_wx_get_rate);
-EXPORT_SYMBOL_RSL(rtllib_wx_set_wap);
-EXPORT_SYMBOL_RSL(rtllib_wx_get_wap);
-EXPORT_SYMBOL_RSL(rtllib_wx_set_mode);
-EXPORT_SYMBOL_RSL(rtllib_wx_get_mode);
-EXPORT_SYMBOL_RSL(rtllib_wx_set_scan);
-EXPORT_SYMBOL_RSL(rtllib_wx_get_freq);
-EXPORT_SYMBOL_RSL(rtllib_wx_set_freq);
-EXPORT_SYMBOL_RSL(rtllib_wx_set_rawtx);
-EXPORT_SYMBOL_RSL(rtllib_wx_get_name);
-EXPORT_SYMBOL_RSL(rtllib_wx_set_power);
-EXPORT_SYMBOL_RSL(rtllib_wx_get_power);
-EXPORT_SYMBOL_RSL(rtllib_wlan_frequencies);
-EXPORT_SYMBOL_RSL(rtllib_wx_set_rts);
-EXPORT_SYMBOL_RSL(rtllib_wx_get_rts);
-#endif

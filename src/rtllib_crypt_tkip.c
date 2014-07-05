@@ -31,13 +31,6 @@
 
 #include <linux/crc32.h>
 
-#ifndef BUILT_IN_RTLLIB
-MODULE_AUTHOR("Jouni Malinen");
-MODULE_DESCRIPTION("Host AP crypt: TKIP");
-MODULE_LICENSE("GPL");
-#endif
-
-
 struct rtllib_tkip_data {
 #define TKIP_KEY_LEN 32
 	u8 key[TKIP_KEY_LEN];
@@ -1002,10 +995,3 @@ void rtllib_tkip_null(void)
 {
         return;
 }
-
-#ifndef BUILT_IN_RTLLIB
-EXPORT_SYMBOL_RSL(rtllib_tkip_null);
-
-module_init(rtllib_crypto_tkip_init);
-module_exit(rtllib_crypto_tkip_exit);
-#endif

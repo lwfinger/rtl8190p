@@ -244,14 +244,3 @@ int ToLegalChannel( struct rtllib_device * dev, u8 channel)
 
 	return default_chn;
 }
-
-#ifndef BUILT_IN_RTLLIB
-EXPORT_SYMBOL_RSL(Dot11d_Init);
-EXPORT_SYMBOL_RSL(Dot11d_Channelmap);
-EXPORT_SYMBOL_RSL(Dot11d_Reset);
-EXPORT_SYMBOL_RSL(Dot11d_UpdateCountryIe);
-EXPORT_SYMBOL_RSL(DOT11D_GetMaxTxPwrInDbm);
-EXPORT_SYMBOL_RSL(DOT11D_ScanComplete);
-EXPORT_SYMBOL_RSL(IsLegalChannel);
-EXPORT_SYMBOL_RSL(ToLegalChannel);
-#endif

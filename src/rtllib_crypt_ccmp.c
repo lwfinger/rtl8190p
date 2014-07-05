@@ -35,13 +35,6 @@
     #include <linux/scatterlist.h>
 #endif
 
-#ifndef BUILT_IN_RTLLIB
-MODULE_AUTHOR("Jouni Malinen");
-MODULE_DESCRIPTION("Host AP crypt: CCMP");
-MODULE_LICENSE("GPL");
-#endif
-
-
 #define AES_BLOCK_LEN 16
 #define CCMP_HDR_LEN 8
 #define CCMP_MIC_LEN 8
@@ -519,10 +512,3 @@ void __exit rtllib_crypto_ccmp_exit(void)
 {
 	rtllib_unregister_crypto_ops(&rtllib_crypt_ccmp);
 }
-
-#ifndef BUILT_IN_RTLLIB
-EXPORT_SYMBOL_RSL(rtllib_ccmp_null);
-
-module_init(rtllib_crypto_ccmp_init);
-module_exit(rtllib_crypto_ccmp_exit);
-#endif

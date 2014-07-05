@@ -591,6 +591,3 @@ void TsStartAddBaProcess(struct rtllib_device* ieee, PTX_TS_RECORD	pTxTS)
 	else
 		RTLLIB_DEBUG(RTLLIB_DL_ERR, "%s() ==>BA timer is already added\n", __FUNCTION__);
 }
-#ifndef BUILT_IN_RTLLIB
-EXPORT_SYMBOL_RSL(RemovePeerTS);
-#endif

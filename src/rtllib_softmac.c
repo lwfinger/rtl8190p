@@ -3482,17 +3482,9 @@ static int rtllib_wpa_set_encryption(struct rtllib_device *ieee,
 			}
 			memset(new_crypt, 0, sizeof(struct rtllib_crypt_data));
 			new_crypt->ops = ops;
-#ifdef BUILT_IN_RTLLIB
 			if (new_crypt->ops)
-#else
-#if LINUX_VERSION_CODE >= KERNEL_VERSION(2, 5, 0)
-			if (new_crypt->ops && try_module_get(new_crypt->ops->owner))
-#else
-			if (new_crypt->ops && try_inc_mod_count(new_crypt->ops->owner))
-#endif
-#endif
-					new_crypt->priv =
-						new_crypt->ops->init(param->u.crypt.idx);
+				new_crypt->priv =
+					new_crypt->ops->init(param->u.crypt.idx);
 
 			if (new_crypt->priv == NULL) {
 				kfree(new_crypt);
@@ -3747,30 +3739,3 @@ void notify_wx_assoc_event(struct rtllib_device *ieee)
 	}
 	wireless_send_event(ieee->dev, SIOCGIWAP, &wrqu, NULL);
 }
-
-#ifndef BUILT_IN_RTLLIB
-EXPORT_SYMBOL_RSL(rtllib_get_beacon);
-EXPORT_SYMBOL_RSL(rtllib_wake_queue);
-EXPORT_SYMBOL_RSL(rtllib_stop_queue);
-EXPORT_SYMBOL_RSL(rtllib_reset_queue);
-EXPORT_SYMBOL_RSL(rtllib_softmac_stop_protocol);
-EXPORT_SYMBOL_RSL(rtllib_softmac_start_protocol);
-EXPORT_SYMBOL_RSL(rtllib_is_shortslot);
-EXPORT_SYMBOL_RSL(rtllib_is_54g);
-EXPORT_SYMBOL_RSL(rtllib_wpa_supplicant_ioctl);
-EXPORT_SYMBOL_RSL(rtllib_ps_tx_ack);
-EXPORT_SYMBOL_RSL(rtllib_softmac_xmit);
-EXPORT_SYMBOL_RSL(rtllib_stop_send_beacons);
-EXPORT_SYMBOL_RSL(notify_wx_assoc_event);
-EXPORT_SYMBOL_RSL(SendDisassociation);
-EXPORT_SYMBOL_RSL(rtllib_disassociate);
-EXPORT_SYMBOL_RSL(rtllib_start_send_beacons);
-EXPORT_SYMBOL_RSL(rtllib_stop_scan);
-EXPORT_SYMBOL_RSL(rtllib_send_probe_requests);
-EXPORT_SYMBOL_RSL(rtllib_softmac_scan_syncro);
-EXPORT_SYMBOL_RSL(rtllib_start_scan_syncro);
-EXPORT_SYMBOL_RSL(rtllib_sta_ps_send_null_frame);
-EXPORT_SYMBOL_RSL(rtllib_sta_ps_send_pspoll_frame);
-EXPORT_SYMBOL_RSL(rtllib_sta_wakeup);
-EXPORT_SYMBOL_RSL(rtllib_ap_sec_type);
-#endif

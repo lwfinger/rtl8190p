@@ -15,8 +15,6 @@ EXTRA_CFLAGS += -I$(TOPDIR)/drivers/net/wireless
 EXTRA_CFLAGS += -std=gnu89
 EXTRA_CFLAGS += -O2
 EXTRA_CFLAGS += -mhard-float -DCONFIG_FORCE_HARD_FLOAT=y
-#flag for single module compile
-EXTRA_CFLAGS += -DBUILT_IN_RTLLIB
 
 r8190_pci-objs := rtl_core.o		\
 		  rtl8192e.o		\

@@ -21,12 +21,6 @@
 
 #include "rtllib.h"
 
-#ifndef BUILT_IN_RTLLIB
-MODULE_AUTHOR("Jouni Malinen");
-MODULE_DESCRIPTION("HostAP crypto");
-MODULE_LICENSE("GPL");
-#endif
-
 struct rtllib_crypto_alg {
 	struct list_head list;
 	struct rtllib_crypto_ops *ops;
@@ -55,16 +49,8 @@ void rtllib_crypt_deinit_entries(struct rtllib_device *ieee,
 
 		list_del(ptr);
 
-		if (entry->ops) {
+		if (entry->ops)
 			entry->ops->deinit(entry->priv);
-#ifndef BUILT_IN_RTLLIB
-#if LINUX_VERSION_CODE >= KERNEL_VERSION(2, 5, 0)
-			module_put(entry->ops->owner);
-#else
-			__MOD_DEC_USE_COUNT(entry->ops->owner);
-#endif
-#endif
-		}
 		kfree(entry);
 	}
 }
@@ -254,16 +240,3 @@ void __exit rtllib_crypto_deinit(void)
 
 	kfree(hcrypt);
 }
-
-#ifndef BUILT_IN_RTLLIB
-EXPORT_SYMBOL_RSL(rtllib_crypt_deinit_entries);
-EXPORT_SYMBOL_RSL(rtllib_crypt_deinit_handler);
-EXPORT_SYMBOL_RSL(rtllib_crypt_delayed_deinit);
-
-EXPORT_SYMBOL_RSL(rtllib_register_crypto_ops);
-EXPORT_SYMBOL_RSL(rtllib_unregister_crypto_ops);
-EXPORT_SYMBOL_RSL(rtllib_get_crypto_ops);
-
-module_init(rtllib_crypto_init);
-module_exit(rtllib_crypto_deinit);
-#endif

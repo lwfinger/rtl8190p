@@ -1292,11 +1292,3 @@ void HTSetConnectBwModeCallback(struct rtllib_device* ieee)
 
 	pHTInfo->bSwBwInProgress = false;
 }
-
-#ifndef BUILT_IN_RTLLIB
-EXPORT_SYMBOL_RSL(HTUpdateSelfAndPeerSetting);
-EXPORT_SYMBOL_RSL(HTFilterMCSRate);
-EXPORT_SYMBOL_RSL(HTGetHighestMCSRate);
-EXPORT_SYMBOL_RSL(MCS_FILTER_ALL);
-EXPORT_SYMBOL_RSL(MCS_FILTER_1SS);
-#endif

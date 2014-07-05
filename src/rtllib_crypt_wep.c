@@ -27,11 +27,7 @@
     #include <linux/scatterlist.h>
 #endif
 #include <linux/crc32.h>
-#ifndef BUILT_IN_RTLLIB
-MODULE_AUTHOR("Jouni Malinen");
-MODULE_DESCRIPTION("Host AP crypt: WEP");
-MODULE_LICENSE("GPL");
-#endif
+
 struct prism2_wep_data {
 	u32 iv;
 #define WEP_KEY_LEN 13
@@ -357,10 +353,3 @@ void rtllib_wep_null(void)
 {
         return;
 }
-
-#ifndef BUILT_IN_RTLLIB
-EXPORT_SYMBOL_RSL(rtllib_wep_null);
-
-module_init(rtllib_crypto_wep_init);
-module_exit(rtllib_crypto_wep_exit);
-#endif

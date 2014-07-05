@@ -4745,7 +4745,6 @@ bool NicIFDisableNIC(struct net_device* dev)
 
 	return status;
 }
-#ifdef BUILT_IN_RTLLIB
 /* fun with the built-in rtllib stack... */
 extern int rtllib_init(void);
 extern int rtllib_exit(void);
@@ -4757,7 +4756,6 @@ extern int rtllib_crypto_ccmp_init(void);
 extern void rtllib_crypto_ccmp_exit(void);
 extern int rtllib_crypto_wep_init(void);
 extern void rtllib_crypto_wep_exit(void);
-#endif
 #ifdef BUILT_IN_MSHCLASS
 extern int msh_init(void);
 extern int msh_exit(void);
@@ -4768,7 +4766,6 @@ static int __init rtl8192_pci_module_init(void)
 	int ret;
 	int error;
 
-#ifdef BUILT_IN_RTLLIB
 	ret = rtllib_init();
 	if (ret) {
 		printk(KERN_ERR "rtllib_init() failed %d\n", ret);
@@ -4794,7 +4791,6 @@ static int __init rtl8192_pci_module_init(void)
 		printk(KERN_ERR "rtllib_crypto_wep_init() failed %d\n", ret);
 		return ret;
 	}
-#endif
 #ifdef BUILT_IN_MSHCLASS
 	ret = msh_init();
 	if (ret) {
@@ -4835,13 +4831,11 @@ static void __exit rtl8192_pci_module_exit(void)
 
 	RT_TRACE(COMP_DOWN, "Exiting");
 	rtl_remove_debugfs_root();
-#ifdef BUILT_IN_RTLLIB
 	rtllib_crypto_tkip_exit();
 	rtllib_crypto_ccmp_exit();
 	rtllib_crypto_wep_exit();
 	rtllib_crypto_deinit();
 	rtllib_exit();
-#endif
 #ifdef BUILT_IN_MSHCLASS
 	msh_exit();
 #endif

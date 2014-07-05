@@ -402,18 +402,8 @@ int rtllib_wx_set_encode(struct rtllib_device *ieee,
 			new_crypt->ops = rtllib_get_crypto_ops("WEP");
 		}
 
-#ifdef BUILT_IN_RTLLIB
 		if (new_crypt->ops)
-#else
-#if LINUX_VERSION_CODE >= KERNEL_VERSION(2, 5, 0)
-		if (new_crypt->ops && try_module_get(new_crypt->ops->owner))
-#else
-		if (new_crypt->ops && try_inc_mod_count(new_crypt->ops->owner))
-#endif
-#endif
-		{
 			new_crypt->priv = new_crypt->ops->init(key);
-		}
 
 		if (!new_crypt->ops || !new_crypt->priv) {
 			kfree(new_crypt);
@@ -656,14 +646,8 @@ int rtllib_wx_set_encode_ext(struct rtllib_device *ieee,
                         goto done;
                 }
                 new_crypt->ops = ops;
-#ifdef BUILT_IN_RTLLIB
 		if (new_crypt->ops)
-#else
-                if (new_crypt->ops && try_module_get(new_crypt->ops->owner))
-#endif
-		{
                         new_crypt->priv = new_crypt->ops->init(idx);
-		}
 
                 if (new_crypt->priv == NULL) {
                         kfree(new_crypt);
@@ -916,16 +900,3 @@ int rtllib_wx_set_gen_ie(struct rtllib_device *ieee, u8 *ie, size_t len)
 #endif
 	return 0;
 }
-
-#ifndef BUILT_IN_RTLLIB
-EXPORT_SYMBOL_RSL(rtllib_wx_set_gen_ie);
-#if (WIRELESS_EXT >= 18)
-EXPORT_SYMBOL_RSL(rtllib_wx_set_mlme);
-EXPORT_SYMBOL_RSL(rtllib_wx_set_auth);
-EXPORT_SYMBOL_RSL(rtllib_wx_set_encode_ext);
-EXPORT_SYMBOL_RSL(rtllib_wx_get_encode_ext);
-#endif
-EXPORT_SYMBOL_RSL(rtllib_wx_get_scan);
-EXPORT_SYMBOL_RSL(rtllib_wx_set_encode);
-EXPORT_SYMBOL_RSL(rtllib_wx_get_encode);
-#endif

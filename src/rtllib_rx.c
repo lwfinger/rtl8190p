@@ -2646,8 +2646,3 @@ void rtllib_rx_mgt(struct rtllib_device *ieee,
             break;
     }
 }
-
-#ifndef BUILT_IN_RTLLIB
-EXPORT_SYMBOL_RSL(rtllib_rx_mgt);
-EXPORT_SYMBOL_RSL(rtllib_rx);
-#endif

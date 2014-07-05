@@ -54,13 +54,6 @@
 
 #include "rtllib.h"
 
-
-#ifndef BUILT_IN_RTLLIB
-MODULE_DESCRIPTION("802.11 data/management/control stack");
-MODULE_AUTHOR("Copyright (C) 2004 Intel Corporation <jketreno@linux.intel.com>");
-MODULE_LICENSE("GPL");
-#endif
-
 #define DRV_NAME "rtllib"
 
 
@@ -276,16 +269,8 @@ void free_rtllib(struct net_device *dev)
 	for (i = 0; i < WEP_KEYS; i++) {
 		struct rtllib_crypt_data *crypt = ieee->crypt[i];
 		if (crypt) {
-			if (crypt->ops) {
+			if (crypt->ops)
 				crypt->ops->deinit(crypt->priv);
-#ifndef BUILT_IN_RTLLIB
-#if LINUX_VERSION_CODE >= KERNEL_VERSION(2, 5, 0)
-				module_put(crypt->ops->owner);
-#else
-				__MOD_DEC_USE_COUNT(crypt->ops->owner);
-#endif
-#endif
-			}
 			kfree(crypt);
 			ieee->crypt[i] = NULL;
 		}
@@ -321,20 +306,4 @@ int __init rtllib_init(void)
 void __exit rtllib_exit(void)
 {
 }
-
-#ifndef BUILT_IN_RTLLIB
-#if (LINUX_VERSION_CODE > KERNEL_VERSION(2, 5, 0))
-#include <linux/moduleparam.h>
-module_param(debug, int, 0444);
-MODULE_PARM_DESC(debug, "debug output mask");
-
-
-module_exit(rtllib_exit);
-module_init(rtllib_init);
-#endif
-
-EXPORT_SYMBOL_RSL(alloc_rtllib);
-EXPORT_SYMBOL_RSL(free_rtllib);
-EXPORT_SYMBOL_RSL(rtllib_debug_level);
-#endif
 #endif
