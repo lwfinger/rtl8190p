@@ -3425,7 +3425,6 @@ void rtl8192_query_rxphystatus(
 	{
 		pstats->SignalStrength = precord_stats->SignalStrength = (u8)(rtl819x_signal_scale_mapping(priv, (long)pwdb_all));//PWDB_ALL;
 
-/bin/bash: :n: command not found
 		//pRfd->Status.SignalStrength = pRecordRfd->Status.SignalStrength = (u8)(SignalScaleMapping(total_rssi/= RF90_PATH_MAX));//(u8)(total_rssi/= RF90_PATH_MAX);
 		// We can judge RX path number now.
 		if (rf_rx_num != 0)

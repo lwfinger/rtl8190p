@@ -27,7 +27,7 @@
 #include <linux/kernel.h>   /* ARRAY_SIZE */
 #include <linux/version.h>
 #include <linux/module.h>
-#if (LINUX_VERSION_CODE > KERNEL_VERSION(2,5,0))
+#if (LINUX_VERSION_CODE > KERNEL_VERSION(2, 5, 0))
 #include <linux/jiffies.h>
 #else
 #include <linux/jffs.h>
@@ -56,7 +56,7 @@
 #include <net/iw_handler.h>
 
 #ifndef RTK_DMP_PLATFORM
-#if (LINUX_VERSION_CODE < KERNEL_VERSION(2,6,20))
+#if (LINUX_VERSION_CODE < KERNEL_VERSION(2, 6, 20))
 #ifndef bool
 typedef enum{false = 0, true} bool;
 #endif
@@ -76,7 +76,7 @@ typedef enum{false = 0, true} bool;
 #define IW_CUSTOM_MAX	256	/* In bytes */
 #endif
 
-#if (LINUX_VERSION_CODE < KERNEL_VERSION(2,5,0))
+#if (LINUX_VERSION_CODE < KERNEL_VERSION(2, 5, 0))
 #define jiffies_to_msecs(t)  ((t) * 1000 / HZ)
 #ifndef __bitwise
 #define __bitwise __attribute__((bitwise))
@@ -108,15 +108,15 @@ struct iw_spy_data{
  */
 #define container_of(ptr, type, member) ({                      \
         const typeof( ((type *)0)->member ) *__mptr = (ptr);    \
-        (type *)( (char *)__mptr - offsetof(type,member) );})
+        (type *)( (char *)__mptr - offsetof(type, member) );})
 #endif
 
-#if (LINUX_VERSION_CODE > KERNEL_VERSION(2,5,0))
+#if (LINUX_VERSION_CODE > KERNEL_VERSION(2, 5, 0))
 	#define EXPORT_SYMBOL_RSL(x) EXPORT_SYMBOL(x)
 #else
 	#define EXPORT_SYMBOL_RSL(x) EXPORT_SYMBOL_NOVERS(x)
 #endif
-#if (LINUX_VERSION_CODE < KERNEL_VERSION(2,5,0))
+#if (LINUX_VERSION_CODE < KERNEL_VERSION(2, 5, 0))
 static inline void tq_init(struct tq_struct * task, void(*func)(void *), void *data)
 {
 	task->routine = func;
@@ -131,43 +131,43 @@ static inline void setup_timer(struct timer_list * timer, void(*function)(unsign
 }
 #endif
 
-#if LINUX_VERSION_CODE >= KERNEL_VERSION(2,6,20)
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(2, 6, 20)
 	typedef struct delayed_work delayed_work_struct_rsl;
-	#define queue_delayed_work_rsl(x,y,z) queue_delayed_work(x,y,z)
-	#define INIT_DELAYED_WORK_RSL(x,y,z) INIT_DELAYED_WORK(x,y)
-#elif LINUX_VERSION_CODE <= KERNEL_VERSION(2,5,40)
+	#define queue_delayed_work_rsl(x, y, z) queue_delayed_work(x, y, z)
+	#define INIT_DELAYED_WORK_RSL(x, y, z) INIT_DELAYED_WORK(x, y)
+#elif LINUX_VERSION_CODE <= KERNEL_VERSION(2, 5, 40)
 	typedef struct tq_struct delayed_work_struct_rsl;
-	#define queue_delayed_work_rsl(x,y,z) schedule_task(y)
-	#define INIT_DELAYED_WORK_RSL(x,y,z) tq_init(x,y,z)
+	#define queue_delayed_work_rsl(x, y, z) schedule_task(y)
+	#define INIT_DELAYED_WORK_RSL(x, y, z) tq_init(x, y, z)
 #else
 	typedef struct work_struct delayed_work_struct_rsl;
-	#define queue_delayed_work_rsl(x,y,z) queue_delayed_work(x,y,z)
-	#define INIT_DELAYED_WORK_RSL(x,y,z) INIT_WORK(x,y,z)
+	#define queue_delayed_work_rsl(x, y, z) queue_delayed_work(x, y, z)
+	#define INIT_DELAYED_WORK_RSL(x, y, z) INIT_WORK(x, y, z)
 #endif
 
-#if LINUX_VERSION_CODE >= KERNEL_VERSION(2,6,20)
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(2, 6, 20)
 	typedef struct work_struct work_struct_rsl;
-	#define queue_work_rsl(x,y) queue_work(x,y)
-	#define INIT_WORK_RSL(x,y,z) INIT_WORK(x,y)
-#elif LINUX_VERSION_CODE <= KERNEL_VERSION(2,5,40)
+	#define queue_work_rsl(x, y) queue_work(x, y)
+	#define INIT_WORK_RSL(x, y, z) INIT_WORK(x, y)
+#elif LINUX_VERSION_CODE <= KERNEL_VERSION(2, 5, 40)
 	typedef struct tq_struct work_struct_rsl;
-	#define queue_work_rsl(x,y) schedule_task(y)
-	#define INIT_WORK_RSL(x,y,z) tq_init(x,y,z)
+	#define queue_work_rsl(x, y) schedule_task(y)
+	#define INIT_WORK_RSL(x, y, z) tq_init(x, y, z)
 #else
 	typedef struct work_struct work_struct_rsl;
-	#define queue_work_rsl(x,y) queue_work(x,y)
-	#define INIT_WORK_RSL(x,y,z) INIT_WORK(x,y,z)
+	#define queue_work_rsl(x, y) queue_work(x, y)
+	#define INIT_WORK_RSL(x, y, z) INIT_WORK(x, y, z)
 #endif
 
-#if LINUX_VERSION_CODE >= KERNEL_VERSION(2,6,20)
-	#define container_of_work_rsl(x,y,z) container_of(x,y,z)
-	#define container_of_dwork_rsl(x,y,z) container_of(container_of(x, struct delayed_work, work), y, z)
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(2, 6, 20)
+	#define container_of_work_rsl(x, y, z) container_of(x, y, z)
+	#define container_of_dwork_rsl(x, y, z) container_of(container_of(x, struct delayed_work, work), y, z)
 #else
-	#define container_of_work_rsl(x,y,z) (x)
-	#define container_of_dwork_rsl(x,y,z) (x)
+	#define container_of_work_rsl(x, y, z) (x)
+	#define container_of_dwork_rsl(x, y, z) (x)
 #endif
 
-#if (LINUX_VERSION_CODE > KERNEL_VERSION(2,4,20)) && (LINUX_VERSION_CODE < KERNEL_VERSION(2,5,0))
+#if (LINUX_VERSION_CODE > KERNEL_VERSION(2, 4, 20)) && (LINUX_VERSION_CODE < KERNEL_VERSION(2, 5, 0))
 static inline char *
 iwe_stream_add_event_rsl(struct iw_request_info *info,
 			char *     stream,         /* Stream of events */
@@ -184,29 +184,29 @@ iwe_stream_add_event_rsl(struct iw_request_info *info,
         }
         return stream;
 }
-#elif LINUX_VERSION_CODE >= KERNEL_VERSION(2,6,27)
-	#define iwe_stream_add_event_rsl(info,start,stop,iwe,len) iwe_stream_add_event(info,start,stop,iwe,len)
+#elif LINUX_VERSION_CODE >= KERNEL_VERSION(2, 6, 27)
+	#define iwe_stream_add_event_rsl(info, start, stop, iwe, len) iwe_stream_add_event(info, start, stop, iwe, len)
 #else
-	#define iwe_stream_add_event_rsl(info,start,stop,iwe,len) iwe_stream_add_event(start,stop,iwe,len)
+	#define iwe_stream_add_event_rsl(info, start, stop, iwe, len) iwe_stream_add_event(start, stop, iwe, len)
 #endif
 
-#if LINUX_VERSION_CODE >= KERNEL_VERSION(2,6,27)
-	#define iwe_stream_add_point_rsl(info,start,stop,iwe,p) iwe_stream_add_point(info,start,stop,iwe,p)
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(2, 6, 27)
+	#define iwe_stream_add_point_rsl(info, start, stop, iwe, p) iwe_stream_add_point(info, start, stop, iwe, p)
 #else
-	#define iwe_stream_add_point_rsl(info,start,stop,iwe,p) iwe_stream_add_point(start,stop,iwe,p)
+	#define iwe_stream_add_point_rsl(info, start, stop, iwe, p) iwe_stream_add_point(start, stop, iwe, p)
 #endif
 
-#if LINUX_VERSION_CODE > KERNEL_VERSION(2,5,0)
-	#define usb_alloc_urb_rsl(x,y) usb_alloc_urb(x,y)
-	#define usb_submit_urb_rsl(x,y) usb_submit_urb(x,y)
+#if LINUX_VERSION_CODE > KERNEL_VERSION(2, 5, 0)
+	#define usb_alloc_urb_rsl(x, y) usb_alloc_urb(x, y)
+	#define usb_submit_urb_rsl(x, y) usb_submit_urb(x, y)
 #else
-	#define usb_alloc_urb_rsl(x,y) usb_alloc_urb(x)
-	#define usb_submit_urb_rsl(x,y) usb_submit_urb(x)
+	#define usb_alloc_urb_rsl(x, y) usb_alloc_urb(x)
+	#define usb_submit_urb_rsl(x, y) usb_submit_urb(x)
 #endif
 
 static inline void *netdev_priv_rsl(struct net_device *dev)
 {
-#if LINUX_VERSION_CODE > KERNEL_VERSION(2,5,0)
+#if LINUX_VERSION_CODE > KERNEL_VERSION(2, 5, 0)
 	return netdev_priv(dev);
 #else
 	return dev->priv;
@@ -379,7 +379,7 @@ enum	_ReasonCode{
 	invalid_AKMP	= 0x14,
 	unsup_RSNIEver = 0x15,
 	invalid_RSNIE	= 0x16,
-	auth_802_1x_fail= 0x17,
+	auth_802_1x_fail = 0x17,
 	ciper_reject		= 0x18,
 
 	QoS_unspec		= 0x20,
@@ -388,7 +388,7 @@ enum	_ReasonCode{
 	no_facility	= 0x23,
 	req_declined	= 0x25,
 	invalid_param	= 0x26,
-	req_not_honored= 0x27,
+	req_not_honored = 0x27,
 	TS_not_created	= 0x2F,
 	DL_not_allowed	= 0x30,
 	dest_not_exist	= 0x31,
@@ -620,7 +620,7 @@ typedef struct ieee_param {
 #define IW_QUAL_NOISE_UPDATED  0x4
 #endif
 
-#if (LINUX_VERSION_CODE < KERNEL_VERSION(2,6,9))
+#if (LINUX_VERSION_CODE < KERNEL_VERSION(2, 6, 9))
 #define MSECS(t)	(HZ * ((t) / 1000) + (HZ * ((t) % 1000)) / 1000)
 static inline unsigned long msleep_interruptible_rsl(unsigned int msecs)
 {
@@ -633,7 +633,7 @@ static inline unsigned long msleep_interruptible_rsl(unsigned int msecs)
          return timeout;
 }
 
-#if (LINUX_VERSION_CODE < KERNEL_VERSION(2,4,31))
+#if (LINUX_VERSION_CODE < KERNEL_VERSION(2, 4, 31))
 static inline void msleep(unsigned int msecs)
 {
          unsigned long timeout = MSECS(msecs) + 1;
@@ -736,11 +736,11 @@ static inline void msleep(unsigned int msecs)
 #define RTLLIB_QCTL_TID              0x000F
 
 #define	FC_QOS_BIT					BIT7
-#define IsDataFrame(pdu)			( ((pdu[0] & 0x0C)==0x08) ? true : false )
+#define IsDataFrame(pdu)			( ((pdu[0] & 0x0C) == 0x08) ? true : false )
 #define	IsLegacyDataFrame(pdu)	(IsDataFrame(pdu) && (!(pdu[0]&FC_QOS_BIT)) )
 #define IsQoSDataFrame(pframe)  ((*(u16*)pframe&(RTLLIB_STYPE_QOS_DATA|RTLLIB_FTYPE_DATA)) == (RTLLIB_STYPE_QOS_DATA|RTLLIB_FTYPE_DATA))
 #define Frame_Order(pframe)     (*(u16*)pframe&RTLLIB_FCTL_ORDER)
-#define SN_LESS(a, b)		(((a-b)&0x800)!=0)
+#define SN_LESS(a, b)		(((a-b)&0x800)!= 0)
 #define SN_EQUAL(a, b)	(a == b)
 #define MAX_DEV_ADDR_SIZE 8
 
@@ -766,7 +766,7 @@ typedef enum _BA_ACTION{
 } BA_ACTION, *PBA_ACTION;
 
 typedef enum _InitialGainOpType{
-	IG_Backup=0,
+	IG_Backup = 0,
 	IG_Restore,
 	IG_Max
 }InitialGainOpType;
@@ -830,7 +830,7 @@ do { if (rtllib_debug_level & (level)) \
 			int i;					\
 			u8 *pdata = (u8 *)data;			\
 			printk(KERN_DEBUG "rtllib: %s()\n", __func__);	\
-			for (i=0; i < (int)(datalen); i++) {			\
+			for (i = 0; i < (int)(datalen); i++) {			\
 				printk("%2x ", pdata[i]);		\
 				if ((i+1)%16 == 0)			\
 					 printk("\n");	\
@@ -846,7 +846,7 @@ do { if (rtllib_debug_level & (level)) \
 /* debug macros not dependent on CONFIG_RTLLIB_DEBUG */
 
 #define MAC_FMT "%02x:%02x:%02x:%02x:%02x:%02x"
-#define MAC_ARG(x) ((u8*)(x))[0],((u8*)(x))[1],((u8*)(x))[2],((u8*)(x))[3],((u8*)(x))[4],((u8*)(x))[5]
+#define MAC_ARG(x) ((u8*)(x))[0], ((u8*)(x))[1], ((u8*)(x))[2], ((u8*)(x))[3], ((u8*)(x))[4], ((u8*)(x))[5]
 
 /*
  * To use the debug system;
@@ -924,7 +924,7 @@ do { if (rtllib_debug_level & (level)) \
                                 int length = (_Len<MAX_STR_LEN)? _Len : (MAX_STR_LEN-1) ;	\
                                 memset(buffer, 0, MAX_STR_LEN);					\
                                 memcpy(buffer, (u8 *)_Ptr, length );				\
-                                for ( __i=0; __i<MAX_STR_LEN; __i++ )                            \
+                                for ( __i = 0; __i<MAX_STR_LEN; __i++ )                            \
                                 {                                                               \
                                      if ( !PRINTABLE(buffer[__i]) )   buffer[__i] = '?';		\
                                 }                                                               \
@@ -1335,11 +1335,11 @@ enum rtllib_mfie {
         MFIE_TYPE_QUIET = 40,
         MFIE_TYPE_IBSS_DFS = 41,
         MFIE_TYPE_ERP = 42,
-	MFIE_TYPE_HT_CAP= 45,
+	MFIE_TYPE_HT_CAP = 45,
 	MFIE_TYPE_RSN = 48,
 	MFIE_TYPE_RATES_EX = 50,
-	MFIE_TYPE_HT_INFO= 61,
-	MFIE_TYPE_AIRONET=133,
+	MFIE_TYPE_HT_INFO = 61,
+	MFIE_TYPE_AIRONET = 133,
 	MFIE_TYPE_GENERIC = 221,
         MFIE_TYPE_QOS_PARAMETER = 222,
 };
@@ -1538,7 +1538,7 @@ typedef union _frameqos {
  * main rates information element... */
 #define MAX_RATES_LENGTH                  ((u8)12)
 #define MAX_RATES_EX_LENGTH               ((u8)16)
-#if (LINUX_VERSION_CODE < KERNEL_VERSION(2,5,0))
+#if (LINUX_VERSION_CODE < KERNEL_VERSION(2, 5, 0))
 #define MAX_NETWORK_COUNT                  16
 #else
 #define MAX_NETWORK_COUNT                  96
@@ -1845,7 +1845,7 @@ struct rtllib_network {
 	size_t wpa_ie_len;
 	u8  rsn_ie[MAX_WPA_IE_LEN];
 	size_t rsn_ie_len;
-#if LINUX_VERSION_CODE > KERNEL_VERSION(2,5,0)
+#if LINUX_VERSION_CODE > KERNEL_VERSION(2, 5, 0)
 	u8  wzc_ie[MAX_WZC_IE_LEN];
 	size_t wzc_ie_len;
 #endif
@@ -1932,14 +1932,14 @@ enum rtllib_state {
 #define RTLLIB_52GHZ_CHANNELS (RTLLIB_52GHZ_MAX_CHANNEL - \
                                   RTLLIB_52GHZ_MIN_CHANNEL + 1)
 
-#if (LINUX_VERSION_CODE <= KERNEL_VERSION(2,6,11))
+#if (LINUX_VERSION_CODE <= KERNEL_VERSION(2, 6, 11))
 static inline int is_multicast_ether_addr(const u8 *addr)
 {
         return ((addr[0] != 0xff) && (0x01 & addr[0]));
 }
 #endif
 
-#if (LINUX_VERSION_CODE <= KERNEL_VERSION(2,6,13))
+#if (LINUX_VERSION_CODE <= KERNEL_VERSION(2, 6, 13))
 static inline int is_broadcast_ether_addr(const u8 *addr)
 {
 	return ((addr[0] == 0xff) && (addr[1] == 0xff) && (addr[2] == 0xff) &&   \
@@ -2088,7 +2088,7 @@ typedef enum
 }country_code_type_t;
 
 typedef enum _SCAN_OPERATION_BACKUP_OPT{
-	SCAN_OPT_BACKUP=0,
+	SCAN_OPT_BACKUP = 0,
 	SCAN_OPT_RESTORE,
 	SCAN_OPT_MAX
 }SCAN_OPERATION_BACKUP_OPT;
@@ -2101,10 +2101,10 @@ typedef	enum _FW_CMD_IO_TYPE{
 	FW_CMD_HIGH_PWR_ENABLE = 4,
 	FW_CMD_HIGH_PWR_DISABLE = 5,
 	FW_CMD_RA_RESET = 6,
-	FW_CMD_RA_ACTIVE= 7,
-	FW_CMD_RA_REFRESH_N= 8,
-	FW_CMD_RA_REFRESH_BG= 9,
-	FW_CMD_RA_INIT= 10,
+	FW_CMD_RA_ACTIVE = 7,
+	FW_CMD_RA_REFRESH_N = 8,
+	FW_CMD_RA_REFRESH_BG = 9,
+	FW_CMD_RA_INIT = 10,
 	FW_CMD_IQK_ENABLE = 11,
 	FW_CMD_TXPWR_TRACK_ENABLE = 12,
 	FW_CMD_TXPWR_TRACK_DISABLE = 13,
@@ -2320,7 +2320,7 @@ struct rtllib_device {
 	int reset_on_keychange; /* Set to 1 if the HW needs to be reset on
 				 * WEP key changes */
 
-	/* If the host performs {en,de}cryption, then set to 1 */
+	/* If the host performs {en, de}cryption, then set to 1 */
 	int host_encrypt;
 	int host_encrypt_msdu;
 	int host_decrypt;
@@ -2531,12 +2531,12 @@ struct rtllib_device {
 	delayed_work_struct_rsl link_change_wq;
 	work_struct_rsl wx_sync_scan_wq;
 
-#if LINUX_VERSION_CODE > KERNEL_VERSION(2,5,0)
+#if LINUX_VERSION_CODE > KERNEL_VERSION(2, 5, 0)
 	struct workqueue_struct *wq;
 #else
 	u32 *wq;
 #endif
-#if LINUX_VERSION_CODE <= KERNEL_VERSION(2,5,40)
+#if LINUX_VERSION_CODE <= KERNEL_VERSION(2, 5, 40)
 	/* used for periodly scan */
 	struct timer_list scan_timer;
 #endif
@@ -2576,7 +2576,7 @@ struct rtllib_device {
 	 * This function can't sleep.
 	 */
 	void (*softmac_data_hard_start_xmit)(struct sk_buff *skb,
-			       struct net_device *dev,int rate);
+			       struct net_device *dev, int rate);
 
 	/* stops the HW queue for DATA frames. Useful to avoid
 	 * waste time to TX data frame when we are reassociating
@@ -2591,7 +2591,7 @@ struct rtllib_device {
 	 * This function can sleep. the driver should ensure
 	 * the radio has been swithced before return.
 	 */
-	void (*set_chan)(struct net_device *dev,short ch);
+	void (*set_chan)(struct net_device *dev, short ch);
 
 	/* These are not used if the ieee stack takes care of
 	 * scanning (IEEE_SOFTMAC_SCAN feature set).
@@ -2649,8 +2649,8 @@ struct rtllib_device {
 	u16  (*rtl_11n_user_show_rates)(struct net_device *dev);
 	void (*ScanOperationBackupHandler)(struct net_device *dev, u8 Operation);
 	void (*LedControlHandler)(struct net_device * dev, LED_CTL_MODE LedAction);
-	void (*SetHwRegHandler)(struct net_device *dev,u8 variable,u8* val);
-	void (*GetHwRegHandler)(struct net_device *dev,u8 variable,u8* val);
+	void (*SetHwRegHandler)(struct net_device *dev, u8 variable, u8* val);
+	void (*GetHwRegHandler)(struct net_device *dev, u8 variable, u8* val);
 #ifdef ENABLE_IPS
         void (*rtllib_ips_leave_wq) (struct net_device *dev);
         void (*rtllib_ips_leave)(struct net_device *dev);
@@ -2703,7 +2703,7 @@ struct rtllib_device {
 
 static inline void *rtllib_priv(struct net_device *dev)
 {
-#if LINUX_VERSION_CODE > KERNEL_VERSION(2,5,0)
+#if LINUX_VERSION_CODE > KERNEL_VERSION(2, 5, 0)
 	return ((struct rtllib_device *)netdev_priv(dev))->priv;
 #else
 	return ((struct rtllib_device *)dev->priv)->priv;
@@ -2935,7 +2935,7 @@ int rtllib_wx_set_wap(struct rtllib_device *ieee,
 			 union iwreq_data *awrq,
 			 char *extra);
 
-int rtllib_wx_get_essid(struct rtllib_device *ieee, struct iw_request_info *a,union iwreq_data *wrqu,char *b);
+int rtllib_wx_get_essid(struct rtllib_device *ieee, struct iw_request_info *a, union iwreq_data *wrqu, char *b);
 
 int rtllib_wx_set_rate(struct rtllib_device *ieee,
 			     struct iw_request_info *info,
@@ -3013,7 +3013,7 @@ u16 HTMcsToDataRate( struct rtllib_device* ieee, u8 nMcsRate);
 u16  TxCountToDataRate( struct rtllib_device* ieee, u8 nDataRate);
 int rtllib_rx_ADDBAReq( struct rtllib_device* ieee, struct sk_buff *skb);
 int rtllib_rx_ADDBARsp( struct rtllib_device* ieee, struct sk_buff *skb);
-int rtllib_rx_DELBA(struct rtllib_device* ieee,struct sk_buff *skb);
+int rtllib_rx_DELBA(struct rtllib_device* ieee, struct sk_buff *skb);
 void TsInitAddBA( struct rtllib_device* ieee, PTX_TS_RECORD   pTS, u8 Policy, u8 bOverwritePending);
 void TsInitDelBA( struct rtllib_device* ieee, PTS_COMMON_INFO pTsCommonInfo, TR_SELECT TxRxSelect);
 void BaSetupTimeOut(unsigned long data);
@@ -3082,7 +3082,7 @@ int rtllib_parse_info_param(struct rtllib_device *ieee,
 		struct rtllib_network *network,
 		struct rtllib_rx_stats *stats);
 
-void rtllib_indicate_packets(struct rtllib_device *ieee, struct rtllib_rxb** prxbIndicateArray,u8  index);
+void rtllib_indicate_packets(struct rtllib_device *ieee, struct rtllib_rxb** prxbIndicateArray, u8  index);
 u8 HTFilterMCSRate( struct rtllib_device* ieee, u8* pSupportMCS, u8* pOperateMCS);
 void HTUseDefaultSetting(struct rtllib_device* ieee);
 #define RT_ASOC_RETRY_LIMIT	5
@@ -3134,7 +3134,7 @@ static inline void dump_buf(u8 *buf, u32 len)
 {
 	u32 i;
 	printk("-----------------Len %d----------------\n", len);
-	for (i=0; i<len; i++)
+	for (i = 0; i<len; i++)
 		printk("%2.2x-", *(buf+i));
 	printk("\n");
 }
