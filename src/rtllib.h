@@ -818,8 +818,6 @@ typedef enum _NETWORK_TYPE{
 #define OUI_SUBTYPE_QOS_CAPABI	5
 
 /* debug macros */
-#define CONFIG_RTLLIB_DEBUG
-#ifdef CONFIG_RTLLIB_DEBUG
 extern u32 rtllib_debug_level;
 #define RTLLIB_DEBUG(level, fmt, args...) \
 do { if (rtllib_debug_level & (level)) \
@@ -838,12 +836,6 @@ do { if (rtllib_debug_level & (level)) \
 			printk("\n");			\
 		}					\
 	} while (0)
-#else
-#define RTLLIB_DEBUG(level, fmt, args...) do {} while (0)
-#define RTLLIB_DEBUG_DATA(level, data, datalen) do {} while (0)
-#endif	/* CONFIG_RTLLIB_DEBUG */
-
-/* debug macros not dependent on CONFIG_RTLLIB_DEBUG */
 
 #define MAC_FMT "%02x:%02x:%02x:%02x:%02x:%02x"
 #define MAC_ARG(x) ((u8*)(x))[0], ((u8*)(x))[1], ((u8*)(x))[2], ((u8*)(x))[3], ((u8*)(x))[4], ((u8*)(x))[5]
@@ -911,7 +903,6 @@ do { if (rtllib_debug_level & (level)) \
 #define RTLLIB_DEBUG_RX(f, a...)  RTLLIB_DEBUG(RTLLIB_DL_RX, f, ## a)
 #define RTLLIB_DEBUG_QOS(f, a...)  RTLLIB_DEBUG(RTLLIB_DL_QOS, f, ## a)
 
-#ifdef CONFIG_RTLLIB_DEBUG
 /* Added by Annie, 2005-11-22. */
 #define MAX_STR_LEN     64
 /* I want to see ASCII 33 to 126 only. Otherwise, I print '?'. Annie, 2005-11-22.*/
@@ -933,10 +924,6 @@ do { if (rtllib_debug_level & (level)) \
                                 printk(_TitleString);                                         \
                                 printk(": %d, <%s>\n", _Len, buffer);                         \
                         }
-#else
-#define RTLLIB_PRINT_STR(_Comp, _TitleString, _Ptr, _Len)  do {} while (0)
-#endif
-
 #ifndef ETH_P_PAE
 #define ETH_P_PAE 0x888E /* Port Access Entity (IEEE 802.1X) */
 #define ETH_P_IP	0x0800		/* Internet Protocol packet	*/

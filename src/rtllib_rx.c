@@ -1192,14 +1192,12 @@ int rtllib_rx(struct rtllib_device *ieee, struct sk_buff *skb,
 		if (/*ieee->ieee802_1x &&*/
 		    rtllib_is_eapol_frame(ieee, skb, hdrlen)) {
 
-#ifdef CONFIG_RTLLIB_DEBUG
 			/* pass unencrypted EAPOL frames even if encryption is
 			 * configured */
 			struct eapol *eap = (struct eapol *)(skb->data +
 				24);
 			RTLLIB_DEBUG_EAP("RX: IEEE 802.1X EAPOL frame: %s\n",
 						eap_get_type(eap->type));
-#endif
 		} else {
 			RTLLIB_DEBUG_DROP(
 				"encryption configured, but RX "
@@ -1209,7 +1207,6 @@ int rtllib_rx(struct rtllib_device *ieee, struct sk_buff *skb,
 		}
 	}
 
-#ifdef CONFIG_RTLLIB_DEBUG
 	if (crypt && !(fc & RTLLIB_FCTL_WEP) &&
 	    rtllib_is_eapol_frame(ieee, skb, hdrlen)) {
 			struct eapol *eap = (struct eapol *)(skb->data +
@@ -1217,7 +1214,6 @@ int rtllib_rx(struct rtllib_device *ieee, struct sk_buff *skb,
 			RTLLIB_DEBUG_EAP("RX: IEEE 802.1X EAPOL frame: %s\n",
 						eap_get_type(eap->type));
 	}
-#endif
 
 	if (crypt && !(fc & RTLLIB_FCTL_WEP) && !ieee->open_wep &&
 	    !rtllib_is_eapol_frame(ieee, skb, hdrlen)) {
@@ -1550,7 +1546,6 @@ static int rtllib_parse_qos_info_param_IE(struct rtllib_info_element
         return rc;
 }
 
-#ifdef CONFIG_RTLLIB_DEBUG
 #define MFIE_STRING(x) case MFIE_TYPE_ ##x: return #x
 
 static const char *get_info_element_string(u16 id)
@@ -1586,7 +1581,6 @@ static const char *get_info_element_string(u16 id)
                 return "UNKNOWN";
         }
 }
-#endif
 
 static inline void rtllib_extract_country_ie(
 	struct rtllib_device *ieee,
@@ -1628,10 +1622,8 @@ int rtllib_parse_info_param(struct rtllib_device *ieee,
 	u16	tmp_htinfo_len = 0;
 	u16 ht_realtek_agg_len = 0;
 	u8  ht_realtek_agg_buf[MAX_IE_LEN];
-#ifdef CONFIG_RTLLIB_DEBUG
 	char rates_str[64];
 	char *p;
-#endif
 
 	while (length >= sizeof(*info_element)) {
 		if (sizeof(*info_element) + info_element->len > length) {
@@ -1667,18 +1659,14 @@ int rtllib_parse_info_param(struct rtllib_device *ieee,
 			break;
 
 		case MFIE_TYPE_RATES:
-#ifdef CONFIG_RTLLIB_DEBUG
 			p = rates_str;
-#endif
 			network->rates_len = min(info_element->len,
 						 MAX_RATES_LENGTH);
 			for (i = 0; i < network->rates_len; i++) {
 				network->rates[i] = info_element->data[i];
-#ifdef CONFIG_RTLLIB_DEBUG
 				p += snprintf(p, sizeof(rates_str) -
 					      (p - rates_str), "%02X ",
 					      network->rates[i]);
-#endif
 				if (rtllib_is_ofdm_rate
 				    (info_element->data[i])) {
 					network->flags |= NETWORK_HAS_OFDM;
@@ -1699,18 +1687,14 @@ int rtllib_parse_info_param(struct rtllib_device *ieee,
 			break;
 
 		case MFIE_TYPE_RATES_EX:
-#ifdef CONFIG_RTLLIB_DEBUG
 			p = rates_str;
-#endif
 			network->rates_ex_len = min(info_element->len,
 						    MAX_RATES_EX_LENGTH);
 			for (i = 0; i < network->rates_ex_len; i++) {
 				network->rates_ex[i] = info_element->data[i];
-#ifdef CONFIG_RTLLIB_DEBUG
 				p += snprintf(p, sizeof(rates_str) -
 					      (p - rates_str), "%02X ",
 					      network->rates[i]);
-#endif
 				if (rtllib_is_ofdm_rate
 				    (info_element->data[i])) {
 					network->flags |= NETWORK_HAS_OFDM;
@@ -2150,15 +2134,6 @@ static inline int rtllib_network_init(
 	struct rtllib_network *network,
 	struct rtllib_rx_stats *stats)
 {
-#ifdef CONFIG_RTLLIB_DEBUG
-#endif
-
-	/*
-        network->qos_data.active = 0;
-        network->qos_data.supported = 0;
-        network->qos_data.param_count = 0;
-        network->qos_data.old_param_count = 0;
-	*/
 	memset(&network->qos_data, 0, sizeof(struct rtllib_qos_data));
 
 	/* Pull out fixed field data */
@@ -2415,9 +2390,7 @@ static inline void rtllib_process_probe_response(
 {
 	struct rtllib_network *target;
 	struct rtllib_network *oldest = NULL;
-#ifdef CONFIG_RTLLIB_DEBUG
 	struct rtllib_info_element *info_element = &beacon->info_element[0];
-#endif
 	unsigned long flags;
 	short renew;
 #if (LINUX_VERSION_CODE > KERNEL_VERSION(2, 6, 13))
@@ -2549,8 +2522,6 @@ static inline void rtllib_process_probe_response(
 			list_del(ieee->network_free_list.next);
 		}
 
-
-#ifdef CONFIG_RTLLIB_DEBUG
 		RTLLIB_DEBUG_SCAN("Adding '%s' (" MAC_FMT ") via %s.\n",
 				     escape_essid(network->ssid,
 						  network->ssid_len),
@@ -2558,7 +2529,6 @@ static inline void rtllib_process_probe_response(
 				     WLAN_FC_GET_STYPE(beacon->header.frame_ctl) ==
 				     RTLLIB_STYPE_PROBE_RESP ?
 				     "PROBE RESPONSE" : "BEACON");
-#endif
 		memcpy(target, network, sizeof(*target));
 		list_add_tail(&target->list, &ieee->network_list);
 		if (ieee->softmac_features & IEEE_SOFTMAC_ASSOCIATE)

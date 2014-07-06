@@ -289,8 +289,6 @@ void free_rtllib(struct net_device *dev)
 #endif
 }
 
-#ifdef CONFIG_RTLLIB_DEBUG
-
 u32 rtllib_debug_level = 0;
 static int debug = \
 			    RTLLIB_DL_ERR
@@ -306,4 +304,3 @@ int __init rtllib_init(void)
 void __exit rtllib_exit(void)
 {
 }
-#endif
