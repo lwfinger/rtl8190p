@@ -104,14 +104,11 @@ do { if (rt_global_debug_component & component) \
 	       ##args);\
 } while (0);
 
-#define RTL819x_DEBUG
-#ifdef RTL819x_DEBUG
 #define assert(expr) \
         if (!(expr)) {                                  \
                 printk( "Assertion failed! %s,%s,%s,line=%d\n", \
                 #expr,__FILE__,__FUNCTION__,__LINE__);          \
         }
-//wb added to debug out data buf
 //if you want print DATA buffer related BA, please set rtllib_debug_level to DATA|BA
 #define RT_DEBUG_DATA(level, data, datalen)      \
         do {							\
@@ -127,10 +124,6 @@ do { if (rt_global_debug_component & component) \
                         printk("\n");                   \
                 }                                       \
         } while (0)
-#else
-#define assert(expr) do {} while (0)
-#define RT_DEBUG_DATA(level, data, datalen) do {} while (0)
-#endif // RTL8169_DEBUG */
 
 #define IS_UNDER_11N_AES_MODE(_rtllib)  ((_rtllib->pHTInfo->bCurrentHTSupport == true) &&\
 					(_rtllib->pairwise_key_type == KEY_TYPE_CCMP))
@@ -764,11 +757,6 @@ typedef struct r8192_priv {
 	u8					EfuseMap[2][HWSET_MAX_SIZE_92S];
 	u16					EfuseUsedBytes;
 	u8					EfuseUsedPercentage;
-
-#ifdef EFUSE_REPG_WORKAROUND
-	bool					efuse_RePGSec1Flag;
-	u8					efuse_RePGData[8];
-#endif
 	u8 EEPROMRegulatory;
 	u8 EEPROMPwrGroup[2][3];
 	// [For 90/92U/ USB single chip, read EEPROM to decied TxRx] 2009.03.31, by Bohn
@@ -1045,10 +1033,8 @@ typedef struct r8192_priv {
 #else
 	u32 *priv_wq;
 #endif
-	//#ifdef POLLING_METHOD_FOR_RADIO
 	struct timer_list gpio_polling_timer;
 	u8     polling_timer_on;
-	//#endif
 	bool bDriverIsGoingToUnload;
 
 	//These are for MP
