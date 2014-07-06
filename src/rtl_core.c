@@ -2113,11 +2113,7 @@ void	rtl819x_watchdog_wqcallback(void *data)
 	if (ieee->actscanning == false){
 		if ((ieee->iw_mode == IW_MODE_INFRA) && (ieee->state == RTLLIB_NOLINK) &&\
 		    (ieee->eRFPowerState == eRfOn)&&!ieee->is_set_key &&\
-		    (!ieee->proto_stoppping) && !ieee->wx_set_enc
-#ifdef CONFIG_RTLWIFI_DEBUGFS
-		    && (!priv->debug->hw_holding)
-#endif
-		 ){
+		    (!ieee->proto_stoppping) && !ieee->wx_set_enc){
 			if (ieee->PowerSaveControl.ReturnPoint == IPS_CALLBACK_NONE){
 				printk("====================>haha:IPSEnter()\n");
 				IPSEnter(dev);

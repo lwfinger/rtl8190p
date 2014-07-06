@@ -53,13 +53,6 @@ void print_buffer(u32 *buffer, int len);
 void dump_eprom(struct net_device *dev);
 void rtl8192_dump_reg(struct net_device *dev);
 
-/* debugfs stuff */
-#ifdef CONFIG_RTLWIFI_DEBUGFS
-int rtl_debug_module_init(struct r8192_priv *priv, const char *name);
-void rtl_debug_module_remove(struct r8192_priv *priv);
-int rtl_create_debugfs_root(void);
-void rtl_remove_debugfs_root(void);
-#else
 static inline int rtl_debug_module_init(struct r8192_priv *priv, const char *name) {
 	return 0;
 }
@@ -71,6 +64,5 @@ static inline int rtl_create_debugfs_root(void) {
 }
 static inline void rtl_remove_debugfs_root(void) {
 }
-#endif
 
 #endif

@@ -582,8 +582,7 @@ struct rtl819x_ops{
 	void (* update_ratr_table)(struct net_device* dev);
 };
 
-typedef struct r8192_priv
-{
+typedef struct r8192_priv {
 	struct pci_dev *pdev;
 	//add for handles different nics' operations. WB
 	struct rtl819x_ops* ops;
@@ -623,7 +622,6 @@ typedef struct r8192_priv
 	bool ps_force;
 	spinlock_t rf_lock; //used to lock rf write operation added by wb
 	spinlock_t ps_lock;
-
 	u32 irq_mask[2];
 	short chan;
 	short sens;
@@ -636,7 +634,6 @@ typedef struct r8192_priv
 	struct sk_buff *rx_buf[MAX_RX_COUNT];
 	int rxringcount;
 	u16 rxbuffersize;
-
 	struct sk_buff *rx_skb;
 	u32 *rxring;
 	u32 *rxringtail;
@@ -705,8 +702,6 @@ typedef struct r8192_priv
 	u8 rf_type; //0 means 1T2R, 1 means 2T4R
 	RT_RF_TYPE_819xU rf_chip;
 	char nick[IW_ESSID_MAX_SIZE + 1];
-
-	//	u32 key0[4];
 	short (*rf_set_sens)(struct net_device *dev,short sens);
 	u8 (*rf_set_chan)(struct net_device *dev,u8 ch);
 	void (*rf_close)(struct net_device *dev);
@@ -717,45 +712,29 @@ typedef struct r8192_priv
 	struct Stats stats;
 	struct iw_statistics wstats;
 	struct proc_dir_entry *dir_dev;
-
-	// modified by davad for Rx process */
 	struct sk_buff_head rx_queue;
 	struct sk_buff_head skb_queue;
 	work_struct_rsl qos_activate;
 	short  tx_urb_index;
 	atomic_t tx_pending[0x10];//UART_PRIORITY+1
-
 	struct urb *rxurb_task;
-
 	//2 Tx Related variables
 	u16	ShortRetryLimit;
 	u16	LongRetryLimit;
 	u32	TransmitConfig;
 	u8	RegCWinMin;		// For turbo mode CW adaptive. Added by Annie, 2005-10-27.
-
 	u32     LastRxDescTSFHigh;
 	u32     LastRxDescTSFLow;
-
-
 	//2 Rx Related variables
 	u16	EarlyRxThreshold;
 	u32	ReceiveConfig;
 	u8	AcmControl;
-
 	u8	RFProgType;
-
 	u8 retry_data;
 	u8 retry_rts;
 	u16 rts;
-
 	struct	ChnlAccessSetting  ChannelAccessSetting;
-
 	work_struct_rsl reset_wq;
-
-#ifdef CONFIG_RTLWIFI_DEBUGFS
-	// debugfs */
-	rtl_fs_debug *debug;
-#endif /* CONFIG_IWLWIFI_DEBUGFS */
 
 	/**********************************************************/
 	//for rtl819xPci
