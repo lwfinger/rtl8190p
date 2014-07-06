@@ -4741,17 +4741,6 @@ bool NicIFDisableNIC(struct net_device* dev)
 
 	return status;
 }
-/* fun with the built-in rtllib stack... */
-int rtllib_init(void);
-int rtllib_exit(void);
-int rtllib_crypto_init(void);
-void rtllib_crypto_deinit(void);
-int rtllib_crypto_tkip_init(void);
-void rtllib_crypto_tkip_exit(void);
-int rtllib_crypto_ccmp_init(void);
-void rtllib_crypto_ccmp_exit(void);
-int rtllib_crypto_wep_init(void);
-void rtllib_crypto_wep_exit(void);
 
 static int __init rtl8192_pci_module_init(void)
 {

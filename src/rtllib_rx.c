@@ -747,14 +747,10 @@ u8 parse_subframe(struct rtllib_device* ieee, struct sk_buff *skb,
 	ieee->bIsAggregateFrame = bIsAggregateFrame;
 	if (!bIsAggregateFrame) {
 		rxb->nr_subframes = 1;
-#ifndef RTK_DMP_PLATFORM
 #ifdef JOHN_NOCPY
 		rxb->subframes[0] = skb;
 #else
 		rxb->subframes[0] = skb_copy(skb, GFP_ATOMIC);
-#endif
-#else
-		rxb->subframes[0] = skb_clone(skb, GFP_ATOMIC);
 #endif
 		memcpy(rxb->src, src, ETH_ALEN);
 		memcpy(rxb->dst, dst, ETH_ALEN);

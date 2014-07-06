@@ -55,11 +55,9 @@
 #endif
 #include <net/iw_handler.h>
 
-#ifndef RTK_DMP_PLATFORM
 #if (LINUX_VERSION_CODE < KERNEL_VERSION(2, 6, 20))
 #ifndef bool
 typedef enum{false = 0, true} bool;
-#endif
 #endif
 #endif
 
@@ -3125,4 +3123,17 @@ static inline void dump_buf(u8 *buf, u32 len)
 		printk("%2.2x-", *(buf+i));
 	printk("\n");
 }
+
+void _setup_timer(struct timer_list *, void *, unsigned long);
+int rtllib_init(void);
+void rtllib_exit(void);
+int rtllib_crypto_init(void);
+void rtllib_crypto_deinit(void);
+int rtllib_crypto_tkip_init(void);
+void rtllib_crypto_tkip_exit(void);
+int rtllib_crypto_ccmp_init(void);
+void rtllib_crypto_ccmp_exit(void);
+int rtllib_crypto_wep_init(void);
+void rtllib_crypto_wep_exit(void);
+
 #endif /* RTLLIB_H */

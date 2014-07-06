@@ -20,7 +20,6 @@
 #include "rtllib.h"
 #include <linux/etherdevice.h>
 #include "rtl819x_TS.h"
-extern void _setup_timer( struct timer_list*, void*, unsigned long);
 #if LINUX_VERSION_CODE < KERNEL_VERSION(2, 5, 0)
 #define list_for_each_entry_safe(pos, n, head, member) \
 	for (pos = list_entry((head)->next, typeof(*pos), member), \
@@ -28,15 +27,15 @@ extern void _setup_timer( struct timer_list*, void*, unsigned long);
 		&pos->member != (head); \
 		pos = n, n = list_entry(n->member.next, typeof(*n), member))
 #endif
-void TsSetupTimeOut(unsigned long data)
+static void TsSetupTimeOut(unsigned long data)
 {
 }
 
-void TsInactTimeout(unsigned long data)
+static void TsInactTimeout(unsigned long data)
 {
 }
 
-void RxPktPendingTimeout(unsigned long data)
+static void RxPktPendingTimeout(unsigned long data)
 {
 	PRX_TS_RECORD	pRxTs = (PRX_TS_RECORD)data;
 	struct rtllib_device *ieee = container_of(pRxTs, struct rtllib_device, RxTsRecord[pRxTs->num]);
@@ -104,7 +103,7 @@ void RxPktPendingTimeout(unsigned long data)
 	spin_unlock_irqrestore(&(ieee->reorder_spinlock), flags);
 }
 
-void TsAddBaProcess(unsigned long data)
+static void TsAddBaProcess(unsigned long data)
 {
 	PTX_TS_RECORD	pTxTs = (PTX_TS_RECORD)data;
 	u8 num = pTxTs->num;
@@ -115,7 +114,7 @@ void TsAddBaProcess(unsigned long data)
 }
 
 
-void ResetTsCommonInfo(PTS_COMMON_INFO	pTsCommonInfo)
+static void ResetTsCommonInfo(PTS_COMMON_INFO	pTsCommonInfo)
 {
 	memset(pTsCommonInfo->Addr, 0, 6);
 	memset(&pTsCommonInfo->TSpec, 0, sizeof(TSPEC_BODY));
@@ -124,7 +123,7 @@ void ResetTsCommonInfo(PTS_COMMON_INFO	pTsCommonInfo)
 	pTsCommonInfo->TClasNum = 0;
 }
 
-void ResetTxTsEntry(PTX_TS_RECORD pTS)
+static void ResetTxTsEntry(PTX_TS_RECORD pTS)
 {
 	ResetTsCommonInfo(&pTS->TsCommonInfo);
 	pTS->TxCurSeq = 0;
@@ -136,7 +135,7 @@ void ResetTxTsEntry(PTX_TS_RECORD pTS)
 	ResetBaEntry(&pTS->TxPendingBARecord);
 }
 
-void ResetRxTsEntry(PRX_TS_RECORD pTS)
+static void ResetRxTsEntry(PRX_TS_RECORD pTS)
 {
 	ResetTsCommonInfo(&pTS->TsCommonInfo);
 	pTS->RxIndicateSeq = 0xffff;
@@ -222,7 +221,7 @@ void TSInitialize(struct rtllib_device *ieee)
 
 }
 
-void AdmitTS(struct rtllib_device *ieee, PTS_COMMON_INFO pTsCommonInfo, u32 InactTime)
+static void AdmitTS(struct rtllib_device *ieee, PTS_COMMON_INFO pTsCommonInfo, u32 InactTime)
 {
 	del_timer_sync(&pTsCommonInfo->SetupTimer);
 	del_timer_sync(&pTsCommonInfo->InactTimer);
@@ -232,42 +231,32 @@ void AdmitTS(struct rtllib_device *ieee, PTS_COMMON_INFO pTsCommonInfo, u32 Inac
 }
 
 
-PTS_COMMON_INFO SearchAdmitTRStream(struct rtllib_device *ieee, u8*	Addr, u8 TID, TR_SELECT	TxRxSelect)
+static PTS_COMMON_INFO SearchAdmitTRStream(struct rtllib_device *ieee, u8*	Addr, u8 TID, TR_SELECT	TxRxSelect)
 {
 	u8	dir;
-	bool				search_dir[4] = {0, 0, 0, 0};
-	struct list_head*		psearch_list;
+	bool	search_dir[4] = {0};
+	struct list_head *psearch_list;
 	PTS_COMMON_INFO	pRet = NULL;
-	if (ieee->iw_mode == IW_MODE_MASTER)
-	{
-		if (TxRxSelect == TX_DIR)
-		{
+
+	if (ieee->iw_mode == IW_MODE_MASTER) {
+		if (TxRxSelect == TX_DIR) {
 			search_dir[DIR_DOWN] = true;
 			search_dir[DIR_BI_DIR]= true;
-		}
-		else
-		{
+		} else {
 			search_dir[DIR_UP]	= true;
 			search_dir[DIR_BI_DIR]= true;
 		}
-	}
-	else if (ieee->iw_mode == IW_MODE_ADHOC)
-	{
+	} else if (ieee->iw_mode == IW_MODE_ADHOC) {
 		if (TxRxSelect == TX_DIR)
 			search_dir[DIR_UP]	= true;
 		else
 			search_dir[DIR_DOWN] = true;
-	}
-	else
-	{
-		if (TxRxSelect == TX_DIR)
-		{
+	} else {
+		if (TxRxSelect == TX_DIR) {
 			search_dir[DIR_UP]	= true;
 			search_dir[DIR_BI_DIR]= true;
 			search_dir[DIR_DIRECT]= true;
-		}
-		else
-		{
+		} else {
 			search_dir[DIR_DOWN] = true;
 			search_dir[DIR_BI_DIR]= true;
 			search_dir[DIR_DIRECT]= true;
@@ -279,18 +268,14 @@ PTS_COMMON_INFO SearchAdmitTRStream(struct rtllib_device *ieee, u8*	Addr, u8 TID
 	else
 		psearch_list = &ieee->Rx_TS_Admit_List;
 
-	for (dir = 0; dir <= DIR_BI_DIR; dir++)
-	{
+	for (dir = 0; dir <= DIR_BI_DIR; dir++) {
 		if (search_dir[dir] == false )
 			continue;
 		list_for_each_entry(pRet, psearch_list, List){
 			if (memcmp(pRet->Addr, Addr, 6) == 0)
 				if (pRet->TSpec.f.TSInfo.field.ucTSID == TID)
 					if (pRet->TSpec.f.TSInfo.field.ucDirection == dir)
-					{
 						break;
-					}
-
 		}
 		if (&pRet->List  != psearch_list)
 			break;
@@ -298,12 +283,12 @@ PTS_COMMON_INFO SearchAdmitTRStream(struct rtllib_device *ieee, u8*	Addr, u8 TID
 
 	if (&pRet->List  != psearch_list){
 		return pRet ;
-	}
-	else
+	} else {
 		return NULL;
+	}
 }
 
-void MakeTSEntry(
+static void MakeTSEntry(
 		PTS_COMMON_INFO	pTsCommonInfo,
 		u8*		Addr,
 		PTSPEC_BODY	pTSPEC,
@@ -452,7 +437,7 @@ bool GetTs(
 	}
 }
 
-void RemoveTsEntry(
+static void RemoveTsEntry(
 	struct rtllib_device*	ieee,
 	PTS_COMMON_INFO			pTs,
 	TR_SELECT			TxRxSelect

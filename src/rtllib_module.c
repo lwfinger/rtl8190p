@@ -74,22 +74,14 @@ static inline int rtllib_networks_allocate(struct rtllib_device *ieee)
 	if (ieee->networks)
 		return 0;
 
-#ifndef RTK_DMP_PLATFORM
-	ieee->networks = kmalloc(
+	ieee->networks = kzalloc(
 		MAX_NETWORK_COUNT * sizeof(struct rtllib_network),
 		GFP_KERNEL);
-#else
-	ieee->networks = dvr_malloc(MAX_NETWORK_COUNT * sizeof(struct rtllib_network));
-#endif
 	if (!ieee->networks) {
 		printk(KERN_WARNING "%s: Out of memory allocating beacons\n",
 		       ieee->dev->name);
 		return -ENOMEM;
 	}
-
-	memset(ieee->networks, 0,
-	       MAX_NETWORK_COUNT * sizeof(struct rtllib_network));
-
 	return 0;
 }
 
@@ -97,11 +89,7 @@ static inline void rtllib_networks_free(struct rtllib_device *ieee)
 {
 	if (!ieee->networks)
 		return;
-#ifndef RTK_DMP_PLATFORM
 	kfree(ieee->networks);
-#else
-	dvr_free(ieee->networks);
-#endif
 	ieee->networks = NULL;
 }
 
@@ -290,17 +278,14 @@ void free_rtllib(struct net_device *dev)
 }
 
 u32 rtllib_debug_level = 0;
-static int debug = \
-			    RTLLIB_DL_ERR
-			    ;
-struct proc_dir_entry *rtllib_proc = NULL;
+static int debug = RTLLIB_DL_ERR;
 
-int __init rtllib_init(void)
+int rtllib_init(void)
 {
 	rtllib_debug_level = debug;
 	return 0;
 }
 
-void __exit rtllib_exit(void)
+void rtllib_exit(void)
 {
 }

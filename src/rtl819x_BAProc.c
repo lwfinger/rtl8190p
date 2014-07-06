@@ -19,23 +19,21 @@
 #include <linux/interrupt.h>
 #include "rtllib.h"
 #include "rtl819x_BA.h"
-#ifdef RTK_DMP_PLATFORM
-#include <linux/usb_setting.h>
-#endif
 
-void ActivateBAEntry(struct rtllib_device* ieee, PBA_RECORD pBA, u16 Time)
+static void ActivateBAEntry(struct rtllib_device* ieee, PBA_RECORD pBA, u16 Time)
 {
 	pBA->bValid = true;
 	if (Time != 0)
 		mod_timer(&pBA->Timer, jiffies + MSECS(Time));
 }
 
-void DeActivateBAEntry( struct rtllib_device* ieee, PBA_RECORD pBA)
+static void DeActivateBAEntry( struct rtllib_device* ieee, PBA_RECORD pBA)
 {
 	pBA->bValid = false;
 	del_timer_sync(&pBA->Timer);
 }
-u8 TxTsDeleteBA( struct rtllib_device* ieee, PTX_TS_RECORD	pTxTs)
+
+static u8 TxTsDeleteBA( struct rtllib_device* ieee, PTX_TS_RECORD	pTxTs)
 {
 	PBA_RECORD		pAdmittedBa = &pTxTs->TxAdmittedBARecord;
 	PBA_RECORD		pPendingBa = &pTxTs->TxPendingBARecord;
@@ -56,7 +54,7 @@ u8 TxTsDeleteBA( struct rtllib_device* ieee, PTX_TS_RECORD	pTxTs)
 	return bSendDELBA;
 }
 
-u8 RxTsDeleteBA( struct rtllib_device* ieee, PRX_TS_RECORD	pRxTs)
+static u8 RxTsDeleteBA( struct rtllib_device* ieee, PRX_TS_RECORD	pRxTs)
 {
 	PBA_RECORD		pBa = &pRxTs->RxAdmittedBARecord;
 	u8			bSendDELBA = false;
@@ -220,7 +218,7 @@ static struct sk_buff* rtllib_DELBA(
 	return skb;
 }
 
-void rtllib_send_ADDBAReq(struct rtllib_device* ieee, u8*	dst, PBA_RECORD	pBA)
+static void rtllib_send_ADDBAReq(struct rtllib_device* ieee, u8*	dst, PBA_RECORD	pBA)
 {
 	struct sk_buff *skb = NULL;
 	skb = rtllib_ADDBA(ieee, dst, pBA, 0, ACT_ADDBAREQ);
@@ -237,7 +235,7 @@ void rtllib_send_ADDBAReq(struct rtllib_device* ieee, u8*	dst, PBA_RECORD	pBA)
 	return;
 }
 
-void rtllib_send_ADDBARsp(struct rtllib_device* ieee, u8* dst, PBA_RECORD pBA, u16 StatusCode)
+static void rtllib_send_ADDBARsp(struct rtllib_device* ieee, u8* dst, PBA_RECORD pBA, u16 StatusCode)
 {
 	struct sk_buff *skb = NULL;
 	skb = rtllib_ADDBA(ieee, dst, pBA, StatusCode, ACT_ADDBARSP);
@@ -254,7 +252,7 @@ void rtllib_send_ADDBARsp(struct rtllib_device* ieee, u8* dst, PBA_RECORD pBA, u
 
 }
 
-void rtllib_send_DELBA(struct rtllib_device* ieee, u8* dst, PBA_RECORD pBA, TR_SELECT TxRxSelect, u16 ReasonCode)
+static void rtllib_send_DELBA(struct rtllib_device* ieee, u8* dst, PBA_RECORD pBA, TR_SELECT TxRxSelect, u16 ReasonCode)
 {
 	struct sk_buff *skb = NULL;
 	skb = rtllib_DELBA(ieee, dst, pBA, TxRxSelect, ReasonCode);

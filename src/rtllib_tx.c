@@ -55,12 +55,7 @@
 
 #include "rtllib.h"
 
-#ifdef RTK_DMP_PLATFORM
-#include <linux/usb_setting.h>
-#endif
-
 /*
-
 
 802.11 Data Frame
 
