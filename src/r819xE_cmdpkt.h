@@ -156,7 +156,4 @@ typedef enum tag_command_packet_directories
     RX_CMD_ELE_MAX
 }cmpk_element_e;
 
-extern  u32 cmpk_message_handle_rx(struct net_device *dev, struct rtllib_rx_stats * pstats);
-
-
 #endif

@@ -1092,7 +1092,6 @@ void rtl8192_rx_enable(struct net_device *);
 void rtl8192_tx_enable(struct net_device *);
 
 void rtl8192_disassociate(struct net_device *dev);
-//void fix_rx_fifo(struct net_device *dev);
 void rtl8185_set_rf_pins_enable(struct net_device *dev,u32 a);
 
 int rtl8192_hard_start_xmit(struct sk_buff *skb,struct net_device *dev);
@@ -1105,20 +1104,16 @@ void rtl8192_hw_sleep_wq (void *data);
 void watch_dog_timer_callback(unsigned long data);
 void rtl8192_irq_rx_tasklet(struct r8192_priv *priv);
 void rtl8192_irq_tx_tasklet(struct r8192_priv *priv);
-//void rtl8192_set_anaparam(struct net_device *dev,u32 a);
-//void rtl8185_set_anaparam2(struct net_device *dev,u32 a);
 void rtl8192_update_msr(struct net_device *dev);
 int rtl8192_down(struct net_device *dev,bool shutdownrf);
 int rtl8192_up(struct net_device *dev);
 void rtl8192_commit(struct net_device *dev);
 void rtl8192_set_chan(struct net_device *dev,short ch);
 
-//short check_nic_enough_desc(struct net_device *dev, priority_t priority);
 void rtl8192_start_beacon(struct net_device *dev);
 
-//extern	void	dm_cck_txpower_adjust(struct net_device *dev,bool  binch14);
-extern void firmware_init_param(struct net_device *dev);
-extern bool cmpk_message_handle_tx(struct net_device *dev, u8* codevirtualaddress, u32 packettype, u32 buffer_len);
+void firmware_init_param(struct net_device *dev);
+bool cmpk_message_handle_tx(struct net_device *dev, u8* codevirtualaddress, u32 packettype, u32 buffer_len);
 void rtl8192_hw_wakeup_wq(void *data);
 
 #if LINUX_VERSION_CODE < KERNEL_VERSION(2,6,18)
