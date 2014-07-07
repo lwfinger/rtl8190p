@@ -72,119 +72,38 @@ dig_t	dm_digtable;
 u8		dm_shadow[16][256] = {{0}};
 // For Dynamic Rx Path Selection by Signal Strength
 DRxPathSel	DM_RxPathSelTable;
-/*------------------------Define global variable-----------------------------*/
 
-
-/*------------------------Define local variable------------------------------*/
-/*------------------------Define local variable------------------------------*/
-
-
-/*--------------------Define export function prototype-----------------------*/
-extern	void	init_hal_dm(struct net_device *dev);
-extern	void deinit_hal_dm(struct net_device *dev);
-
-extern void hal_dm_watchdog(struct net_device *dev);
-
-
-extern	void	init_rate_adaptive(struct net_device *dev);
-extern	void	dm_txpower_trackingcallback(void *data);
-
-//extern	void	dm_cck_txpower_adjust(struct net_device *dev, bool  binch14);
-extern	void	dm_restore_dynamic_mechanism_state(struct net_device *dev);
-extern	void	dm_backup_dynamic_mechanism_state(struct net_device *dev);
-extern	void	dm_change_dynamic_initgain_thresh(struct net_device *dev,
-								u32		dm_type,
-								u32		dm_value);
-extern	void	DM_ChangeFsyncSetting(struct net_device *dev,
-												s32		DM_Type,
-												s32		DM_Value);
-extern	void dm_force_tx_fw_info(struct net_device *dev,
-										u32		force_type,
-										u32		force_value);
-extern	void	dm_init_edca_turbo(struct net_device *dev);
-extern	void	dm_rf_operation_test_callback(unsigned long data);
-extern	void	dm_rf_pathcheck_workitemcallback(void *data);
-extern	void dm_fsync_timer_callback(unsigned long data);
-extern	void dm_check_fsync(struct net_device *dev);
-extern	void	dm_shadow_init(struct net_device *dev);
-extern	void dm_initialize_txpower_tracking(struct net_device *dev);
-
-/*--------------------Define export function prototype-----------------------*/
-
-
-/*---------------------Define local function prototype-----------------------*/
-// DM --> Rate Adaptive
-static	void	dm_check_rate_adaptive(struct net_device *dev);
-
-// DM --> Bandwidth switch
-static	void	dm_init_bandwidth_autoswitch(struct net_device *dev);
-static	void	dm_bandwidth_autoswitch(	struct net_device *dev);
-
-// DM --> TX power control
-//static	void	dm_initialize_txpower_tracking(struct net_device *dev);
-
-static	void	dm_check_txpower_tracking(struct net_device *dev);
-
-
-
-//static	void	dm_txpower_reset_recovery(struct net_device *dev);
-
-
-// DM --> BB init gain restore
-static	void	dm_bb_initialgain_restore(struct net_device *dev);
-
-
-// DM --> BB init gain backup
-static	void	dm_bb_initialgain_backup(struct net_device *dev);
-
-// DM --> Dynamic Init Gain by RSSI
+static	void	dm_init_dynamic_txpower(struct net_device *dev);
 static	void	dm_dig_init(struct net_device *dev);
-static	void	dm_ctrl_initgain_byrssi(struct net_device *dev);
-static	void	dm_ctrl_initgain_byrssi_highpwr(struct net_device *dev);
-static	void	dm_ctrl_initgain_byrssi_by_driverrssi(	struct net_device *dev);
+static	void	dm_init_bandwidth_autoswitch(struct net_device *dev);
+static void dm_init_fsync(struct net_device *dev);
+static	void dm_init_rxpath_selection(struct net_device *dev);
+static	void dm_init_ctstoself(struct net_device *dev);
+static	void dm_Init_WA_Broadcom_IOT(struct net_device *dev);
+static void dm_deInit_fsync(struct net_device *dev);
+static  void	dm_check_ac_dc_power(struct net_device *dev);
+static	void dm_check_pbc_gpio(struct net_device *dev);
+static	void	dm_check_txrateandretrycount(struct net_device *dev);
+static	void	dm_check_edca_turbo(struct net_device *dev);
+static	void	dm_check_rate_adaptive(struct net_device *dev);
+static	void	dm_dynamic_txpower(struct net_device *dev);
+static	void	dm_check_txpower_tracking(struct net_device *dev);
 static	void	dm_ctrl_initgain_byrssi_by_fwfalse_alarm(struct net_device *dev);
+static	void	dm_bandwidth_autoswitch(	struct net_device *dev);
+static	void	dm_check_rx_path_selection(struct net_device *dev);
+static	void dm_send_rssi_tofw(struct net_device *dev);
+static	void	dm_ctstoself(struct net_device *dev);
+static	void	dm_bb_initialgain_restore(struct net_device *dev);
+static	void	dm_bb_initialgain_backup(struct net_device *dev);
+static	void	dm_ctrl_initgain_byrssi_by_driverrssi(	struct net_device *dev);
 static	void	dm_initial_gain(struct net_device *dev);
 static	void	dm_pd_th(struct net_device *dev);
 static	void	dm_cs_ratio(struct net_device *dev);
-
-static	void dm_init_ctstoself(struct net_device *dev);
-static	void dm_Init_WA_Broadcom_IOT(struct net_device *dev);
-
-
-// DM --> EDCA turboe mode control
-static	void	dm_check_edca_turbo(struct net_device *dev);
-
-// DM --> HW RF control
-
-// DM --> Check PBC
-static	void dm_check_pbc_gpio(struct net_device *dev);
-
-
-// DM --> Check current RX RF path state
-static	void	dm_check_rx_path_selection(struct net_device *dev);
-static	void dm_init_rxpath_selection(struct net_device *dev);
+static	void	dm_ctrl_initgain_byrssi_highpwr(struct net_device *dev);
 static	void dm_rxpath_sel_byrssi(struct net_device *dev);
+static	void dm_fsync_timer_callback(unsigned long data);
+static	void	dm_ctrl_initgain_byrssi(struct net_device *dev);
 
-
-// DM --> Fsync for broadcom ap
-static void dm_init_fsync(struct net_device *dev);
-static void dm_deInit_fsync(struct net_device *dev);
-
-//Added by vivi, 20080522
-static	void	dm_check_txrateandretrycount(struct net_device *dev);
-
-static  void	dm_check_ac_dc_power(struct net_device *dev);
-/*---------------------Define local function prototype-----------------------*/
-
-//---------------------Define of Tx Power Control For Near/Far Range --------
-//Add by Jacken 2008/02/18
-static	void	dm_init_dynamic_txpower(struct net_device *dev);
-static	void	dm_dynamic_txpower(struct net_device *dev);
-
-
-// DM --> For rate adaptive and DIG, we must send RSSI to firmware
-static	void dm_send_rssi_tofw(struct net_device *dev);
-static	void	dm_ctstoself(struct net_device *dev);
 /*---------------------------Define function prototype------------------------*/
 //================================================================================
 //	HW Dynamic mechanism interface.
@@ -198,7 +117,7 @@ static	void	dm_ctstoself(struct net_device *dev);
 //		This function is only invoked at driver intialization once.
 //
 //
-extern	void
+void
 init_hal_dm(struct net_device *dev)
 {
 	struct r8192_priv *priv = rtllib_priv(dev);
@@ -222,7 +141,7 @@ init_hal_dm(struct net_device *dev)
 	dm_Init_WA_Broadcom_IOT(dev);
 }	// InitHalDm
 
-extern void deinit_hal_dm(struct net_device *dev)
+void deinit_hal_dm(struct net_device *dev)
 {
 
 	dm_deInit_fsync(dev);
@@ -273,7 +192,7 @@ void dm_CheckRxAggregation(struct net_device *dev) {
 
 
 
-extern  void    hal_dm_watchdog(struct net_device *dev)
+void    hal_dm_watchdog(struct net_device *dev)
 {
 	// call script file to enable/disable legacy power save */
 	dm_check_ac_dc_power(dev);
@@ -304,7 +223,7 @@ extern  void    hal_dm_watchdog(struct net_device *dev)
 }	//HalDmWatchDog
 
 // call the script file to enable
-void dm_check_ac_dc_power(struct net_device *dev)
+static void dm_check_ac_dc_power(struct net_device *dev)
 {
 	struct r8192_priv *priv = rtllib_priv(dev);
 	static char *ac_dc_check_script_path = "/etc/acpi/wireless-rtl-ac-dc-power.sh";
@@ -335,7 +254,7 @@ void dm_check_ac_dc_power(struct net_device *dev)
 //	01/16/2008	MHC		RF_Type is assigned in ReadAdapterInfo(). We must call
 //						the function after making sure RF_Type.
 //
-extern void init_rate_adaptive(struct net_device * dev)
+void init_rate_adaptive(struct net_device * dev)
 {
 
 	struct r8192_priv *priv = rtllib_priv(dev);
@@ -1480,7 +1399,7 @@ static void dm_CCKTxPowerAdjust_TSSI(struct net_device *dev, bool  bInCH14)
 
 }
 
-extern void dm_cck_txpower_adjust(
+void dm_cck_txpower_adjust(
 	struct net_device *dev,
 	bool  binch14
 )
@@ -1509,7 +1428,7 @@ static void dm_txpower_reset_recovery(
 
 }	// dm_TXPowerResetRecovery
 
-extern void dm_restore_dynamic_mechanism_state(struct net_device *dev)
+void dm_restore_dynamic_mechanism_state(struct net_device *dev)
 {
 	struct r8192_priv *priv = rtllib_priv(dev);
 	u32	reg_ratr = priv->rate_adaptive.last_ratr;
@@ -1584,7 +1503,7 @@ static void dm_bb_initialgain_restore(struct net_device *dev)
 }	// dm_BBInitialGainRestore
 
 
-extern void dm_backup_dynamic_mechanism_state(struct net_device *dev)
+void dm_backup_dynamic_mechanism_state(struct net_device *dev)
 {
 	struct r8192_priv *priv = rtllib_priv(dev);
 
@@ -1638,7 +1557,7 @@ static void dm_bb_initialgain_backup(struct net_device *dev)
 //	05/29/2008	amy		Create Version 0 porting from windows code.
 //
 //---------------------------------------------------------------------------*/
-extern void dm_change_dynamic_initgain_thresh(struct net_device *dev,
+void dm_change_dynamic_initgain_thresh(struct net_device *dev,
 								u32		dm_type,
 								u32		dm_value)
 {
@@ -1684,100 +1603,6 @@ extern void dm_change_dynamic_initgain_thresh(struct net_device *dev,
 		dm_digtable.rx_gain_range_max = (u8)dm_value;
 	}
 }	// DM_ChangeDynamicInitGainThresh */
-extern	void
-dm_change_fsync_setting(
-	struct net_device *dev,
-	s32		DM_Type,
-	s32		DM_Value)
-{
-	struct r8192_priv *priv = rtllib_priv(dev);
-
-	if (DM_Type == 0)	// monitor 0xc38 register
-	{
-		if (DM_Value > 1)
-			DM_Value = 1;
-		priv->framesyncMonitor = (u8)DM_Value;
-		//DbgPrint("pHalData->framesyncMonitor = %d", pHalData->framesyncMonitor);
-	}
-}
-
-extern void
-dm_change_rxpath_selection_setting(
-	struct net_device *dev,
-	s32		DM_Type,
-	s32		DM_Value)
-{
-	struct r8192_priv *priv = rtllib_priv(dev);
-	prate_adaptive	pRA = (prate_adaptive)&(priv->rate_adaptive);
-
-
-	if (DM_Type == 0)
-	{
-		if (DM_Value > 1)
-			DM_Value = 1;
-		DM_RxPathSelTable.Enable = (u8)DM_Value;
-	}
-	else if (DM_Type == 1)
-	{
-		if (DM_Value > 1)
-			DM_Value = 1;
-		DM_RxPathSelTable.DbgMode = (u8)DM_Value;
-	}
-	else if (DM_Type == 2)
-	{
-		if (DM_Value > 40)
-			DM_Value = 40;
-		DM_RxPathSelTable.SS_TH_low = (u8)DM_Value;
-	}
-	else if (DM_Type == 3)
-	{
-		if (DM_Value > 25)
-			DM_Value = 25;
-		DM_RxPathSelTable.diff_TH = (u8)DM_Value;
-	}
-	else if (DM_Type == 4)
-	{
-		if (DM_Value >= CCK_Rx_Version_MAX)
-			DM_Value = CCK_Rx_Version_1;
-		DM_RxPathSelTable.cck_method = (u8)DM_Value;
-	}
-	else if (DM_Type == 10)
-	{
-		if (DM_Value > 100)
-			DM_Value = 50;
-		DM_RxPathSelTable.rf_rssi[0] = (u8)DM_Value;
-	}
-	else if (DM_Type == 11)
-	{
-		if (DM_Value > 100)
-			DM_Value = 50;
-		DM_RxPathSelTable.rf_rssi[1] = (u8)DM_Value;
-	}
-	else if (DM_Type == 12)
-	{
-		if (DM_Value > 100)
-			DM_Value = 50;
-		DM_RxPathSelTable.rf_rssi[2] = (u8)DM_Value;
-	}
-	else if (DM_Type == 13)
-	{
-		if (DM_Value > 100)
-			DM_Value = 50;
-		DM_RxPathSelTable.rf_rssi[3] = (u8)DM_Value;
-	}
-	else if (DM_Type == 20)
-	{
-		if (DM_Value > 1)
-			DM_Value = 1;
-		pRA->ping_rssi_enable = (u8)DM_Value;
-	}
-	else if (DM_Type == 21)
-	{
-		if (DM_Value > 30)
-			DM_Value = 30;
-		pRA->ping_rssi_thresh_for_ra = DM_Value;
-	}
-}
 
 //-----------------------------------------------------------------------------
 // Function:	dm_dig_init()
@@ -1836,36 +1661,6 @@ static void dm_dig_init(struct net_device *dev)
 	dm_digtable.BackoffVal_range_max = DM_DIG_BACKOFF_MAX;
 	dm_digtable.BackoffVal_range_min = DM_DIG_BACKOFF_MIN;
 }	// dm_dig_init */
-
-void dm_FalseAlarmCounterStatistics(struct net_device *dev)
-{
-	struct r8192_priv *priv = rtllib_priv(dev);
-	u32 ret_value;
-	PFALSE_ALARM_STATISTICS FalseAlmCnt = &(priv->FalseAlmCnt);
-
-	ret_value = rtl8192_QueryBBReg(dev, rOFDM_PHYCounter1, bMaskDWord);
-        FalseAlmCnt->Cnt_Parity_Fail = ((ret_value&0xffff0000)>>16);
-
-        ret_value = rtl8192_QueryBBReg(dev, rOFDM_PHYCounter2, bMaskDWord);
-	FalseAlmCnt->Cnt_Rate_Illegal = (ret_value&0xffff);
-	FalseAlmCnt->Cnt_Crc8_fail = ((ret_value&0xffff0000)>>16);
-	ret_value = rtl8192_QueryBBReg(dev, rOFDM_PHYCounter3, bMaskDWord);
-	FalseAlmCnt->Cnt_Mcs_fail = (ret_value&0xffff);
-
-	FalseAlmCnt->Cnt_Ofdm_fail = FalseAlmCnt->Cnt_Parity_Fail + FalseAlmCnt->Cnt_Rate_Illegal +
-							  FalseAlmCnt->Cnt_Crc8_fail + FalseAlmCnt->Cnt_Mcs_fail;
-
-	ret_value = rtl8192_QueryBBReg(dev, 0xc64, bMaskDWord);	// read CCK false alarm
-	FalseAlmCnt->Cnt_Cck_fail = (ret_value&0xffff);
-	FalseAlmCnt->Cnt_all = (FalseAlmCnt->Cnt_Parity_Fail +
-						FalseAlmCnt->Cnt_Rate_Illegal +
-						FalseAlmCnt->Cnt_Crc8_fail +
-						FalseAlmCnt->Cnt_Mcs_fail +
-						FalseAlmCnt->Cnt_Cck_fail);
-
-	RT_TRACE(COMP_DIG, "Cnt_Ofdm_fail = %d, Cnt_Cck_fail = %d, Cnt_all = %d\n",
-				FalseAlmCnt->Cnt_Ofdm_fail, FalseAlmCnt->Cnt_Cck_fail , FalseAlmCnt->Cnt_all);
-}
 
 //-----------------------------------------------------------------------------
 // Function:	dm_ctrl_initgain_byrssi()
@@ -2227,102 +2022,6 @@ static void dm_initial_gain(
 	}
 }
 
-void dm_initial_gain_STABeforeConnect(
-	struct net_device * dev)
-{
-	struct r8192_priv *priv = rtllib_priv(dev);
-	u8			initial_gain = 0;
-	static u8		initialized = 0, force_write = 0;
-	//u8			ret_value;
-
-	RT_TRACE(COMP_DIG, "PreSTAConnectState = %x, CurSTAConnectState = %x\n",
-				dm_digtable.PreSTAConnectState, dm_digtable.CurSTAConnectState);
-
-
-	if ((dm_digtable.PreSTAConnectState == dm_digtable.CurSTAConnectState) ||
-		(dm_digtable.CurSTAConnectState == DIG_STA_BEFORE_CONNECT))
-	{
-		// beforeconnect -> beforeconnect or  (dis)connect -> beforeconnect
-		if (dm_digtable.CurSTAConnectState == DIG_STA_BEFORE_CONNECT)
-		{
-			if (priv->rtllib->eRFPowerState != eRfOn)
-				return;
-
-			if (dm_digtable.Backoff_Enable_Flag == true)
-			{
-				if (priv->FalseAlmCnt.Cnt_all > dm_digtable.FAHighThresh)
-				{
-					if ((dm_digtable.backoff_val -6) < dm_digtable.BackoffVal_range_min)
-						dm_digtable.backoff_val = dm_digtable.BackoffVal_range_min;
-					else
-						dm_digtable.backoff_val -= 6;
-				}
-				else if (priv->FalseAlmCnt.Cnt_all < dm_digtable.FALowThresh)
-				{
-					if ((dm_digtable.backoff_val+6) > dm_digtable.BackoffVal_range_max)
-						dm_digtable.backoff_val = dm_digtable.BackoffVal_range_max;
-					else
-						dm_digtable.backoff_val += 6;
-				}
-			}
-			else
-				dm_digtable.backoff_val = DM_DIG_BACKOFF;
-
-			if ((dm_digtable.rssi_val+10-dm_digtable.backoff_val) > dm_digtable.rx_gain_range_max)
-				dm_digtable.cur_ig_value = dm_digtable.rx_gain_range_max;
-			else if ((dm_digtable.rssi_val+10-dm_digtable.backoff_val) < dm_digtable.rx_gain_range_min)
-				dm_digtable.cur_ig_value = dm_digtable.rx_gain_range_min;
-			else
-				dm_digtable.cur_ig_value = dm_digtable.rssi_val+10-dm_digtable.backoff_val;
-
-			if (priv->FalseAlmCnt.Cnt_all > 10000)
-				dm_digtable.cur_ig_value = (dm_digtable.cur_ig_value>0x33)?dm_digtable.cur_ig_value:0x33;
-
-			if (priv->FalseAlmCnt.Cnt_all > 16000)
-				dm_digtable.cur_ig_value = dm_digtable.rx_gain_range_max;
-
-		}
-		else // connected -> connected or disconnected -> disconnected
-		{
-			return;	// Firmware control DIG, do nothing in driver dm
-		}
-	}
-	else	// disconnected -> connected or connected -> disconnected or beforeconnect->(dis)connected
-	{
-		// Enable FW DIG
-		dm_digtable.Dig_Ext_Port_Stage = DIG_EXT_PORT_STAGE_MAX;
-		priv->rtllib->SetFwCmdHandler(dev, FW_CMD_DIG_ENABLE);
-
-		dm_digtable.backoff_val = DM_DIG_BACKOFF;
-		dm_digtable.cur_ig_value = priv->DefaultInitialGain[0];
-		dm_digtable.pre_ig_value = 0;
-		return;
-	}
-
-	// Forced writing to prevent from fw-dig overwriting.
-	if (dm_digtable.pre_ig_value != rtl8192_QueryBBReg(dev, rOFDM0_XAAGCCore1, bMaskByte0))
-		force_write = 1;
-
-	if ((dm_digtable.pre_ig_value != dm_digtable.cur_ig_value) || !initialized || force_write)
-	{
-		// Disable FW DIG
-		priv->rtllib->SetFwCmdHandler(dev, FW_CMD_DIG_DISABLE);
-
-		initial_gain = (u8)dm_digtable.cur_ig_value;
-
-		// Set initial gain.
-		rtl8192_setBBreg(dev, rOFDM0_XAAGCCore1, bMaskByte0, initial_gain);
-		rtl8192_setBBreg(dev, rOFDM0_XBAGCCore1, bMaskByte0, initial_gain);
-		dm_digtable.pre_ig_value = dm_digtable.cur_ig_value;
-		initialized = 1;
-		force_write = 0;
-	}
-
-	RT_TRACE(COMP_DIG, "CurIGValue = 0x%x, pre_ig_value = 0x%x, backoff_val = %d\n",
-				dm_digtable.cur_ig_value, dm_digtable.pre_ig_value, dm_digtable.backoff_val);
-
-}
-
 static void dm_pd_th(
 	struct net_device * dev)
 {
@@ -2476,7 +2175,7 @@ static	void dm_cs_ratio(
 	}
 }
 
-extern void dm_init_edca_turbo(struct net_device * dev)
+void dm_init_edca_turbo(struct net_device * dev)
 {
 	struct r8192_priv *priv = rtllib_priv(dev);
 
@@ -2642,26 +2341,6 @@ dm_CheckEdcaTurbo_EXIT:
 	lastTxOkCnt = priv->stats.txbytesunicast;
 	lastRxOkCnt = priv->stats.rxbytesunicast;
 }	// dm_CheckEdcaTurbo
-
-extern void DM_CTSToSelfSetting(struct net_device * dev, u32 DM_Type, u32 DM_Value)
-{
-	struct r8192_priv *priv = rtllib_priv((struct net_device *)dev);
-
-	if (DM_Type == 0)	// CTS to self disable/enable
-	{
-		if (DM_Value > 1)
-			DM_Value = 1;
-		priv->rtllib->bCTSToSelfEnable = (bool)DM_Value;
-		//DbgPrint("pMgntInfo->bCTSToSelfEnable = %d\n", pMgntInfo->bCTSToSelfEnable);
-	}
-	else if (DM_Type == 1) //CTS to self Th
-	{
-		if (DM_Value >= 50)
-			DM_Value = 50;
-		priv->rtllib->CTSToSelfTH = (u8)DM_Value;
-		//DbgPrint("pMgntInfo->CTSToSelfTH = %d\n", pMgntInfo->CTSToSelfTH);
-	}
-}
 
 static void dm_init_ctstoself(struct net_device * dev)
 {
@@ -3139,7 +2818,7 @@ static void dm_deInit_fsync(struct net_device *dev)
 	del_timer_sync(&priv->fsync_timer);
 }
 
-extern void dm_fsync_timer_callback(unsigned long data)
+static void dm_fsync_timer_callback(unsigned long data)
 {
 	struct net_device *dev = (struct net_device *)data;
 	struct r8192_priv *priv = rtllib_priv((struct net_device *)data);
@@ -3465,7 +3144,7 @@ void dm_check_fsync(struct net_device *dev)
 //	05/29/2008	amy		Create Version 0 porting from windows code.
 //
 //---------------------------------------------------------------------------*/
-extern void dm_shadow_init(struct net_device *dev)
+void dm_shadow_init(struct net_device *dev)
 {
 	u8	page;
 	u16	offset;

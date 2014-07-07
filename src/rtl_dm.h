@@ -310,7 +310,6 @@ extern  void dm_force_tx_fw_info(struct net_device *dev,
 extern  void    dm_init_edca_turbo(struct net_device *dev);
 extern  void    dm_rf_operation_test_callback(unsigned long data);
 extern  void    dm_rf_pathcheck_workitemcallback(void *data);
-extern  void dm_fsync_timer_callback(unsigned long data);
 extern  void dm_check_fsync(struct net_device *dev);
 extern  void    dm_shadow_init(struct net_device *dev);
 extern  void dm_initialize_txpower_tracking(struct net_device *dev);
