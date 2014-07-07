@@ -456,30 +456,22 @@ drop:
 
 	return 1;
 }
-bool
-AddReorderEntry(
+
+static bool AddReorderEntry(
 	PRX_TS_RECORD			pTS,
 	PRX_REORDER_ENTRY		pReorderEntry
 	)
 {
 	struct list_head *pList = &pTS->RxPendingPktList;
-#if  1
-	while (pList->next != &pTS->RxPendingPktList)
-	{
+
+	while (pList->next != &pTS->RxPendingPktList) {
 		if ( SN_LESS(pReorderEntry->SeqNum, ((PRX_REORDER_ENTRY)list_entry(pList->next, RX_REORDER_ENTRY, List))->SeqNum) )
-		{
 			pList = pList->next;
-		}
 		else if ( SN_EQUAL(pReorderEntry->SeqNum, ((PRX_REORDER_ENTRY)list_entry(pList->next, RX_REORDER_ENTRY, List))->SeqNum) )
-		{
 			return false;
-		}
 		else
-		{
 			break;
-		}
 	}
-#endif
 	pReorderEntry->List.next = pList->next;
 	pReorderEntry->List.next->prev = &pReorderEntry->List;
 	pReorderEntry->List.prev = pList;
@@ -546,7 +538,7 @@ void rtllib_indicate_packets(struct rtllib_device *ieee, struct rtllib_rxb** prx
 }
 
 
-void RxReorderIndicatePacket( struct rtllib_device *ieee,
+static void RxReorderIndicatePacket( struct rtllib_device *ieee,
 		struct rtllib_rxb* prxb,
 		PRX_TS_RECORD		pTS,
 		u16			SeqNum)
@@ -709,7 +701,7 @@ void RxReorderIndicatePacket( struct rtllib_device *ieee,
 	}
 }
 
-u8 parse_subframe(struct rtllib_device* ieee, struct sk_buff *skb,
+static u8 parse_subframe(struct rtllib_device* ieee, struct sk_buff *skb,
                   struct rtllib_rx_stats *rx_stats,
 		  struct rtllib_rxb *rxb, u8* src, u8* dst)
 {
@@ -2114,7 +2106,7 @@ static inline u8 rtllib_SignalStrengthTranslate(u8  CurrSS)
 	return RetSS;
 }
 
-long rtllib_translate_todbm(u8 signal_strength_index	)
+static long rtllib_translate_todbm(u8 signal_strength_index	)
 {
 	long	signal_power;
 

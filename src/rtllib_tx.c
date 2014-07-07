@@ -234,8 +234,8 @@ void rtllib_txb_free(struct rtllib_txb *txb)
 	kfree(txb);
 }
 
-struct rtllib_txb *rtllib_alloc_txb(int nr_frags, int txb_size,
-					  int gfp_mask)
+static struct rtllib_txb *rtllib_alloc_txb(int nr_frags, int txb_size,
+					   gfp_t gfp_mask)
 {
 #ifdef USB_USE_ALIGNMENT
 	u32 Tmpaddr = 0;
@@ -243,13 +243,13 @@ struct rtllib_txb *rtllib_alloc_txb(int nr_frags, int txb_size,
 #endif
 	struct rtllib_txb *txb;
 	int i;
-	txb = kmalloc(
+
+	txb = kzalloc(
 		sizeof(struct rtllib_txb) + (sizeof(u8*) * nr_frags),
 		gfp_mask);
 	if (!txb)
 		return NULL;
 
-	memset(txb, 0, sizeof(struct rtllib_txb));
 	txb->nr_frags = nr_frags;
 	txb->frag_size = txb_size;
 
@@ -279,8 +279,7 @@ struct rtllib_txb *rtllib_alloc_txb(int nr_frags, int txb_size,
 	return txb;
 }
 
-int
-rtllib_classify(struct sk_buff *skb, u8 bIsAmsdu)
+static int rtllib_classify(struct sk_buff *skb, u8 bIsAmsdu)
 {
 	struct ethhdr *eth;
 	struct iphdr *ip;
@@ -315,7 +314,7 @@ rtllib_classify(struct sk_buff *skb, u8 bIsAmsdu)
 	}
 }
 
-void rtllib_tx_query_agg_cap(struct rtllib_device* ieee, struct sk_buff* skb, cb_desc* tcb_desc)
+static void rtllib_tx_query_agg_cap(struct rtllib_device* ieee, struct sk_buff* skb, cb_desc* tcb_desc)
 {
 	PRT_HIGH_THROUGHPUT	pHTInfo = ieee->pHTInfo;
 	PTX_TS_RECORD			pTxTs = NULL;
@@ -389,21 +388,17 @@ FORCED_AGG_SETTING:
 		return;
 }
 
-extern void rtllib_qurey_ShortPreambleMode(struct rtllib_device* ieee, cb_desc* tcb_desc)
+static void rtllib_qurey_ShortPreambleMode(struct rtllib_device* ieee, cb_desc* tcb_desc)
 {
 	tcb_desc->bUseShortPreamble = false;
 	if (tcb_desc->data_rate == 2)
-	{
 		return;
-	}
 	else if (ieee->current_network.capability & WLAN_CAPABILITY_SHORT_PREAMBLE)
-	{
 		tcb_desc->bUseShortPreamble = true;
-	}
 	return;
 }
 
-extern	void
+static void
 rtllib_query_HTCapShortGI(struct rtllib_device *ieee, cb_desc *tcb_desc)
 {
 	PRT_HIGH_THROUGHPUT		pHTInfo = ieee->pHTInfo;
@@ -425,7 +420,7 @@ rtllib_query_HTCapShortGI(struct rtllib_device *ieee, cb_desc *tcb_desc)
 		tcb_desc->bUseShortGI = true;
 }
 
-void rtllib_query_BandwidthMode(struct rtllib_device* ieee, cb_desc *tcb_desc)
+static void rtllib_query_BandwidthMode(struct rtllib_device* ieee, cb_desc *tcb_desc)
 {
 	PRT_HIGH_THROUGHPUT	pHTInfo = ieee->pHTInfo;
 
@@ -444,7 +439,7 @@ void rtllib_query_BandwidthMode(struct rtllib_device* ieee, cb_desc *tcb_desc)
 	return;
 }
 
-void rtllib_query_protectionmode(struct rtllib_device* ieee, cb_desc* tcb_desc, struct sk_buff* skb)
+static void rtllib_query_protectionmode(struct rtllib_device* ieee, cb_desc* tcb_desc, struct sk_buff* skb)
 {
 	tcb_desc->bRTSSTBC			= false;
 	tcb_desc->bRTSUseShortGI		= false;
@@ -523,7 +518,7 @@ NO_PROTECTION:
 }
 
 
-void rtllib_txrate_selectmode(struct rtllib_device* ieee, cb_desc* tcb_desc)
+static void rtllib_txrate_selectmode(struct rtllib_device* ieee, cb_desc* tcb_desc)
 {
 	if (ieee->bTxDisableRateFallBack)
 		tcb_desc->bTxDisableRateFallBack = true;
@@ -577,7 +572,7 @@ static int wme_downgrade_ac(struct sk_buff *skb)
 	}
 }
 
-int rtllib_xmit_inter(struct sk_buff *skb, struct net_device *dev)
+static int rtllib_xmit_inter(struct sk_buff *skb, struct net_device *dev)
 {
 	struct rtllib_device *ieee = (struct rtllib_device *)netdev_priv_rsl(dev);
 	struct rtllib_txb *txb = NULL;
