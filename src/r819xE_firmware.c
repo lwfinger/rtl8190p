@@ -25,7 +25,7 @@
 #include <linux/firmware.h>
 #endif
 
-extern void firmware_init_param(struct net_device *dev)
+void firmware_init_param(struct net_device *dev)
 {
 	struct r8192_priv	*priv = rtllib_priv(dev);
 	rt_firmware		*pfirmware = priv->pFirmware;
@@ -33,7 +33,7 @@ extern void firmware_init_param(struct net_device *dev)
 	pfirmware->cmdpacket_frag_thresold = GET_COMMAND_PACKET_FRAG_THRESHOLD(MAX_TRANSMIT_BUFFER_SIZE);
 }
 
-bool fw_download_code(struct net_device *dev, u8 *code_virtual_address, u32 buffer_len)
+static bool fw_download_code(struct net_device *dev, u8 *code_virtual_address, u32 buffer_len)
 {
 	struct r8192_priv   *priv = rtllib_priv(dev);
 	bool		    rt_status = true;
@@ -94,11 +94,7 @@ bool fw_download_code(struct net_device *dev, u8 *code_virtual_address, u32 buff
 	return rt_status;
 }
 
-bool
-fwSendNullPacket(
-	struct net_device *dev,
-	u32			Length
-)
+static bool fwSendNullPacket(struct net_device *dev, u32 Length)
 {
 	bool	rtStatus = true;
 	struct r8192_priv   *priv = rtllib_priv(dev);
@@ -130,7 +126,7 @@ fwSendNullPacket(
 	return rtStatus;
 }
 
-bool CPUcheck_maincodeok_turnonCPU(struct net_device *dev)
+static bool CPUcheck_maincodeok_turnonCPU(struct net_device *dev)
 {
 	bool		rt_status = true;
 	u32		CPU_status = 0;
@@ -177,7 +173,7 @@ CPUCheckMainCodeOKAndTurnOnCPU_Fail:
 	return rt_status;
 }
 
-bool CPUcheck_firmware_ready(struct net_device *dev)
+static bool CPUcheck_firmware_ready(struct net_device *dev)
 {
 
 	bool	rt_status = true;

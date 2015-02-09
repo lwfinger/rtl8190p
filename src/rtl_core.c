@@ -65,7 +65,7 @@
 
 int hwwep = 1; //default use hw. set 0 to use software security
 static int channels = 0x3fff;
-char* ifname = "wlan%d";
+static char* ifname = "wlan%d";
 
 //set here to open your trace code. //WB
 u32 rt_global_debug_component = \
@@ -94,7 +94,7 @@ u32 rt_global_debug_component = \
 //				COMP_RATE       |
 				COMP_ERR ; //always open err flags on
 
-struct rtl819x_ops rtl819xp_ops = {
+static struct rtl819x_ops rtl819xp_ops = {
 	.nic_type = NIC_UNKNOWN,
 	.get_eeprom_size = rtl8192_get_eeprom_size,
 	.initialize_adapter = rtl8192_adapter_start,
@@ -445,7 +445,7 @@ void write_nic_word(struct net_device *dev, int x, u16 y)
    -----------------------------GENERAL FUNCTION-------------------------
 *****************************************************************************/
 
-void
+static void
 MgntDisconnectIBSS(
 	struct net_device* dev
 )
@@ -477,7 +477,7 @@ MgntDisconnectIBSS(
 
 }
 
-void
+static void
 MlmeDisassociateRequest(
 	struct net_device* dev,
 	u8*		asSta,
@@ -492,7 +492,7 @@ MlmeDisassociateRequest(
 
 	//SendDisassociation( priv->rtllib, 0, asRsn );
 
-	if (memcpy(priv->rtllib->current_network.bssid, asSta, 6) == 0)
+	if (memcpy(priv->rtllib->current_network.bssid, asSta, 6) == NULL)
 	{
 		//ShuChen TODO: change media status.
 		//ShuChen TODO: What to do when disassociate.
@@ -511,7 +511,7 @@ MlmeDisassociateRequest(
 
 }
 
-void
+static void
 MgntDisconnectAP(
 	struct net_device* dev,
 	u8 asRsn
@@ -547,7 +547,7 @@ MgntDisconnectAP(
 	//pMgntInfo->AsocTimestamp = 0;
 }
 
-bool
+static bool
 MgntDisconnect(
 	struct net_device* dev,
 	u8 asRsn
@@ -771,7 +771,7 @@ MgntActSet_RF_State(
 }
 
 
-short get_nic_desc_num(struct net_device *dev, int prio)
+static short get_nic_desc_num(struct net_device *dev, int prio)
 {
     struct r8192_priv *priv = rtllib_priv(dev);
     struct rtl8192_tx_ring *ring = &priv->tx_ring[prio];
@@ -830,13 +830,6 @@ void rtl8192_irq_disable(struct net_device *dev)
 	write_nic_dword(dev, INTA_MASK, 0);
 
 	priv->irq_enabled = 0;
-}
-
-void rtl8192_irq_clear(struct net_device *dev)
-{
-	u32 tmp = 0;
-	tmp = read_nic_dword(dev, ISR);
-	write_nic_dword(dev, ISR, tmp);
 }
 
 void rtl8192_set_chan(struct net_device *dev, short ch)
@@ -952,7 +945,7 @@ static struct rtllib_qos_parameters def_qos_parameters = {
         {0, 0, 0, 0} // tx_op_limit */
 };
 
-void rtl8192_update_beacon(void *data)
+static void rtl8192_update_beacon(void *data)
 {
 #if LINUX_VERSION_CODE >= KERNEL_VERSION(2, 6, 20)
 	struct r8192_priv *priv = container_of_work_rsl(data, struct r8192_priv, update_beacon_wq.work);
@@ -976,7 +969,7 @@ void rtl8192_update_beacon(void *data)
 //background support to run QoS activate functionality
 //
 int WDCAPARA_ADD[] = {EDCAPARA_BE, EDCAPARA_BK, EDCAPARA_VI, EDCAPARA_VO};
-void rtl8192_qos_activate(void *data)
+static void rtl8192_qos_activate(void *data)
 {
 #if LINUX_VERSION_CODE >= KERNEL_VERSION(2, 6, 20)
 	struct r8192_priv *priv = container_of_work_rsl(data, struct r8192_priv, qos_activate);
@@ -1145,7 +1138,7 @@ static int rtl8192_handle_assoc_response(struct net_device *dev,
         return 0;
 }
 
-void rtl8192_prepare_beacon(struct r8192_priv *priv)
+static void rtl8192_prepare_beacon(struct r8192_priv *priv)
 {
 	struct sk_buff *skb;
 	cb_desc *tcb_desc;
@@ -1164,7 +1157,7 @@ void rtl8192_prepare_beacon(struct r8192_priv *priv)
 	}
 }
 
-void rtl8192_stop_beacon(struct net_device *dev)
+static void rtl8192_stop_beacon(struct net_device *dev)
 {
 }
 
@@ -1260,7 +1253,7 @@ void rtl8192_config_rate(struct net_device* dev, u16* rate_config)
 	 }
 }
 
-bool GetNmodeSupportBySecCfg8190Pci(struct net_device *dev)
+static bool GetNmodeSupportBySecCfg8190Pci(struct net_device *dev)
 {
 	struct r8192_priv *priv = rtllib_priv(dev);
 	struct rtllib_device *ieee = priv->rtllib;
@@ -1272,7 +1265,7 @@ bool GetNmodeSupportBySecCfg8190Pci(struct net_device *dev)
 	}
 }
 
-void rtl8192_refresh_supportrate(struct r8192_priv* priv)
+static void rtl8192_refresh_supportrate(struct r8192_priv* priv)
 {
 	struct rtllib_device* ieee = priv->rtllib;
 	//we donot consider set support rate for ABG mode, only HT MCS rate is set here.
@@ -1285,7 +1278,7 @@ void rtl8192_refresh_supportrate(struct r8192_priv* priv)
 	return;
 }
 
-u8 rtl8192_getSupportedWireleeMode(struct net_device*dev)
+static u8 rtl8192_getSupportedWireleeMode(struct net_device*dev)
 {
 	struct r8192_priv *priv = rtllib_priv(dev);
 	u8 ret = 0;
@@ -1348,7 +1341,7 @@ void rtl8192_SetWirelessMode(struct net_device* dev, u8 wireless_mode)
 	rtl8192_refresh_supportrate(priv);
 }
 
-bool GetHalfNmodeSupportByAPs819xPci(struct net_device* dev)
+static bool GetHalfNmodeSupportByAPs819xPci(struct net_device* dev)
 {
 	bool			Reval;
 	struct r8192_priv* priv = rtllib_priv(dev);
@@ -1535,9 +1528,9 @@ static void rtl8192_init_priv_variable(struct net_device* dev)
 
 
 	priv->AcmControl = 0;
-	priv->pFirmware = (rt_firmware*)vmalloc(sizeof(rt_firmware));
-	if (priv->pFirmware)
-	memset(priv->pFirmware, 0, sizeof(rt_firmware));
+	priv->pFirmware = (rt_firmware *)vzalloc(sizeof(rt_firmware));
+	if (!priv->pFirmware)
+		/* FIXME */
 
 	// rx related queue */
         skb_queue_head_init(&priv->rx_queue);
@@ -1606,7 +1599,7 @@ static void rtl8192_init_priv_task(struct net_device* dev)
 //	Note:	dev->EEPROMAddressSize should be set before this function call.
 //			EEPROM address size can be got through GetEEPROMSize8185()
 //
-short rtl8192_get_channel_map(struct net_device * dev)
+static short rtl8192_get_channel_map(struct net_device * dev)
 {
 	struct r8192_priv *priv = rtllib_priv(dev);
 	//acturally 8225 & 8256 rf chip only support B, G, 24N mode
@@ -1627,8 +1620,7 @@ short rtl8192_get_channel_map(struct net_device * dev)
 	return 0;
 }
 
-void check_rfctrl_gpio_timer(unsigned long data);
-short rtl8192_init(struct net_device *dev)
+static short rtl8192_init(struct net_device *dev)
 {
 	struct r8192_priv *priv = rtllib_priv(dev);
 
@@ -1751,7 +1743,7 @@ short rtl8192_is_tx_queue_empty(struct net_device *dev)
 	return 1;
 }
 
-bool HalTxCheckStuck819xPci(struct net_device *dev)
+static bool HalTxCheckStuck819xPci(struct net_device *dev)
 {
 	struct r8192_priv *priv = rtllib_priv(dev);
 	bool	bStuck = false;
@@ -1771,7 +1763,7 @@ bool HalTxCheckStuck819xPci(struct net_device *dev)
 //      <Assumption: RT_TX_SPINLOCK is acquired.>
 //      First added: 2006.11.19 by emily
 //
-RESET_TYPE
+static RESET_TYPE
 TxCheckStuck(struct net_device *dev)
 {
 	struct r8192_priv *priv = rtllib_priv(dev);
@@ -1836,7 +1828,7 @@ TxCheckStuck(struct net_device *dev)
 	return RESET_TYPE_NORESET;
 }
 
-bool HalRxCheckStuck8190Pci(struct net_device *dev)
+static bool HalRxCheckStuck8190Pci(struct net_device *dev)
 {
 	struct r8192_priv *priv = rtllib_priv(dev);
 	u16		  RegRxCounter = read_nic_word(dev, 0x130);
@@ -1891,7 +1883,7 @@ bool HalRxCheckStuck8190Pci(struct net_device *dev)
 	return bStuck;
 }
 
-RESET_TYPE RxCheckStuck(struct net_device *dev)
+static RESET_TYPE RxCheckStuck(struct net_device *dev)
 {
 	if (HalRxCheckStuck8190Pci(dev)) {
 		RT_TRACE(COMP_RESET, "RxStuck Condition\n");
@@ -1901,7 +1893,7 @@ RESET_TYPE RxCheckStuck(struct net_device *dev)
 	return RESET_TYPE_NORESET;
 }
 
-RESET_TYPE
+static RESET_TYPE
 rtl819x_ifcheck_resetornot(struct net_device *dev)
 {
 	struct r8192_priv *priv = rtllib_priv(dev);
@@ -1941,7 +1933,7 @@ rtl819x_ifcheck_resetornot(struct net_device *dev)
 // The method checking Tx/Rx stuck of this function is supported by FW,
 // which reports Tx and Rx counter to register 0x128 and 0x130.
 //
-void rtl819x_ifsilentreset(struct net_device *dev)
+static void rtl819x_ifsilentreset(struct net_device *dev)
 {
 	struct r8192_priv *priv = rtllib_priv(dev);
 	u8	reset_times = 0;
@@ -2070,7 +2062,7 @@ END:
 	}
 }
 
-void rtl819x_update_rxcounts(struct r8192_priv *priv,
+static void rtl819x_update_rxcounts(struct r8192_priv *priv,
 			     u32 *TotalRxBcnNum,
 			     u32 *TotalRxDataNum)
 {
@@ -2251,7 +2243,7 @@ void rtl8192_rx_enable(struct net_device *dev)
 //  HIGH_QUEUE     ===>                        7
 //  BEACON_QUEUE   ===>                        8
 //  */
-u32 TX_DESC_BASE[] = {BKQDA, BEQDA, VIQDA, VOQDA, HCCAQDA, CQDA, MQDA, HQDA, BQDA};
+static u32 TX_DESC_BASE[] = {BKQDA, BEQDA, VIQDA, VOQDA, HCCAQDA, CQDA, MQDA, HQDA, BQDA};
 
 void rtl8192_tx_enable(struct net_device *dev)
 {
@@ -2303,19 +2295,6 @@ static void rtl8192_free_tx_ring(struct net_device *dev, unsigned int prio)
     pci_free_consistent(priv->pdev, sizeof(*ring->desc)*ring->entries,
             ring->desc, ring->dma);
     ring->desc = NULL;
-}
-
-
-void rtl8192_beacon_disable(struct net_device *dev)
-{
-	struct r8192_priv *priv = (struct r8192_priv *)rtllib_priv(dev);
-	u32 reg;
-
-	reg = read_nic_dword(priv->rtllib->dev, INTA_MASK);
-
-	// disable Beacon realted interrupt signal */
-	reg &= ~(IMR_BcnInt | IMR_BcnInt | IMR_TBDOK | IMR_TBDER);
-	write_nic_dword(priv->rtllib->dev, INTA_MASK, reg);
 }
 
 void rtl8192_data_hard_stop(struct net_device *dev)
@@ -2414,7 +2393,7 @@ int rtl8192_hard_start_xmit(struct sk_buff *skb, struct net_device *dev)
 
 }
 
-void rtl8192_tx_isr(struct net_device *dev, int prio)
+static void rtl8192_tx_isr(struct net_device *dev, int prio)
 {
     struct r8192_priv *priv = (struct r8192_priv *)rtllib_priv(dev);
 
@@ -2599,7 +2578,7 @@ short rtl8192_tx(struct net_device *dev, struct sk_buff* skb)
     return 0;
 }
 
-short rtl8192_alloc_rx_desc_ring(struct net_device *dev)
+static short rtl8192_alloc_rx_desc_ring(struct net_device *dev)
 {
     struct r8192_priv *priv = rtllib_priv(dev);
     rx_desc *entry = NULL;
@@ -2759,7 +2738,7 @@ void UpdateRxPktTimeStamp8190 (struct net_device *dev, struct rtllib_rx_stats *s
 	}
 }
 
-long rtl819x_translate_todbm(u8 signal_strength_index	)// 0-100 index.
+static long rtl819x_translate_todbm(u8 signal_strength_index	)// 0-100 index.
 {
 	long	signal_power; // in dBm.
 
@@ -2780,7 +2759,7 @@ long rtl819x_translate_todbm(u8 signal_strength_index	)// 0-100 index.
 //		In normal operation, user only care about the information of the BSS
 //		and we shall invoke this function if the packet received is from the BSS.
 //
-void
+static void
 rtl819x_update_rxsignalstatistics8190pci(
 	struct r8192_priv * priv,
 	struct rtllib_rx_stats * pprevious_stats
@@ -2807,7 +2786,7 @@ rtl819x_update_rxsignalstatistics8190pci(
 	priv->stats.recv_signal_power = (priv->stats.recv_signal_power * 5 + pprevious_stats->RecvSignalPower + weighting) / 6;
 }
 
-void
+static void
 rtl8190_process_cck_rxpathsel(
 	struct r8192_priv * priv,
 	struct rtllib_rx_stats * pprevious_stats
@@ -3127,7 +3106,7 @@ rtl819x_evm_dbtopercentage(
 //	We want good-looking for signal strength/quality
 //	2007/7/19 01:09, by cosa.
 //
-long
+static long
 rtl819x_signal_scale_mapping(struct r8192_priv * priv,
 	long currsig
 	)
@@ -3428,7 +3407,7 @@ void rtl8192_query_rxphystatus(
 	}
 }	// QueryRxPhyStatus8190Pci */
 
-void
+static void
 rtl8192_record_rxdesc_forlateruse(
 	struct rtllib_rx_stats * psrc_stats,
 	struct rtllib_rx_stats * ptarget_stats
@@ -3591,7 +3570,7 @@ void UpdateReceivedRateHistogramStatistics8190(
 	priv->stats.received_rate_histogram[rcvType][rateIndex]++;
 }
 
-void rtl8192_rx(struct net_device *dev)
+static void rtl8192_rx(struct net_device *dev)
 {
 	struct r8192_priv *priv = (struct r8192_priv *)rtllib_priv(dev);
 	struct rtllib_hdr_1addr *rtllib_hdr = NULL;
@@ -3622,7 +3601,7 @@ void rtl8192_rx(struct net_device *dev)
 			struct sk_buff *new_skb = NULL;
 			if (!priv->ops->rx_query_status_descriptor(dev, &stats, pdesc, skb))
 				goto done;
-#if LINUX_VERSION_CODE > KERNEL_VERSION(2, 5, 0)
+#if LINUX_VERSION_CODE < KERNEL_VERSION(2, 5, 0)
 			pci_dma_sync_single_for_cpu(priv->pdev,
 						*((dma_addr_t *)skb->cb),
 						priv->rxbuffersize,
@@ -3690,7 +3669,7 @@ done:
 
 
 
-void rtl8192_tx_resume(struct net_device *dev)
+static void rtl8192_tx_resume(struct net_device *dev)
 {
 	struct r8192_priv *priv = (struct r8192_priv *)rtllib_priv(dev);
 	struct rtllib_device *ieee = priv->rtllib;
@@ -3851,7 +3830,7 @@ int _rtl8192_up(struct net_device *dev)
 }
 
 
-int rtl8192_open(struct net_device *dev)
+static int rtl8192_open(struct net_device *dev)
 {
 	struct r8192_priv *priv = rtllib_priv(dev);
 	int ret;
@@ -3874,7 +3853,7 @@ int rtl8192_up(struct net_device *dev)
 }
 
 
-int rtl8192_close(struct net_device *dev)
+static int rtl8192_close(struct net_device *dev)
 {
 	struct r8192_priv *priv = rtllib_priv(dev);
 	int ret;
@@ -4021,7 +4000,7 @@ static void r8192_set_multicast(struct net_device *dev)
 }
 #endif
 
-int r8192_set_mac_adr(struct net_device *dev, void *mac)
+static int r8192_set_mac_adr(struct net_device *dev, void *mac)
 {
 	struct r8192_priv *priv = rtllib_priv(dev);
 	struct sockaddr *addr = mac;
@@ -4040,9 +4019,8 @@ int r8192_set_mac_adr(struct net_device *dev, void *mac)
 	return 0;
 }
 
-
 /* based on ipw2200 driver */
-int rtl8192_ioctl(struct net_device *dev, struct ifreq *rq, int cmd)
+static int rtl8192_ioctl(struct net_device *dev, struct ifreq *rq, int cmd)
 {
 	struct r8192_priv *priv = (struct r8192_priv *)rtllib_priv(dev);
 	struct iwreq *wrq = (struct iwreq *)rq;
@@ -4357,7 +4335,7 @@ irqreturn_t rtl8192_interrupt(int irq, void *netdev)
 }
 
 //find vid of pci card from config space
-bool rtl8192_pci_findadapter(struct pci_dev *pdev, struct net_device *dev)
+static bool rtl8192_pci_findadapter(struct pci_dev *pdev, struct net_device *dev)
 {
 	//u32  size;
 	u16  DeviceID;
@@ -4595,20 +4573,11 @@ static int rtl8192_pci_probe(struct pci_dev *pdev,
 	return 0;
 
 fail1:
-#ifdef CONFIG_RTL8192_IO_MAP
-
-	if ( dev->base_addr != 0 ){
-
-		release_region(dev->base_addr,
-	       pci_resource_len(pdev, 0) );
-	}
-#else
-	if ( dev->mem_start != (unsigned long)NULL ){
+	if (dev->mem_start){
 		iounmap( (void *)dev->mem_start );
 		release_mem_region( pci_resource_start(pdev, 1),
 				    pci_resource_len(pdev, 1) );
 	}
-#endif //end #ifdef RTL_IO_MAP
 
 fail:
 	if (dev){
@@ -4700,16 +4669,13 @@ bool NicIFEnableNIC(struct net_device* dev)
 	struct r8192_priv* priv = rtllib_priv(dev);
 	PRT_POWER_SAVE_CONTROL pPSC = (PRT_POWER_SAVE_CONTROL)(&(priv->rtllib->PowerSaveControl));
 
-	// <1> Reset memory: descriptor, buffer,..
-	//NicIFResetMemory(Adapter);
-
 	// <2> Enable Adapter
 	printk("===========>%s()\n", __FUNCTION__);
 	priv->bfirst_init = true;
 	init_status = priv->ops->initialize_adapter(dev);
 	if (init_status != true) {
 		RT_TRACE(COMP_ERR,"ERR!!! %s(): initialization is failed!\n", __FUNCTION__);
-		return -1;
+		return false;
 	}
 	RT_TRACE(COMP_INIT, "start adapter finished\n");
 	RT_CLEAR_PS_LEVEL(pPSC, RT_RF_OFF_LEVL_HALT_NIC);
@@ -4720,6 +4686,7 @@ bool NicIFEnableNIC(struct net_device* dev)
 	priv->bdisable_nic = false;
 	return init_status;
 }
+
 bool NicIFDisableNIC(struct net_device* dev)
 {
 	bool	status = true;

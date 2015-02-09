@@ -21,13 +21,14 @@
 #include <linux/interrupt.h>
 #include "rtl_core.h"
 #include "dot11d.h"
+#include "rtl_wx.h"
 
 #ifdef CONFIG_MP
 #include "r8192S_mp.h"
 #endif
 
 #define RATE_COUNT 12
-u32 rtl8192_rates[] = {1000000, 2000000, 5500000, 11000000,
+static u32 rtl8192_rates[] = {1000000, 2000000, 5500000, 11000000,
 	6000000, 9000000, 12000000, 18000000, 24000000, 36000000, 48000000, 54000000};
 
 
@@ -201,7 +202,7 @@ typedef struct
 	adhoc_peer_entry_t Entry[MAX_ADHOC_PEER_NUM];
 	unsigned char num;
 } adhoc_peers_info_t, *p_adhoc_peers_info_t;
-int r8192_wx_get_adhoc_peers(struct net_device *dev,
+static int r8192_wx_get_adhoc_peers(struct net_device *dev,
 			       struct iw_request_info *info,
 			       union iwreq_data *wrqu, char *extra)
 {
@@ -1397,7 +1398,6 @@ static iw_handler r8192_private_handler[] = {
 #endif
 };
 
-//#if WIRELESS_EXT >= 17
 struct iw_statistics *r8192_get_wireless_stats(struct net_device *dev)
 {
        struct r8192_priv *priv = rtllib_priv(dev);
@@ -1434,7 +1434,6 @@ struct iw_statistics *r8192_get_wireless_stats(struct net_device *dev)
 #endif
 	return wstats;
 }
-//#endif
 
 struct iw_handler_def  r8192_wx_handlers_def ={
 	.standard = r8192_wx_handlers,

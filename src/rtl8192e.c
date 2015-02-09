@@ -31,8 +31,6 @@
 #include "rtl_dm.h"
 #include "rtl_wx.h"
 
-extern int WDCAPARA_ADD[];
-
 void
 rtl8192e_SetHwReg(struct net_device *dev, u8 variable, u8* val)
 {
@@ -955,7 +953,7 @@ end:
 
 }
 
-void rtl8192_net_update(struct net_device *dev)
+static void rtl8192_net_update(struct net_device *dev)
 {
 
 	struct r8192_priv *priv = rtllib_priv(dev);
@@ -1205,7 +1203,7 @@ void  rtl8192_tx_fill_cmd_desc(struct net_device* dev, tx_desc_cmd * entry,
     entry->OWN = 1;
 }
 
-u8 HwRateToMRate90(bool bIsHT, u8 rate)
+static u8 HwRateToMRate90(bool bIsHT, u8 rate)
 {
 	u8  ret_rate = 0x02;
 

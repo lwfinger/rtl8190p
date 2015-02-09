@@ -1073,6 +1073,9 @@ typedef struct r8192_priv {
 }r8192_priv;
 
 
+extern int WDCAPARA_ADD[];
+extern int hwwep;
+
 extern const struct ethtool_ops rtl819x_ethtool_ops;
 
 bool init_firmware(struct net_device *dev);
