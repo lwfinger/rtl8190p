@@ -46,6 +46,7 @@
 #include <asm/uaccess.h>
 #include <linux/pci.h>
 #include <linux/interrupt.h>
+#include <linux/vmalloc.h>
 #include "rtl_core.h"
 #include "r819xE_phy.h" //added by WB 4.30.2008
 #include "r819xE_phyreg.h"
