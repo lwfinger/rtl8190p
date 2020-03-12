@@ -773,8 +773,7 @@ int rtllib_wx_set_mlme(struct rtllib_device *ieee,
 	switch (mlme->cmd) {
 		case IW_MLME_DEAUTH:
 			deauth = true;
-			/* leave break out intentionly */
-
+			__attribute__((__fallthrough__));
 		case IW_MLME_DISASSOC:
 			if (deauth == true) {
 				printk("disauth packet !\n");

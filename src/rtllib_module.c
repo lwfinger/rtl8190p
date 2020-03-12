@@ -62,12 +62,14 @@ struct cfg80211_ops rtllib_config_ops = { };
 void *rtllib_wiphy_privid = &rtllib_wiphy_privid;
 #endif
 
+#if LINUX_VERSION_CODE < KERNEL_VERSION(4, 15, 0)
 void _setup_timer( struct timer_list* ptimer, void* fun, unsigned long data )
 {
    ptimer->function = fun;
    ptimer->data = data;
    init_timer( ptimer );
 }
+#endif
 
 static inline int rtllib_networks_allocate(struct rtllib_device *ieee)
 {
@@ -177,9 +179,13 @@ struct net_device *alloc_rtllib(int sizeof_priv)
 	ieee->ieee802_1x = 1; /* Default to supporting 802.1x */
 
 	INIT_LIST_HEAD(&ieee->crypt_deinit_list);
+#if LINUX_VERSION_CODE < KERNEL_VERSION(4, 15, 0)
 	_setup_timer(&ieee->crypt_deinit_timer,
 		    rtllib_crypt_deinit_handler,
 		    (unsigned long) ieee);
+#else
+	timer_setup(&ieee->crypt_deinit_timer, rtllib_crypt_deinit_handler, 0);
+#endif
 	ieee->rtllib_ap_sec_type = rtllib_ap_sec_type;
 
 	spin_lock_init(&ieee->lock);

@@ -79,7 +79,11 @@ int rtllib_register_crypto_ops(struct rtllib_crypto_ops *ops);
 int rtllib_unregister_crypto_ops(struct rtllib_crypto_ops *ops);
 struct rtllib_crypto_ops * rtllib_get_crypto_ops(const char *name);
 void rtllib_crypt_deinit_entries(struct rtllib_device *, int);
+#if LINUX_VERSION_CODE < KERNEL_VERSION(4, 15, 0)
 void rtllib_crypt_deinit_handler(unsigned long);
+#else
+void rtllib_crypt_deinit_handler(struct timer_list *t);
+#endif
 void rtllib_crypt_delayed_deinit(struct rtllib_device *ieee,
 				    struct rtllib_crypt_data **crypt);
 #if (LINUX_VERSION_CODE < KERNEL_VERSION(2,5,0))

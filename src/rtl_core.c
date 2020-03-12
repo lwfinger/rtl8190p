@@ -43,7 +43,7 @@
 #undef DEBUG_TX_DESC
 
 //#define CONFIG_RTL8192_IO_MAP
-#include <asm/uaccess.h>
+//#include <asm/uaccess.h>
 #include <linux/pci.h>
 #include <linux/interrupt.h>
 #include <linux/vmalloc.h>
@@ -52,7 +52,7 @@
 #include "r819xE_phyreg.h"
 #include "r8190_rtl8256.h" // RTL8225 Radio frontend */
 #include "r819xE_cmdpkt.h"
-
+#include "rtllib.h"
 #include "rtl_wx.h"
 #include "rtl_dm.h"
 
@@ -803,7 +803,11 @@ short check_nic_enough_desc(struct net_device *dev, int prio)
     }
 }
 
+#if (LINUX_VERSION_CODE < KERNEL_VERSION(5, 6, 0))
 void tx_timeout(struct net_device *dev)
+#else
+void tx_timeout(struct net_device *dev, unsigned int txqueue)
+#endif
 {
     struct r8192_priv *priv = rtllib_priv(dev);
 
@@ -1648,13 +1652,20 @@ static short rtl8192_init(struct net_device *dev)
 
 	init_hal_dm(dev);
 
-	setup_timer(&priv->watch_dog_timer,
+#if (LINUX_VERSION_CODE <  KERNEL_VERSION(4, 15, 0))
+ 	setup_timer(&priv->watch_dog_timer,
 		    watch_dog_timer_callback,
 		    (unsigned long) dev);
 
 	setup_timer(&priv->gpio_polling_timer,
 		    check_rfctrl_gpio_timer,
 		    (unsigned long)dev);
+#else
+	timer_setup(&priv->watch_dog_timer, watch_dog_timer_callback, 0);
+
+	timer_setup(&priv->gpio_polling_timer, check_rfctrl_gpio_timer,
+		    0);
+#endif
 
 	rtl8192_irq_disable(dev);
 #if defined(IRQF_SHARED)
@@ -2217,9 +2228,18 @@ void	rtl819x_watchdog_wqcallback(void *data)
 
 }
 
+#if (LINUX_VERSION_CODE <  KERNEL_VERSION(4, 15, 0))
 void watch_dog_timer_callback(unsigned long data)
+#else
+void watch_dog_timer_callback(struct timer_list *t)
+#endif
 {
+#if (LINUX_VERSION_CODE <  KERNEL_VERSION(4, 15, 0))
 	struct r8192_priv *priv = rtllib_priv((struct net_device *) data);
+#else
+	struct r8192_priv *priv = from_timer(priv, t, watch_dog_timer);
+#endif
+
 	queue_delayed_work_rsl(priv->priv_wq,&priv->watch_dog_wq, 0);
 	mod_timer(&priv->watch_dog_timer, jiffies + MSECS(RTLLIB_WATCH_DOG_TIME));
 }
@@ -2574,7 +2594,9 @@ short rtl8192_tx(struct net_device *dev, struct sk_buff* skb)
     __skb_queue_tail(&ring->queue, skb);
     pdesc->OWN = 1;
     spin_unlock_irqrestore(&priv->irq_th_lock, flags);
+#if (LINUX_VERSION_CODE <  KERNEL_VERSION(4, 7, 0))
     dev->trans_start = jiffies;
+#endif
     write_nic_word(dev, TPPoll, 0x01<<tcb_desc->queue_index);
     return 0;
 }
@@ -3815,7 +3837,11 @@ int _rtl8192_up(struct net_device *dev)
 #endif
 	rtllib_reset_queue(priv->rtllib);
 #ifndef CONFIG_MP
+#if (LINUX_VERSION_CODE <  KERNEL_VERSION(4, 15, 0))
 	watch_dog_timer_callback((unsigned long) dev);
+#else
+	watch_dog_timer_callback(&priv->watch_dog_timer);
+#endif
 #endif
 
 #ifdef CONFIG_CRDA
@@ -4403,7 +4429,9 @@ static const struct net_device_ops rtl8192_netdev_ops = {
 	.ndo_do_ioctl = rtl8192_ioctl,
 	.ndo_set_mac_address = r8192_set_mac_adr,
 	.ndo_validate_addr = eth_validate_addr,
+#if LINUX_VERSION_CODE < KERNEL_VERSION(5, 6, 0)
 	.ndo_change_mtu = eth_change_mtu,
+#endif
 	.ndo_start_xmit = rtllib_xmit,
 };
 #endif
@@ -4453,6 +4481,7 @@ static int rtl8192_pci_probe(struct pci_dev *pdev,
 	priv = rtllib_priv(dev);
 	priv->rtllib = (struct rtllib_device *)netdev_priv_rsl(dev);
 	priv->pdev = pdev;
+	priv->dev = dev;
 	priv->rtllib->pdev = pdev;
 #if LINUX_VERSION_CODE > KERNEL_VERSION(2, 5, 0)
 	if ((pdev->subsystem_vendor == PCI_VENDOR_ID_DLINK)&&(pdev->subsystem_device == 0x3304)){
@@ -4498,7 +4527,11 @@ static int rtl8192_pci_probe(struct pci_dev *pdev,
 	}
 
 
+#if (LINUX_VERSION_CODE < KERNEL_VERSION(5, 6, 0))
 	ioaddr = (unsigned long)ioremap_nocache( pmem_start, pmem_len);
+#else
+	ioaddr = (unsigned long)ioremap( pmem_start, pmem_len);
+#endif
 	if ( ioaddr == (unsigned long)NULL ){
 		RT_TRACE(COMP_ERR,"ioremap failed!");
 	       // release_mem_region( pmem_start, pmem_len );
@@ -4791,9 +4824,17 @@ u8 QueryIsShort(u8 TxHT, u8 TxRate, cb_desc *tcb_desc)
 	return tmp_Short;
 }
 
+#if (LINUX_VERSION_CODE <  KERNEL_VERSION(4, 15, 0))
 void check_rfctrl_gpio_timer(unsigned long data)
+#else
+void check_rfctrl_gpio_timer(struct timer_list *t)
+#endif
 {
+#if (LINUX_VERSION_CODE <  KERNEL_VERSION(4, 15, 0))
 	struct r8192_priv* priv = rtllib_priv((struct net_device *)data);
+#else
+	struct r8192_priv *priv = from_timer(priv, t, gpio_polling_timer);
+#endif
 
 	priv->polling_timer_on = 1;//add for S3/S4
 

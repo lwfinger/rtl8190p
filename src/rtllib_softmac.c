@@ -19,11 +19,13 @@
 #include <linux/delay.h>
 #include <linux/version.h>
 #include <linux/interrupt.h>
-#include <asm/uaccess.h>
+//#include <asm/uaccess.h>
 #include "rtllib.h"
 #include "dot11d.h"
 
+#if LINUX_VERSION_CODE < KERNEL_VERSION(4, 15, 0)
 extern void _setup_timer( struct timer_list*, void*, unsigned long );
+#endif
 
 short rtllib_is_54g(struct rtllib_network *net)
 {
@@ -420,10 +422,19 @@ static void rtllib_send_beacon(struct rtllib_device *ieee)
 }
 
 
+#if LINUX_VERSION_CODE < KERNEL_VERSION(4, 15, 0)
 static void rtllib_send_beacon_cb(unsigned long _ieee)
+#else
+static void rtllib_send_beacon_cb(struct timer_list *t)
+#endif
 {
+#if LINUX_VERSION_CODE < KERNEL_VERSION(4, 15, 0)
 	struct rtllib_device *ieee =
 		(struct rtllib_device *) _ieee;
+#else
+	struct rtllib_device *ieee =
+		from_timer(ieee, t, beacon_timer);
+#endif
 	unsigned long flags;
 
 	spin_lock_irqsave(&ieee->beacon_lock, flags);
@@ -547,11 +558,10 @@ static void rtllib_softmac_scan_wq(void *data)
 	do {
 		ieee->current_network.channel =
 			(ieee->current_network.channel + 1) % MAX_CHANNEL_NUMBER;
-		if (ieee->scan_watch_dog++ > MAX_CHANNEL_NUMBER)
-		{
-			if (!channel_map[ieee->current_network.channel]);
+		if (ieee->scan_watch_dog++ > MAX_CHANNEL_NUMBER) {
+			if (!channel_map[ieee->current_network.channel])
 				ieee->current_network.channel = 6;
-				goto out; /* no good chans */
+			goto out; /* no good chans */
 		}
 	}
 	while (!channel_map[ieee->current_network.channel]);
@@ -1470,9 +1480,19 @@ void rtllib_associate_abort(struct rtllib_device *ieee)
 	spin_unlock_irqrestore(&ieee->lock, flags);
 }
 
+#if LINUX_VERSION_CODE < KERNEL_VERSION(4, 15, 0)
 static void rtllib_associate_abort_cb(unsigned long dev)
+#else
+static void rtllib_associate_abort_cb(struct timer_list *t)
+#endif
 {
+#if LINUX_VERSION_CODE < KERNEL_VERSION(4, 15, 0)
 	rtllib_associate_abort((struct rtllib_device *) dev);
+#else
+	struct rtllib_device *dev = from_timer(dev, t, associate_timer);
+
+	rtllib_associate_abort(dev);
+#endif
 }
 
 
@@ -2037,9 +2057,11 @@ static short rtllib_sta_ps_sleep(struct rtllib_device *ieee, u32 *time_h, u32 *t
 	if (dtim & (RTLLIB_DTIM_UCAST & ieee->ps))
 		return 2;
 
+#if (LINUX_VERSION_CODE <  KERNEL_VERSION(4, 7, 0))
 	if (!time_after(jiffies, ieee->dev->trans_start + MSECS(timeout))){
 		return 0;
 	}
+#endif
 	if (!time_after(jiffies, ieee->last_rx_ps_time + MSECS(timeout))){
 		return 0;
 	}
@@ -3131,6 +3153,7 @@ void rtllib_softmac_init(struct rtllib_device *ieee)
 #endif
 	ieee->tx_pending.txb = NULL;
 
+#if LINUX_VERSION_CODE < KERNEL_VERSION(4, 15, 0)
 	_setup_timer(&ieee->associate_timer,
 		    rtllib_associate_abort_cb,
 		    (unsigned long) ieee);
@@ -3138,6 +3161,11 @@ void rtllib_softmac_init(struct rtllib_device *ieee)
 	_setup_timer(&ieee->beacon_timer,
 		    rtllib_send_beacon_cb,
 		    (unsigned long) ieee);
+#else
+	timer_setup(&ieee->associate_timer, rtllib_associate_abort_cb, 0);
+
+	timer_setup(&ieee->beacon_timer, rtllib_send_beacon_cb, 0);
+#endif
 
 #if LINUX_VERSION_CODE > KERNEL_VERSION(2, 5, 0)
 #ifdef PF_SYNCTHREAD

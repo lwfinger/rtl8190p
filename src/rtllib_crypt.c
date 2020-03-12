@@ -55,9 +55,17 @@ void rtllib_crypt_deinit_entries(struct rtllib_device *ieee,
 	}
 }
 
+#if LINUX_VERSION_CODE < KERNEL_VERSION(4, 15, 0)
 void rtllib_crypt_deinit_handler(unsigned long data)
+#else
+void rtllib_crypt_deinit_handler(struct timer_list *t)
+#endif
 {
+#if LINUX_VERSION_CODE < KERNEL_VERSION(4, 15, 0)
 	struct rtllib_device *ieee = (struct rtllib_device *)data;
+#else
+	struct rtllib_device *ieee = from_timer(ieee, t, crypt_deinit_timer);
+#endif
 	unsigned long flags;
 
 	spin_lock_irqsave(&ieee->lock, flags);

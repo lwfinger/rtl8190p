@@ -101,7 +101,11 @@ static	void	dm_pd_th(struct net_device *dev);
 static	void	dm_cs_ratio(struct net_device *dev);
 static	void	dm_ctrl_initgain_byrssi_highpwr(struct net_device *dev);
 static	void dm_rxpath_sel_byrssi(struct net_device *dev);
-static	void dm_fsync_timer_callback(unsigned long data);
+#if LINUX_VERSION_CODE < KERNEL_VERSION(4, 15, 0)
+static void dm_fsync_timer_callback(unsigned long data);
+#else
+static void dm_fsync_timer_callback(struct timer_list *t);
+#endif
 static	void	dm_ctrl_initgain_byrssi(struct net_device *dev);
 
 /*---------------------------Define function prototype------------------------*/
@@ -2809,7 +2813,11 @@ static void dm_init_fsync (struct net_device *dev)
 	priv->rtllib->fsync_state = Default_Fsync;
 
 	priv->framesyncMonitor = 1;	// current default 0xc38 monitor on
+#if LINUX_VERSION_CODE < KERNEL_VERSION(4, 15, 0)
 	setup_timer(&priv->fsync_timer, dm_fsync_timer_callback, (unsigned long) dev);
+#else
+	timer_setup(&priv->fsync_timer, dm_fsync_timer_callback, 0);
+#endif
 }
 
 static void dm_deInit_fsync(struct net_device *dev)
@@ -2818,10 +2826,19 @@ static void dm_deInit_fsync(struct net_device *dev)
 	del_timer_sync(&priv->fsync_timer);
 }
 
+#if LINUX_VERSION_CODE < KERNEL_VERSION(4, 15, 0)
 static void dm_fsync_timer_callback(unsigned long data)
+#else
+static void dm_fsync_timer_callback(struct timer_list *t)
+#endif
 {
+#if LINUX_VERSION_CODE < KERNEL_VERSION(4, 15, 0)
 	struct net_device *dev = (struct net_device *)data;
 	struct r8192_priv *priv = rtllib_priv((struct net_device *)data);
+#else
+	struct r8192_priv *priv = from_timer(priv, t, fsync_timer);
+	struct net_device *dev = priv->dev;
+#endif
 	u32 rate_index, rate_count = 0, rate_count_diff = 0;
 	bool		bSwitchFromCountDiff = false;
 	bool		bDoubleTimeInterval = false;

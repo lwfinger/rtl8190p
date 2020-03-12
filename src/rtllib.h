@@ -49,6 +49,7 @@
 
 #include <linux/netdevice.h>
 #include <linux/if_arp.h> /* ARPHRD_ETHER */
+#include <linux/workqueue.h>
 
 #ifndef WIRELESS_SPY
 #define WIRELESS_SPY
@@ -114,19 +115,29 @@ struct iw_spy_data{
 #else
 	#define EXPORT_SYMBOL_RSL(x) EXPORT_SYMBOL_NOVERS(x)
 #endif
-#if (LINUX_VERSION_CODE < KERNEL_VERSION(2, 5, 0))
+#if (LINUX_VERSION_CODE < KERNEL_VERSION(2, 5, 0)) || (LINUX_VERSION_CODE >= KERNEL_VERSION(4, 15, 0))
+#if (LINUX_VERSION_CODE >= KERNEL_VERSION(4, 15, 0))
+static inline void tq_init(struct work_struct * task, void(*func)(struct work_struct *), void *data)
+#else
 static inline void tq_init(struct tq_struct * task, void(*func)(void *), void *data)
+#endif
 {
+#if (LINUX_VERSION_CODE < KERNEL_VERSION(2, 6, 20))
 	task->routine = func;
 	task->data	= data;
 	INIT_LIST_HEAD(&task->list);
 	task->sync = 0;
+#else
+	INIT_WORK(task, func);
+#endif
 }
+#if LINUX_VERSION_CODE < KERNEL_VERSION(4, 15, 0)
 static inline void setup_timer(struct timer_list * timer, void(*function)(unsigned long), unsigned long data)
 {
 	timer->function = function;
 	timer->data	= data;
 }
+#endif
 #endif
 
 #if LINUX_VERSION_CODE >= KERNEL_VERSION(2, 6, 20)
@@ -3001,9 +3012,15 @@ int rtllib_rx_ADDBARsp( struct rtllib_device* ieee, struct sk_buff *skb);
 int rtllib_rx_DELBA(struct rtllib_device* ieee, struct sk_buff *skb);
 void TsInitAddBA( struct rtllib_device* ieee, PTX_TS_RECORD   pTS, u8 Policy, u8 bOverwritePending);
 void TsInitDelBA( struct rtllib_device* ieee, PTS_COMMON_INFO pTsCommonInfo, TR_SELECT TxRxSelect);
+#if LINUX_VERSION_CODE < KERNEL_VERSION(4, 15, 0)
 void BaSetupTimeOut(unsigned long data);
 void TxBaInactTimeout(unsigned long data);
 void RxBaInactTimeout(unsigned long data);
+#else
+void BaSetupTimeOut(struct timer_list *t);
+void TxBaInactTimeout(struct timer_list *t);
+void RxBaInactTimeout(struct timer_list *t);
+#endif
 void ResetBaEntry( PBA_RECORD pBA);
 bool GetTs(
         struct rtllib_device*        ieee,
@@ -3124,7 +3141,9 @@ static inline void dump_buf(u8 *buf, u32 len)
 	printk("\n");
 }
 
+#if LINUX_VERSION_CODE < KERNEL_VERSION(4, 15, 0)
 void _setup_timer(struct timer_list *, void *, unsigned long);
+#endif
 int rtllib_init(void);
 void rtllib_exit(void);
 int rtllib_crypto_init(void);

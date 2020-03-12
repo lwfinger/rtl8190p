@@ -586,18 +586,37 @@ TsInitDelBA( struct rtllib_device* ieee, PTS_COMMON_INFO pTsCommonInfo, TR_SELEC
 				DELBA_REASON_END_BA	);
 	}
 }
+
+#if LINUX_VERSION_CODE < KERNEL_VERSION(4, 15, 0)
 void BaSetupTimeOut(unsigned long data)
+#else
+void BaSetupTimeOut(struct timer_list *t)
+#endif
 {
+#if LINUX_VERSION_CODE < KERNEL_VERSION(4, 15, 0)
 	PTX_TS_RECORD	pTxTs = (PTX_TS_RECORD)data;
+#else
+	PTX_TS_RECORD   pTxTs = from_timer(pTxTs, t,
+					   TxPendingBARecord.Timer);
+#endif
 
 	pTxTs->bAddBaReqInProgress = false;
 	pTxTs->bAddBaReqDelayed = true;
 	pTxTs->TxPendingBARecord.bValid = false;
 }
 
+#if LINUX_VERSION_CODE < KERNEL_VERSION(4, 15, 0)
 void TxBaInactTimeout(unsigned long data)
+#else
+void TxBaInactTimeout(struct timer_list *t)
+#endif
 {
+#if LINUX_VERSION_CODE < KERNEL_VERSION(4, 15, 0)
 	PTX_TS_RECORD	pTxTs = (PTX_TS_RECORD)data;
+#else
+	PTX_TS_RECORD pTxTs = from_timer(pTxTs, t,
+					 TxAdmittedBARecord.Timer);
+#endif
 	struct rtllib_device *ieee = container_of(pTxTs, struct rtllib_device, TxTsRecord[pTxTs->num]);
 	TxTsDeleteBA(ieee, pTxTs);
 	rtllib_send_DELBA(
@@ -608,9 +627,18 @@ void TxBaInactTimeout(unsigned long data)
 		DELBA_REASON_TIMEOUT);
 }
 
+#if LINUX_VERSION_CODE < KERNEL_VERSION(4, 15, 0)
 void RxBaInactTimeout(unsigned long data)
+#else
+void RxBaInactTimeout(struct timer_list *t)
+#endif
 {
+#if LINUX_VERSION_CODE < KERNEL_VERSION(4, 15, 0)
 	PRX_TS_RECORD	pRxTs = (PRX_TS_RECORD)data;
+#else
+	PRX_TS_RECORD pRxTs = from_timer(pRxTs, t,
+					 RxAdmittedBARecord.Timer);
+#endif
 	struct rtllib_device *ieee = container_of(pRxTs, struct rtllib_device, RxTsRecord[pRxTs->num]);
 
 	RxTsDeleteBA(ieee, pRxTs);

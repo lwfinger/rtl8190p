@@ -1014,7 +1014,7 @@ int rtllib_rx(struct rtllib_device *ieee, struct sk_buff *skb,
 	}
 #endif
 
-	dev->last_rx = jiffies;
+//	dev->last_rx = jiffies;
 
 #ifdef NOT_YET
 	if ((ieee->iw_mode == IW_MODE_MASTER ||

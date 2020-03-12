@@ -51,6 +51,9 @@
 #if (LINUX_VERSION_CODE < KERNEL_VERSION(2,6,27))
 #include <asm/semaphore.h>
 #endif
+#if (LINUX_VERSION_CODE >= KERNEL_VERSION(4, 3, 0))
+#include <crypto/skcipher.h>
+#endif
 #include "rtllib.h"
 
 #include "dot11d.h"
@@ -576,6 +579,7 @@ struct rtl819x_ops{
 };
 
 typedef struct r8192_priv {
+	struct net_device *dev;
 	struct pci_dev *pdev;
 	//add for handles different nics' operations. WB
 	struct rtl819x_ops* ops;
@@ -1104,7 +1108,11 @@ void rtl8192_data_hard_resume(struct net_device *dev);
 void rtl8192_restart(void *data);
 void rtl819x_watchdog_wqcallback(void *data);
 void rtl8192_hw_sleep_wq (void *data);
+#if (LINUX_VERSION_CODE <  KERNEL_VERSION(4, 15, 0))
 void watch_dog_timer_callback(unsigned long data);
+#else
+void watch_dog_timer_callback(struct timer_list *t);
+#endif
 void rtl8192_irq_rx_tasklet(struct r8192_priv *priv);
 void rtl8192_irq_tx_tasklet(struct r8192_priv *priv);
 void rtl8192_update_msr(struct net_device *dev);
@@ -1137,7 +1145,11 @@ int _rtl8192_up(struct net_device *dev);
 
 short rtl8192_is_tx_queue_empty(struct net_device *dev);
 
+#if (LINUX_VERSION_CODE <  KERNEL_VERSION(4, 15, 0))
 void check_rfctrl_gpio_timer(unsigned long data);
+#else
+void check_rfctrl_gpio_timer(struct timer_list *t);
+#endif
 u8 HalSetSysClk8192SE(struct net_device *dev, u8 Data);
 void gen_RefreshLedState(struct net_device *dev);
 #define IS_HARDWARE_TYPE_819xP(_priv) ((((struct r8192_priv*)rtllib_priv(dev))->card_8192==NIC_8190P)||\
@@ -1149,7 +1161,11 @@ void gen_RefreshLedState(struct net_device *dev);
 #define IS_HARDWARE_TYPE_8192DU(_priv)	(((struct r8192_priv*)rtllib_priv(dev))->card_8192==NIC_8192DU)
 extern void dm_InitRateAdaptiveMask(struct net_device * dev);
 
+#if (LINUX_VERSION_CODE < KERNEL_VERSION(5, 6, 0))
 void tx_timeout(struct net_device *dev);
+#else
+void tx_timeout(struct net_device *dev, unsigned int txqueue);
+#endif
 void rtl8192_pci_resetdescring(struct net_device *dev);
 void rtl8192_SetWirelessMode(struct net_device* dev, u8 wireless_mode);
 void rtl8192_irq_enable(struct net_device *dev);

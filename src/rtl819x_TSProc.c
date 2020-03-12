@@ -27,6 +27,7 @@
 		&pos->member != (head); \
 		pos = n, n = list_entry(n->member.next, typeof(*n), member))
 #endif
+#if LINUX_VERSION_CODE < KERNEL_VERSION(4, 15, 0)
 static void TsSetupTimeOut(unsigned long data)
 {
 }
@@ -36,8 +37,24 @@ static void TsInactTimeout(unsigned long data)
 }
 
 static void RxPktPendingTimeout(unsigned long data)
+#else
+static void TsSetupTimeOut(struct timer_list *unused)
 {
+}
+
+static void TsInactTimeout(struct timer_list *unused)
+{
+}
+
+static void RxPktPendingTimeout(struct timer_list *t)
+#endif
+{
+#if LINUX_VERSION_CODE < KERNEL_VERSION(4, 15, 0)
 	PRX_TS_RECORD	pRxTs = (PRX_TS_RECORD)data;
+#else
+	PRX_TS_RECORD pRxTs = from_timer(pRxTs, t,
+						RxPktPendingTimer);
+#endif
 	struct rtllib_device *ieee = container_of(pRxTs, struct rtllib_device, RxTsRecord[pRxTs->num]);
 
 	PRX_REORDER_ENTRY	pReorderEntry = NULL;
@@ -103,9 +120,17 @@ static void RxPktPendingTimeout(unsigned long data)
 	spin_unlock_irqrestore(&(ieee->reorder_spinlock), flags);
 }
 
+#if LINUX_VERSION_CODE < KERNEL_VERSION(4, 15, 0)
 static void TsAddBaProcess(unsigned long data)
+#else
+static void TsAddBaProcess(struct timer_list *t)
+#endif
 {
+#if LINUX_VERSION_CODE < KERNEL_VERSION(4, 15, 0)
 	PTX_TS_RECORD	pTxTs = (PTX_TS_RECORD)data;
+#else
+	PTX_TS_RECORD pTxTs = from_timer(pTxTs, t, TsAddBaTimer);
+#endif
 	u8 num = pTxTs->num;
 	struct rtllib_device *ieee = container_of(pTxTs, struct rtllib_device, TxTsRecord[num]);
 
@@ -157,6 +182,7 @@ void TSInitialize(struct rtllib_device *ieee)
 	for (count = 0; count < TOTAL_TS_NUM; count++)
 	{
 		pTxTS->num = count;
+#if LINUX_VERSION_CODE < KERNEL_VERSION(4, 15, 0)
 		_setup_timer(&pTxTS->TsCommonInfo.SetupTimer,
 			    TsSetupTimeOut,
 			    (unsigned long) pTxTS);
@@ -175,6 +201,21 @@ void TSInitialize(struct rtllib_device *ieee)
 		_setup_timer(&pTxTS->TxAdmittedBARecord.Timer,
 			    TxBaInactTimeout,
 			    (unsigned long) pTxTS);
+#else
+		timer_setup(&pTxTS->TsCommonInfo.SetupTimer, TsSetupTimeOut,
+			    0);
+
+		timer_setup(&pTxTS->TsCommonInfo.InactTimer, TsInactTimeout,
+			    0);
+
+		timer_setup(&pTxTS->TsAddBaTimer, TsAddBaProcess, 0);
+
+		timer_setup(&pTxTS->TxPendingBARecord.Timer, BaSetupTimeOut,
+			    0);
+		timer_setup(&pTxTS->TxAdmittedBARecord.Timer,
+			    TxBaInactTimeout, 0);
+
+#endif
 
 		ResetTxTsEntry(pTxTS);
 		list_add_tail(&pTxTS->TsCommonInfo.List,
@@ -190,6 +231,7 @@ void TSInitialize(struct rtllib_device *ieee)
 		pRxTS->num = count;
 		INIT_LIST_HEAD(&pRxTS->RxPendingPktList);
 
+#if LINUX_VERSION_CODE < KERNEL_VERSION(4, 15, 0)
 		_setup_timer(&pRxTS->TsCommonInfo.SetupTimer,
 			    TsSetupTimeOut,
 			    (unsigned long) pRxTS);
@@ -205,6 +247,20 @@ void TSInitialize(struct rtllib_device *ieee)
 		_setup_timer(&pRxTS->RxPktPendingTimer,
 			    RxPktPendingTimeout,
 			    (unsigned long) pRxTS);
+#else
+		timer_setup(&pTxTS->TsCommonInfo.SetupTimer, TsSetupTimeOut,
+			    0);
+
+		timer_setup(&pTxTS->TsCommonInfo.InactTimer, TsInactTimeout,
+			    0);
+
+		timer_setup(&pRxTS->RxAdmittedBARecord.Timer,
+			    RxBaInactTimeout, 0);
+
+		timer_setup(&pRxTS->RxPktPendingTimer,
+			    RxPktPendingTimeout, 0);
+
+#endif
 
 		ResetRxTsEntry(pRxTS);
 		list_add_tail(&pRxTS->TsCommonInfo.List, &ieee->Rx_TS_Unused_List);
