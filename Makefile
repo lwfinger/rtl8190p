@@ -73,7 +73,7 @@ modules:
 	$(MAKE) ARCH=$(ARCH) CROSS_COMPILE=$(CROSS_COMPILE) -C $(KSRC) M=$(shell pwd)  modules
 
 install:
-	install -p -m 644 src/r8190_pci.ko $(MODDESTDIR)
+	install -p -m 644 8190p.ko $(MODDESTDIR)
 	depmod -a
 	cp -p firmware/*.img /lib/firmware/rtlwifi/.
 uninstall:
