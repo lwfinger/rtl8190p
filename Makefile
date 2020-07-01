@@ -77,7 +77,7 @@ install:
 	depmod -a
 	cp -p firmware/*.img /lib/firmware/rtlwifi/.
 uninstall:
-	$(shell [ -d $(MODDESTDIR) ] && rm -f $(MODDESTDIR)/r8190_pci.ko)
+	$(shell [ -d $(MODDESTDIR) ] && rm -f $(MODDESTDIR)/8190p.ko)
 	depmod -a
 clean:
 	@rm -f rc/.mod.c src/*.mod *.o src/.*.cmd src/*.ko *~
