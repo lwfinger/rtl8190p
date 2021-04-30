@@ -115,7 +115,7 @@ static void * rtllib_tkip_init(int key_idx)
 		goto fail;
 	}
 #else
-#if (LINUX_VERSION_CODE < KERNEL_VERSION(4, 3, 0))
+#if (LINUX_VERSION_CODE < KERNEL_VERSION(5, 5, 0))
 	priv->tx_tfm_arc4 = crypto_alloc_blkcipher("ecb(arc4)", 0,
 			CRYPTO_ALG_ASYNC);
 #else
@@ -129,7 +129,7 @@ static void * rtllib_tkip_init(int key_idx)
 		goto fail;
 	}
 
-#if (LINUX_VERSION_CODE < KERNEL_VERSION(4, 3, 0))
+#if (LINUX_VERSION_CODE < KERNEL_VERSION(4, 6, 0))
 	priv->tx_tfm_michael = crypto_alloc_hash("michael_mic", 0,
 			CRYPTO_ALG_ASYNC);
 #else
@@ -143,7 +143,7 @@ static void * rtllib_tkip_init(int key_idx)
 		goto fail;
 	}
 
-#if (LINUX_VERSION_CODE >= KERNEL_VERSION(4, 3, 0))
+#if (LINUX_VERSION_CODE >= KERNEL_VERSION(5, 5, 0))
 	priv->rx_tfm_arc4 = crypto_alloc_sync_skcipher("ecb(arc4)", 0,
 			CRYPTO_ALG_ASYNC);
 #else
@@ -157,7 +157,7 @@ static void * rtllib_tkip_init(int key_idx)
 		goto fail;
 	}
 
-#if (LINUX_VERSION_CODE >= KERNEL_VERSION(4, 3, 0))
+#if (LINUX_VERSION_CODE >= KERNEL_VERSION(4, 6, 0))
 	priv->rx_tfm_michael = crypto_alloc_shash("michael_mic", 0,
 			CRYPTO_ALG_ASYNC);
 #else
