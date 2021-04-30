@@ -966,7 +966,7 @@ static int rtllib_tkip_set_key(void *key, int len, u8 *seq, void *priv)
 	struct crypto_tfm *tfm2 = tkey->tx_tfm_arc4;
 	struct crypto_tfm *tfm3 = tkey->rx_tfm_michael;
 	struct crypto_tfm *tfm4 = tkey->rx_tfm_arc4;
-#elif (LINUX_VERSION_CODE >= KERNEL_VERSION(4, 3, 0))
+#elif (LINUX_VERSION_CODE >= KERNEL_VERSION(5, 5, 0))
 	struct crypto_shash *tfm = tkey->tx_tfm_michael;
 	struct crypto_sync_skcipher *tfm2 = tkey->tx_tfm_arc4;
 	struct crypto_shash *tfm3 = tkey->rx_tfm_michael;
