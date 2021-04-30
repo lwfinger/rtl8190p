@@ -24,9 +24,7 @@
 #include <crypto/skcipher.h>
 #endif
 #include "rtllib.h"
-#if (LINUX_VERSION_CODE >= KERNEL_VERSION(5, 12, 0))
 #include <crypto/hash.h>
-#endif
 
 #include <linux/crypto.h>
 #if LINUX_VERSION_CODE < KERNEL_VERSION(2, 6, 20)
@@ -60,7 +58,7 @@ struct rtllib_tkip_data {
 	u32 dot11RSNAStatsTKIPLocalMICFailures;
 
 	int key_idx;
-#if (LINUX_VERSION_CODE >= KERNEL_VERSION(4, 3, 0))
+#if (LINUX_VERSION_CODE >= KERNEL_VERSION(5, 5, 0))
 	struct crypto_sync_skcipher *rx_tfm_arc4;
 	struct crypto_shash *rx_tfm_michael;
 	struct crypto_sync_skcipher *tx_tfm_arc4;
@@ -188,7 +186,7 @@ fail:
 		if (priv->rx_tfm_arc4)
 			crypto_free_tfm(priv->rx_tfm_arc4);
 
-#elif (LINUX_VERSION_CODE >= KERNEL_VERSION(4, 3, 0))
+#elif (LINUX_VERSION_CODE >= KERNEL_VERSION(4, 20, 0))
 		if (priv->tx_tfm_michael)
 			crypto_free_shash(priv->tx_tfm_michael);
 		if (priv->tx_tfm_arc4)
@@ -467,7 +465,7 @@ static int rtllib_tkip_encrypt(struct sk_buff *skb, int hdr_len, void *priv)
 	*pos++ = (tkey->tx_iv32 >> 24) & 0xff;
 
 	if (!tcb_desc->bHwSec) {
-#if (LINUX_VERSION_CODE >= KERNEL_VERSION(4, 3, 0))
+#if (LINUX_VERSION_CODE >= KERNEL_VERSION(4, 20, 0))
 		SYNC_SKCIPHER_REQUEST_ON_STACK(req, tkey->tx_tfm_arc4);
 #endif
 		icv = skb_put(skb, 4);
@@ -493,7 +491,7 @@ static int rtllib_tkip_encrypt(struct sk_buff *skb, int hdr_len, void *priv)
 #if ((LINUX_VERSION_CODE < KERNEL_VERSION(2, 6, 21)) && (!OPENSUSE_SLED))
 		crypto_cipher_setkey(tkey->tx_tfm_arc4, rc4key, 16);
 		crypto_cipher_encrypt(tkey->tx_tfm_arc4, &sg, &sg, len + 4);
-#elif (LINUX_VERSION_CODE >= KERNEL_VERSION(4, 3, 0))
+#elif (LINUX_VERSION_CODE >= KERNEL_VERSION(4, 20, 0))
 		crypto_sync_skcipher_setkey(tkey->tx_tfm_arc4, rc4key, 16);
 		skcipher_request_set_sync_tfm(req, tkey->tx_tfm_arc4);
 		skcipher_request_set_callback(req, 0, NULL, NULL);
@@ -573,7 +571,7 @@ static int rtllib_tkip_decrypt(struct sk_buff *skb, int hdr_len, void *priv)
 	pos += 8;
 
 	if (!tcb_desc->bHwSec || (skb->cb[0] == 1)) {
-#if (LINUX_VERSION_CODE >= KERNEL_VERSION(4, 3, 0))
+#if (LINUX_VERSION_CODE >= KERNEL_VERSION(4, 20, 0))
 		SYNC_SKCIPHER_REQUEST_ON_STACK(req, tkey->rx_tfm_arc4);
 #endif
 		if ((iv32 < tkey->rx_iv32 ||
