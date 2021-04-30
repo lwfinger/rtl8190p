@@ -117,6 +117,9 @@ static struct pci_device_id rtl8192_pci_id_tbl[] = {
 	{}
 };
 MODULE_DEVICE_TABLE(pci, rtl8192_pci_id_tbl);
+#if (LINUX_VERSION_CODE >= KERNEL_VERSION(5, 12, 0))
+MODULE_IMPORT_NS(CRYPTO_INTERNAL);
+#endif
 
 static int rtl8192_pci_probe(struct pci_dev *pdev,
 			 const struct pci_device_id *id);

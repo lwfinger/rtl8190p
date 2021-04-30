@@ -22,6 +22,9 @@
 #include <linux/wireless.h>
 #include <linux/interrupt.h>
 #include "rtllib.h"
+#if (LINUX_VERSION_CODE >= KERNEL_VERSION(5, 12, 0))
+#include <crypto/internal/cipher.h>
+#endif
 
 #if (LINUX_VERSION_CODE < KERNEL_VERSION(2, 5, 0))
 #include "rtl_crypto.h"

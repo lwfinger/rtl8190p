@@ -24,6 +24,9 @@
 #include <crypto/skcipher.h>
 #endif
 #include "rtllib.h"
+#if (LINUX_VERSION_CODE >= KERNEL_VERSION(5, 12, 0))
+#include <crypto/hash.h>
+#endif
 
 #include <linux/crypto.h>
 #if LINUX_VERSION_CODE < KERNEL_VERSION(2, 6, 20)
