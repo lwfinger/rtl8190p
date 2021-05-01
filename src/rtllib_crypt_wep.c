@@ -39,7 +39,7 @@ struct prism2_wep_data {
 	u8 key_idx;
 	#if ((LINUX_VERSION_CODE < KERNEL_VERSION(2, 6, 21)) && (!OPENSUSE_SLED))
 	struct crypto_tfm *tfm;
-	#elif (LINUX_VERSION_CODE >= KERNEL_VERSION(4, 3, 0))
+	#elif (LINUX_VERSION_CODE >= KERNEL_VERSION(4, 20, 0))
 	struct crypto_sync_skcipher *tx_tfm;
 	struct crypto_sync_skcipher *rx_tfm;
 	#else
@@ -65,7 +65,7 @@ static void * prism2_wep_init(int keyidx)
 		       "crypto API arc4\n");
 		goto fail;
 	}
-	#elif (LINUX_VERSION_CODE >= KERNEL_VERSION(4, 3, 0))
+	#elif (LINUX_VERSION_CODE >= KERNEL_VERSION(4, 20, 0))
 	priv->tx_tfm = crypto_alloc_sync_skcipher("ecb(arc4)", 0, CRYPTO_ALG_ASYNC);
         if (IS_ERR(priv->tx_tfm)) {
                 printk(KERN_DEBUG "rtllib_crypt_wep: could not allocate "
@@ -109,7 +109,7 @@ fail:
 			crypto_free_tfm(priv->tfm);
 		kfree(priv);
 	}
-	#elif (LINUX_VERSION_CODE >= KERNEL_VERSION(4, 3, 0))
+	#elif (LINUX_VERSION_CODE >= KERNEL_VERSION(4, 20, 0))
 	if (priv) {
                 if (priv->tx_tfm)
                         crypto_free_sync_skcipher(priv->tx_tfm);
@@ -136,7 +136,7 @@ static void prism2_wep_deinit(void *priv)
 	#if ((LINUX_VERSION_CODE < KERNEL_VERSION(2, 6, 21)) && (!OPENSUSE_SLED))
 	if (_priv && _priv->tfm)
 		crypto_free_tfm(_priv->tfm);
-	#elif (LINUX_VERSION_CODE >= KERNEL_VERSION(4, 3, 0))
+	#elif (LINUX_VERSION_CODE >= KERNEL_VERSION(4, 20, 0))
 	if (_priv) {
                 if (_priv->tx_tfm)
                         crypto_free_sync_skcipher(_priv->tx_tfm);
@@ -168,7 +168,7 @@ static int prism2_wep_encrypt(struct sk_buff *skb, int hdr_len, void *priv)
 	u8 *pos;
 	cb_desc *tcb_desc = (cb_desc *)(skb->cb + MAX_DEV_ADDR_SIZE);
 	#if ((LINUX_VERSION_CODE >= KERNEL_VERSION(2, 6, 21)) && \
-	     (LINUX_VERSION_CODE < KERNEL_VERSION(4, 3, 0)))
+	     (LINUX_VERSION_CODE < KERNEL_VERSION(4, 20, 0)))
 	struct blkcipher_desc desc = {.tfm = wep->tx_tfm};
 	#endif
 #if (LINUX_VERSION_CODE >= KERNEL_VERSION(4, 3, 0))
@@ -210,7 +210,7 @@ static int prism2_wep_encrypt(struct sk_buff *skb, int hdr_len, void *priv)
 	memcpy(key + 3, wep->key, wep->key_len);
 
 	if (!tcb_desc->bHwSec) {
-#if (LINUX_VERSION_CODE >= KERNEL_VERSION(4, 3, 0))
+#if (LINUX_VERSION_CODE >= KERNEL_VERSION(4, 20, 0))
 		SYNC_SKCIPHER_REQUEST_ON_STACK(req, wep->tx_tfm);
 #endif
 		/* Append little-endian CRC32 and encrypt it to produce ICV */
@@ -236,7 +236,7 @@ static int prism2_wep_encrypt(struct sk_buff *skb, int hdr_len, void *priv)
 		crypto_cipher_setkey(wep->tfm, key, klen);
 		crypto_cipher_encrypt(wep->tfm, &sg, &sg, len + 4);
 		return 0;
-	#elif (LINUX_VERSION_CODE >= KERNEL_VERSION(4, 3, 0))
+	#elif (LINUX_VERSION_CODE >= KERNEL_VERSION(4, 20, 0))
 		crypto_sync_skcipher_setkey(wep->tx_tfm, key, klen);
 		skcipher_request_set_sync_tfm(req, wep->tx_tfm);
 		skcipher_request_set_callback(req, 0, NULL, NULL);
@@ -269,7 +269,7 @@ static int prism2_wep_decrypt(struct sk_buff *skb, int hdr_len, void *priv)
 	u8 keyidx, *pos;
 	cb_desc *tcb_desc = (cb_desc *)(skb->cb + MAX_DEV_ADDR_SIZE);
 	#if ((LINUX_VERSION_CODE >= KERNEL_VERSION(2, 6, 21)) && \
-	     (LINUX_VERSION_CODE < KERNEL_VERSION(4, 3, 0)))
+	     (LINUX_VERSION_CODE < KERNEL_VERSION(4, 20, 0)))
 	struct blkcipher_desc desc = {.tfm = wep->rx_tfm};
 	#endif
 	u32 crc;
@@ -295,7 +295,7 @@ static int prism2_wep_decrypt(struct sk_buff *skb, int hdr_len, void *priv)
 	plen = skb->len - hdr_len - 8;
 
 	if (!tcb_desc->bHwSec) {
-	#if (LINUX_VERSION_CODE >= KERNEL_VERSION(4, 3, 0))
+	#if (LINUX_VERSION_CODE >= KERNEL_VERSION(4, 20, 0))
 		int err;
 		SYNC_SKCIPHER_REQUEST_ON_STACK(req, wep->rx_tfm);
 	#endif
@@ -309,7 +309,7 @@ static int prism2_wep_decrypt(struct sk_buff *skb, int hdr_len, void *priv)
 	#if ((LINUX_VERSION_CODE < KERNEL_VERSION(2, 6, 21)) && (!OPENSUSE_SLED))
 		crypto_cipher_setkey(wep->tfm, key, klen);
 		crypto_cipher_decrypt(wep->tfm, &sg, &sg, plen + 4);
-	#elif (LINUX_VERSION_CODE >= KERNEL_VERSION(4, 3, 0))
+	#elif (LINUX_VERSION_CODE >= KERNEL_VERSION(4, 20, 0))
 		crypto_sync_skcipher_setkey(wep->rx_tfm, key, klen);
 		skcipher_request_set_sync_tfm(req, wep->rx_tfm);
 		skcipher_request_set_callback(req, 0, NULL, NULL);
