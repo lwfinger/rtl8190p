@@ -73,7 +73,7 @@
 #define DRV_AUTHOR  "<wlanfae@realtek.com>"
 #define DRV_VERSION "V 1.1"
 
-#define DRV_NAME "rtl819xP"
+#define DRV_NAME "rtl8190P"
 
 #if (LINUX_VERSION_CODE > KERNEL_VERSION(2,5,0))
 #define RTL_PCI_DEVICE(vend, dev, cfg) \
