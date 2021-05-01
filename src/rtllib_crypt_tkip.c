@@ -196,7 +196,7 @@ fail:
 			crypto_free_shash(priv->tx_tfm_michael);
 		if (priv->rx_tfm_michael)
 			crypto_free_shash(priv->rx_tfm_michael);
-#if LINUX_VERSION_CODE == KERNEL_VERSION(4, 19, 0)
+#if LINUX_VERSION_CODE < KERNEL_VERSION(4, 20, 0)
 		if (priv->tx_tfm_arc4)
 			crypto_free_blkcipher(priv->tx_tfm_arc4);
 		if (priv->rx_tfm_arc4)
