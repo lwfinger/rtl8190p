@@ -174,10 +174,15 @@ void TSInitialize(struct rtllib_device *ieee)
 	PRX_TS_RECORD		pRxTS  = ieee->RxTsRecord;
 	PRX_REORDER_ENTRY	pRxReorderEntry = ieee->RxReorderEntry;
 	u8				count = 0;
+
 	RTLLIB_DEBUG(RTLLIB_DL_TS, "==========>%s()\n", __FUNCTION__);
 	INIT_LIST_HEAD(&ieee->Tx_TS_Admit_List);
 	INIT_LIST_HEAD(&ieee->Tx_TS_Pending_List);
 	INIT_LIST_HEAD(&ieee->Tx_TS_Unused_List);
+        INIT_LIST_HEAD(&ieee->Rx_TS_Admit_List);
+        INIT_LIST_HEAD(&ieee->Rx_TS_Pending_List);
+        INIT_LIST_HEAD(&ieee->Rx_TS_Unused_List);
+        INIT_LIST_HEAD(&ieee->RxReorder_Unused_List);
 
 	for (count = 0; count < TOTAL_TS_NUM; count++)
 	{
@@ -218,14 +223,13 @@ void TSInitialize(struct rtllib_device *ieee)
 #endif
 
 		ResetTxTsEntry(pTxTS);
+		INIT_LIST_HEAD(&pTxTS->TsCommonInfo.List);
 		list_add_tail(&pTxTS->TsCommonInfo.List,
 				&ieee->Tx_TS_Unused_List);
 		pTxTS++;
 	}
+	pr_info("******** Finished Loop1\n");
 
-	INIT_LIST_HEAD(&ieee->Rx_TS_Admit_List);
-	INIT_LIST_HEAD(&ieee->Rx_TS_Pending_List);
-	INIT_LIST_HEAD(&ieee->Rx_TS_Unused_List);
 	for (count = 0; count < TOTAL_TS_NUM; count++)
 	{
 		pRxTS->num = count;
@@ -263,10 +267,11 @@ void TSInitialize(struct rtllib_device *ieee)
 #endif
 
 		ResetRxTsEntry(pRxTS);
+		INIT_LIST_HEAD(&pRxTS->TsCommonInfo.List);
 		list_add_tail(&pRxTS->TsCommonInfo.List, &ieee->Rx_TS_Unused_List);
 		pRxTS++;
 	}
-	INIT_LIST_HEAD(&ieee->RxReorder_Unused_List);
+	pr_info("******** Finished Loop2\n");
 	for (count = 0; count < REORDER_ENTRY_NUM; count++)
 	{
 		list_add_tail( &pRxReorderEntry->List,&ieee->RxReorder_Unused_List);
