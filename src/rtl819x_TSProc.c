@@ -224,8 +224,14 @@ void TSInitialize(struct rtllib_device *ieee)
 
 		ResetTxTsEntry(pTxTS);
 		INIT_LIST_HEAD(&pTxTS->TsCommonInfo.List);
+		pr_info("@pTxTS->TsCommonInfo.List.next %p, @pTxTS->TsCommonInfo.List.prev.next %p\n", &pTxTS->TsCommonInfo.List.next, &pTxTS->TsCommonInfo.List.prev->next);
+		pr_info("&ieee->Tx_TS_Unused_List.next %p, &ieee->Tx_TS_Unused_List.prev->next %p\n",
+			&ieee->Tx_TS_Unused_List.next, &ieee->Tx_TS_Unused_List.prev->next);
+		list_add_tail(&pRxTS->TsCommonInfo.List, &ieee->Rx_TS_Unused_List);
+		pr_info("****** Back from list_add_tail\n");
 		list_add_tail(&pTxTS->TsCommonInfo.List,
 				&ieee->Tx_TS_Unused_List);
+		pr_info("****** Back from list_add_tail\n");
 		pTxTS++;
 	}
 	pr_info("******** Finished Loop1\n");
@@ -268,7 +274,10 @@ void TSInitialize(struct rtllib_device *ieee)
 
 		ResetRxTsEntry(pRxTS);
 		INIT_LIST_HEAD(&pRxTS->TsCommonInfo.List);
+		pr_info("@pRxTS->TsCommonInfo.List.next %p, @pRxTS->TsCommonInfo.List.prev.next %p\n", &pRxTS->TsCommonInfo.List.next, &pRxTS->TsCommonInfo.List.prev->next);
+		pr_info("&ieee->RxReorder_Unused_List.next %p, &ieee->RxReorder_Unused_List.prev->next %p\n", &ieee->RxReorder_Unused_List.next, &ieee->RxReorder_Unused_List.prev->next);
 		list_add_tail(&pRxTS->TsCommonInfo.List, &ieee->Rx_TS_Unused_List);
+		pr_info("****** Back from list_add_tail\n");
 		pRxTS++;
 	}
 	pr_info("******** Finished Loop2\n");
